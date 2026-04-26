@@ -146,9 +146,9 @@ exports.getProductById = async (req, res) => {
       include: [
         { model: ProductImage, as: 'images' },
         { model: Category },
-        { 
-          model: Review, 
-          include: [{ model: User, attributes: ['name'] }] 
+        {
+          model: Review,
+          include: [{ model: User, attributes: ['name'] }]
         }
       ]
     });
@@ -170,8 +170,47 @@ exports.getStats = async (req, res) => {
     res.json({
       products: productCount || 0,
       brands: brandCount || 0,
-      customers: (userCount || 0) + 30000 
+      customers: (userCount || 0) + 30000
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { name, price, originalPrice, description, CategoryId, brand, style } = req.body;
+    const product = await Product.findByPk(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    await product.update({
+      name,
+      price,
+      originalPrice,
+      description,
+      CategoryId,
+      brand,
+      style
+    });
+
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    await product.destroy();
+    res.json({ message: 'Product deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -44,7 +44,29 @@ export default function SellerDashboard() {
     }
   };
 
-  if (loading) return <div>Loading Dashboard...</div>;
+  const deleteProduct = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok) {
+        setProducts(products.filter(p => p.id !== id));
+      } else {
+        alert('Failed to delete product');
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
+  if (loading) return <div className="loading">Loading Dashboard...</div>;
 
   return (
     <>
@@ -110,7 +132,10 @@ export default function SellerDashboard() {
                         <td>₹{product.price}</td>
                         <td><span className="status-badge">Active</span></td>
                         <td>
-                          <Link href={`/seller/edit-product/${product.id}`} style={{color: '#000', fontWeight: '600'}}>Edit</Link>
+                          <div className="action-btns">
+                            <Link href={`/seller/edit-product/${product.id}`} className="edit-link">Edit</Link>
+                            <button onClick={() => deleteProduct(product.id)} className="delete-btn">Delete</button>
+                          </div>
                         </td>
                       </tr>
                     ))
