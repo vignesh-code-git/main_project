@@ -1,0 +1,5 @@
+name,price,originalPrice,rating,description,isNewArrival,isTopSelling,CategoryId,brand,style,imageUrl
+Graphic T-shirt,2499,2999,4.5,Premium cotton graphic t-shirt,true,false,1,ZARA,Casual,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab
+Formal Shirt,3499,3999,4.8,Classic white formal shirt,false,true,2,PRADA,Formal,https://images.unsplash.com/photo-1598033129183-c4f50c717658
+Gym Hoodie,2999,,4.2,Heavyweight gym hoodie,true,false,4,Calvin Klein,Gym,https://images.unsplash.com/photo-1556821840-3a63f95609a7
+Party Dress,5499,6499,5.0,Elegant evening party dress,false,true,3,GUCCI,Party,https://images.unsplash.com/photo-1566174053879-31528523f8ae

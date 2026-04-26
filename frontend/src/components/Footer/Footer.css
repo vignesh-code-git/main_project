@@ -1,0 +1,153 @@
+.footer {
+  background-color: var(--secondary-gray);
+  padding-top: 100px;
+  position: relative;
+}
+
+.newsletter-section {
+  position: absolute;
+  top: -90px;
+  left: 0;
+  width: 100%;
+}
+
+.newsletter-container {
+  background: var(--primary-black);
+  padding: 36px 64px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.newsletter-container h2 {
+  color: white;
+  text-align: left;
+  margin: 0;
+  max-width: 550px;
+  font-size: 40px;
+}
+
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 350px;
+}
+
+.input-group {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+}
+
+.subscribe-btn {
+  background: white;
+  color: black;
+  padding: 12px;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: opacity 0.2s;
+}
+
+.subscribe-btn:hover {
+  opacity: 0.9;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  padding: 60px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  gap: 50px;
+}
+
+.footer-brand {
+  flex: 1;
+  max-width: 250px;
+}
+
+.footer-logo {
+  font-size: 34px;
+  margin-bottom: 25px;
+}
+
+.footer-brand p {
+  margin-bottom: 35px;
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+  font-size: 24px;
+}
+
+.footer-links {
+  flex: 3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.link-group h3 {
+  letter-spacing: 3px;
+  margin-bottom: 25px;
+}
+
+.link-group ul {
+  list-style: none;
+}
+
+.link-group li {
+  color: var(--text-gray);
+  margin-bottom: 18px;
+  cursor: pointer;
+}
+
+.link-group li:hover {
+  color: var(--primary-black);
+}
+
+.footer-bottom {
+  padding: 25px 0 80px;
+}
+
+.bottom-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payment-methods {
+  font-size: 32px;
+}
+
+@media (max-width: 992px) {
+  .newsletter-container {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px;
+  }
+  .newsletter-container h2 {
+    text-align: center;
+    font-size: 32px;
+  }
+  .footer-content {
+    flex-direction: column;
+  }
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+}

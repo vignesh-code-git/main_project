@@ -1,0 +1,73 @@
+.brand-banner {
+  background: var(--primary-black);
+  padding: 44px 0;
+}
+
+.brand-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.brand-name {
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Mimicking specific/* VERSACE Style - Thin, Wide Serif */
+.brand-versace {
+  font-family: 'Cinzel', serif;
+  font-weight: 400;
+  letter-spacing: 4px;
+  font-size: 50px;
+}
+
+/* ZARA Style - Extreme Overlap */
+.brand-zara {
+  font-family: 'Bodoni Moda', serif;
+  font-weight: 900;
+  letter-spacing: -14px;
+  font-size: 50px;
+  transform: scaleX(0.75) scaleY(1.1);
+  display: inline-block;
+}
+
+/* GUCCI Style - Classic Serif */
+.brand-gucci {
+  font-family: 'Bodoni Moda', serif;
+  font-weight: 600;
+  letter-spacing: 6px;
+  font-size: 50px;
+}
+
+/* PRADA Style - Strong Block Serif */
+.brand-prada {
+  font-family: 'Bodoni Moda', serif;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 50px;
+}
+
+/* Calvin Klein Style - Ultra-Thin Sans */
+.brand-ck {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  letter-spacing: 2px;
+  font-size: 50px;
+  text-transform: none;
+}
+
+@media (max-width: 992px) {
+  .brand-container {
+    justify-content: center;
+    gap: 40px;
+  }
+
+  .brand-name {
+    font-size: 24px;
+  }
+}

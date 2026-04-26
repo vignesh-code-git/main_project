@@ -1,0 +1,139 @@
+.product-info-detail {
+  flex: 1;
+}
+
+.product-title {
+  font-size: 40px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.product-info-detail .product-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.rating-text {
+  color: var(--text-gray);
+}
+
+.product-info-detail .product-price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.current-price {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.original-price {
+  font-size: 32px;
+  color: rgba(0,0,0,0.3);
+  text-decoration: line-through;
+}
+
+.discount-tag {
+  background: rgba(255, 51, 51, 0.1);
+  color: var(--accent-red);
+  padding: 6px 14px;
+  border-radius: 62px;
+  font-weight: 500;
+}
+
+.product-description {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 24px;
+}
+
+.selection-group {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding-bottom: 24px;
+}
+
+.selection-group h4 {
+  color: var(--text-gray);
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+
+.color-swatches {
+  display: flex;
+  gap: 16px;
+}
+
+.color-swatch {
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.color-swatch.active {
+  box-shadow: 0 0 0 1px white, 0 0 0 2px var(--primary-black);
+}
+
+.size-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.size-btn {
+  padding: 12px 24px;
+  border-radius: 62px;
+  background: var(--secondary-gray);
+  color: var(--text-gray);
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.size-btn.active {
+  background: var(--primary-black);
+  color: white;
+}
+
+.actions-group {
+  display: flex;
+  gap: 20px;
+}
+
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  background: var(--secondary-gray);
+  padding: 12px 20px;
+  border-radius: 62px;
+  gap: 20px;
+  width: fit-content;
+}
+
+.quantity-selector button {
+  background: transparent;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.add-to-cart-btn {
+  flex: 1;
+  background: var(--primary-black);
+  color: white;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: opacity 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  opacity: 0.9;
+}

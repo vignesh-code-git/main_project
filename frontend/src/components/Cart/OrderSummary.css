@@ -1,0 +1,97 @@
+.order-summary {
+  width: 505px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.order-summary h3 {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.summary-row span {
+  color: var(--text-gray);
+}
+
+.summary-row .value {
+  color: var(--primary-black);
+  font-weight: 700;
+}
+
+.summary-row.discount .value {
+  color: #FF3333;
+}
+
+.summary-divider {
+  height: 1px;
+  background: rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.summary-row.total {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.summary-row.total span {
+  color: var(--primary-black);
+}
+
+.promo-code {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.promo-input {
+  flex: 1;
+  background: var(--secondary-gray);
+  padding: 12px 16px;
+  border-radius: 62px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.promo-input input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.apply-btn {
+  background: var(--primary-black);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 62px;
+  font-weight: 500;
+}
+
+.checkout-btn {
+  width: 100%;
+  background: var(--primary-black);
+  color: white;
+  padding: 20px;
+  border-radius: 62px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .order-summary {
+    width: 100%;
+  }
+}

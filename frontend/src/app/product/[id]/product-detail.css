@@ -1,0 +1,11 @@
+.product-detail-main {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 1024px) {
+  .product-detail-main {
+    flex-direction: column;
+  }
+}

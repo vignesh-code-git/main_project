@@ -1,0 +1,190 @@
+.hero {
+  background-color: #F2F0F1;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.hero-container {
+  display: flex;
+  min-height: calc(100vh - 160px);
+  position: relative;
+  z-index: 10;
+}
+
+.hero-content {
+  width: 50%;
+  padding: 58px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-content h1 {
+  font-size: 74px;
+  line-height: 0.95;
+  font-weight: 900;
+  margin-bottom: 32px;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: -3.5px;
+}
+
+.hero-content p {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.shop-now-btn {
+  background: #000;
+  color: #fff;
+  padding: 16px 64px;
+  border-radius: 62px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  cursor: pointer;
+  border: none;
+  width: fit-content;
+  transition: opacity 0.2s;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-item h2 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #000;
+}
+
+.stat-item p {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 74px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* 100% Precision Image Positioning - FINAL */
+.hero-image-wrapper {
+  position: absolute;
+  bottom: 0;
+  right: 2%;
+  width: auto;
+  height: 100%;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-main-img {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+  display: block;
+}
+
+/* Stars */
+.star {
+  position: absolute;
+  color: #000;
+  z-index: 15;
+}
+
+.star-large {
+  font-size: 120px;
+  /* Increased for more impact */
+  top: 10%;
+  right: 5%;
+}
+
+.star-small {
+  font-size: 64px;
+  /* Increased size */
+  top: 45%;
+  /* Moved up */
+  left: 52%;
+}
+
+/* All Devices - Responsiveness */
+@media (max-width: 992px) {
+  .hero-container {
+    flex-direction: column;
+    min-height: auto;
+    padding-top: 40px;
+  }
+
+  .hero-content {
+    width: 100%;
+    padding: 0 20px 40px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-content h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .hero-content p {
+    margin: 0 auto 30px;
+  }
+
+  .shop-now-btn {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .hero-stats {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .hero-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 450px;
+    margin-top: 20px;
+  }
+
+  .hero-main-img {
+    object-position: bottom center;
+  }
+
+  .star-large {
+    font-size: 60px;
+    right: 5%;
+  }
+
+  .star-small {
+    font-size: 40px;
+    left: 5%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .stat-item:last-child {
+    grid-column: span 2;
+  }
+}

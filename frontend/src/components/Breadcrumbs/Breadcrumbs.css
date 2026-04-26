@@ -1,0 +1,17 @@
+.breadcrumbs {
+  padding: 24px 0;
+  font-size: 16px;
+  color: var(--text-gray);
+}
+
+.breadcrumbs a {
+  transition: color 0.2s;
+}
+
+.breadcrumbs a:hover {
+  color: var(--primary-black);
+}
+
+.separator {
+  margin: 0 10px;
+}
