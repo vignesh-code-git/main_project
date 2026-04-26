@@ -3,12 +3,14 @@ import { useRouter } from 'next/navigation';
 import { clearCart } from '@/lib/redux/slices/cartSlice';
 import { Tag, ArrowRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import RazorpayDemo from '../Payment/RazorpayDemo';
 import './OrderSummary.css';
 
 export default function OrderSummary() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showRazorpay, setShowRazorpay] = useState(false);
 
   const totalAmount = useSelector((state) => state.cart.totalAmount);
   const cartItems = useSelector((state) => state.cart.items);
@@ -20,7 +22,7 @@ export default function OrderSummary() {
   const deliveryFee = totalAmount > 0 ? 15 : 0;
   const grandTotal = totalAmount - discountAmount + deliveryFee;
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!isAuthenticated) {
       alert('Please log in to proceed with checkout.');
       router.push('/auth/login');
@@ -28,13 +30,17 @@ export default function OrderSummary() {
     }
 
     if (cartItems.length === 0) return;
+    setShowRazorpay(true);
+  };
 
+  const handlePaymentSuccess = async () => {
+    setShowRazorpay(false);
     setLoading(true);
     try {
       const orderData = {
         userId: user.id,
         totalAmount: Math.round(grandTotal),
-        shippingAddress: '123 High Street, Downtown, Mumbai', // Placeholder or prompt
+        shippingAddress: '123 High Street, Downtown, Mumbai',
         zipcode: '400001',
         items: cartItems.map(item => ({
           id: item.id,
@@ -53,10 +59,9 @@ export default function OrderSummary() {
 
       if (res.ok) {
         dispatch(clearCart());
-        alert('Order placed successfully!');
         router.push('/profile');
       } else {
-        throw new Error('Failed to place order');
+        throw new Error('Failed to save order after payment');
       }
     } catch (err) {
       alert(err.message);
@@ -108,6 +113,14 @@ export default function OrderSummary() {
       >
         {loading ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : <>Go to Checkout <ArrowRight size={20} /></>}
       </button>
+
+      {showRazorpay && (
+        <RazorpayDemo 
+          amount={Math.round(grandTotal) * 100} 
+          onSuccess={handlePaymentSuccess}
+          onCancel={() => setShowRazorpay(false)}
+        />
+      )}
     </div>
   );
 }

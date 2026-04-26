@@ -9,6 +9,7 @@ const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const path = require('path');
 
@@ -35,6 +36,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 
 // Test DB Connection
