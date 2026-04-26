@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [allOrders, setAllOrders] = useState([]);
   const [toast, setToast] = useState({ show: false, message: '' });
   const router = useRouter();
 
@@ -32,22 +33,25 @@ export default function AdminDashboard() {
       try {
         const headers = { 'Authorization': `Bearer ${token}` };
 
-        const [usersRes, sellersRes, settingsRes, productsRes] = await Promise.all([
+        const [usersRes, sellersRes, settingsRes, productsRes, ordersRes] = await Promise.all([
           fetch('http://localhost:5000/api/admin/users', { headers }),
           fetch('http://localhost:5000/api/admin/sellers', { headers }),
           fetch('http://localhost:5000/api/admin/settings'),
-          fetch('http://localhost:5000/api/products')
+          fetch('http://localhost:5000/api/products'),
+          fetch('http://localhost:5000/api/orders', { headers })
         ]);
-
+ 
         const usersData = await usersRes.json();
         const sellersData = await sellersRes.json();
         const settingsData = await settingsRes.json();
         const productsData = await productsRes.json();
-
+        const ordersData = await ordersRes.json();
+ 
         setUsers(Array.isArray(usersData) ? usersData : []);
         setSellers(Array.isArray(sellersData) ? sellersData : []);
         setSettings(Array.isArray(settingsData) ? settingsData : []);
         setProducts(Array.isArray(productsData) ? productsData : (productsData.products || []));
+        setAllOrders(Array.isArray(ordersData) ? ordersData : []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -114,6 +118,27 @@ export default function AdminDashboard() {
   const getSettingValue = (key) => {
     const setting = settings.find(s => s.key === key);
     return setting ? `http://localhost:5000${setting.value}` : null;
+  };
+
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (res.ok) {
+        setAllOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        showToast(`ORDER #${orderId.split('-')[0]} UPDATED TO ${newStatus.toUpperCase()}`);
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+    }
   };
 
   if (!admin || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
@@ -192,14 +217,55 @@ export default function AdminDashboard() {
         {activeTab === 'orders' && (
           <div className="view-container-stylish">
             <header className="admin-page-header">
-              <h1>ORDER LOGS</h1>
-              <p>Review and process all platform sales.</p>
+              <h1>ORDER MANAGEMENT</h1>
+              <p>Process and track all platform transactions.</p>
             </header>
             <div className="admin-card-stylish">
-              <h2>Recent Orders</h2>
-              <p style={{ padding: '40px', textAlign: 'center', color: 'var(--admin-text-muted)', fontSize: '18px', fontWeight: '600' }}>
-                No active orders recorded at this time.
-              </p>
+              <h2>Master Order List</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Current Status</th>
+                    <th>Update Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allOrders.map(order => (
+                    <tr key={order.id}>
+                      <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
+                      <td>{order.User?.name}</td>
+                      <td>{order.OrderItems?.length} items</td>
+                      <td>₹{order.totalAmount}</td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <span className={`status-pill ${order.status.toLowerCase()}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td>
+                        <select 
+                          className="status-dropdown-admin"
+                          value={order.status}
+                          onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                  {allOrders.length === 0 && (
+                    <tr><td colSpan="7" style={{ textAlign: 'center', padding: '64px' }}>No orders found.</td></tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

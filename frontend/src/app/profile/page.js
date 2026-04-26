@@ -42,7 +42,7 @@ export default function UserProfile() {
   };
 
   const handleTrackOrder = (order) => {
-    alert(`Tracking status for ${order.id}: \nStatus: ${order.status}\nTracking No: ${order.trackingNumber || 'N/A'}`);
+    router.push(`/track-order/${order.id}`);
   };
 
   if (!mounted || !user) return null;

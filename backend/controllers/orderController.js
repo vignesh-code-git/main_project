@@ -52,6 +52,25 @@ exports.getUserOrders = async (req, res) => {
   }
 };
 
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: OrderItem,
+          include: [Product]
+        },
+        User
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching all orders' });
+  }
+};
+
 exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findByPk(req.params.id, {
@@ -68,5 +87,21 @@ exports.getOrderById = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching order' });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    order.status = status;
+    await order.save();
+
+    res.json({ message: 'Order status updated successfully', order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating order status' });
   }
 };
