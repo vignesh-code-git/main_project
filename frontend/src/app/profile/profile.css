@@ -1,0 +1,367 @@
+.profile-page-container {
+  padding: 40px 0 100px;
+  background: #F9F9F9;
+  min-height: calc(100vh - 180px);
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+}
+
+/* Sidebar Styles */
+.profile-sidebar {
+  background: #FFF;
+  border: 1px solid #E6E6E6;
+  border-radius: 20px;
+  padding: 30px;
+  height: fit-content;
+}
+
+.user-info-brief {
+  text-align: center;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #F0F0F0;
+  margin-bottom: 30px;
+}
+
+.avatar-large {
+  width: 80px;
+  height: 80px;
+  background: #000;
+  color: #FFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 auto 15px;
+}
+
+.user-info-brief h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.user-info-brief p {
+  font-size: 14px;
+  color: #666;
+}
+
+.profile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  color: #666;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-align: left;
+}
+
+.profile-nav button:hover {
+  background: #F0F0F0;
+  color: #000;
+}
+
+.profile-nav button.active {
+  background: #000;
+  color: #FFF;
+}
+
+/* Main Content Styles */
+.profile-main-content {
+  background: #FFF;
+  border: 1px solid #E6E6E6;
+  border-radius: 20px;
+  padding: 40px;
+}
+
+.view-header {
+  margin-bottom: 40px;
+}
+
+.view-header h2 {
+  font-size: 32px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.view-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Orders List */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-card-premium {
+  border: 1px solid #E6E6E6;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.order-main-info {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 20px;
+  background: #FFF;
+}
+
+.order-icon-box {
+  width: 50px;
+  height: 50px;
+  background: #F0F0F0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.order-id {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.order-date {
+  font-size: 14px;
+  color: #666;
+}
+
+.order-stats {
+  display: flex;
+  gap: 30px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-item label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #AAA;
+  letter-spacing: 1px;
+}
+
+.stat-item span {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status-pill.delivered {
+  background: #E6F4EA;
+  color: #1E8E3E;
+}
+
+.status-pill.in-transit {
+  background: #FFF4E5;
+  color: #B26B00;
+}
+
+.track-btn {
+  background: #000;
+  color: #FFF;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tracking-preview {
+  background: #F9F9F9;
+  padding: 15px 20px;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Address View */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.address-card {
+  border: 1px solid #E6E6E6;
+  border-radius: 15px;
+  padding: 25px;
+  position: relative;
+}
+
+.address-card.default {
+  border-color: #000;
+  background: #FBFAFA;
+}
+
+.address-card .tag {
+  background: #000;
+  color: #FFF;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+}
+
+.address-card h3 {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.address-card p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.card-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.card-actions button {
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  color: #666;
+}
+
+.card-actions button:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+.add-address-card {
+  border: 2px dashed #D0D0D0;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-height: 200px;
+}
+
+.add-address-card:hover {
+  border-color: #000;
+  background: #F9F9F9;
+}
+
+.add-circle {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #D0D0D0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #666;
+}
+
+/* Settings Form */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group label {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 1px solid #E6E6E6;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #000;
+}
+
+.form-group input:disabled {
+  background: #F9F9F9;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  background: #000;
+  color: #FFF;
+  border: none;
+  padding: 15px 40px;
+  border-radius: 62px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.save-btn:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 1024px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}

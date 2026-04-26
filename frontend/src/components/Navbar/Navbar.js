@@ -78,7 +78,7 @@ export default function Navbar() {
           
           {mounted && isAuthenticated ? (
             <div className="user-nav-group">
-              <span className="user-greeting">Hi, {user.name.split(' ')[0]}</span>
+              <Link href="/profile" className="user-greeting" title="My Profile">Hi, {user.name.split(' ')[0]}</Link>
               <button onClick={handleLogout} className="logout-icon-btn" title="Logout">
                 <LogOut size={24} />
               </button>

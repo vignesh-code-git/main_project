@@ -8,8 +8,23 @@ const PORT = process.env.PORT || 5000;
 const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const path = require('path');
+
+// Models for associations
+const User = require('./models/User');
+const Order = require('./models/Order');
+const OrderItem = require('./models/OrderItem');
+const Product = require('./models/Product');
+
+// Associations
+User.hasMany(Order, { foreignKey: 'userId' });
+Order.belongsTo(User, { foreignKey: 'userId' });
+Order.hasMany(OrderItem, { foreignKey: 'orderId' });
+OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
+OrderItem.belongsTo(Product, { foreignKey: 'productId' });
+Product.hasMany(OrderItem, { foreignKey: 'productId' });
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +34,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/products', productRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 
 // Test DB Connection
