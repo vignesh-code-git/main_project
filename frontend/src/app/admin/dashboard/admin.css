@@ -168,8 +168,7 @@
 }
 
 .stat-box-stylish:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .stat-box-stylish h3 {
