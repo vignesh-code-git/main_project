@@ -12,7 +12,7 @@
 }
 
 .newsletter-container {
-  background: var(--primary-black);
+  background: #000;
   padding: 36px 64px;
   border-radius: 20px;
   display: flex;
@@ -27,6 +27,8 @@
   margin: 0;
   max-width: 550px;
   font-size: 40px;
+  font-weight: 900;
+  line-height: 1.1;
 }
 
 .newsletter-form {
@@ -45,11 +47,16 @@
   gap: 12px;
 }
 
+.mail-icon {
+  color: rgba(0,0,0,0.4);
+}
+
 .input-group input {
   border: none;
   outline: none;
   width: 100%;
   font-size: 16px;
+  font-family: inherit;
 }
 
 .subscribe-btn {
@@ -57,9 +64,11 @@
   color: black;
   padding: 12px;
   border-radius: 62px;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 16px;
   transition: opacity 0.2s;
+  border: none;
+  cursor: pointer;
 }
 
 .subscribe-btn:hover {
@@ -69,7 +78,7 @@
 .footer-content {
   display: flex;
   justify-content: space-between;
-  padding: 60px 0;
+  padding: 140px 0 60px; /* Increased top padding for newsletter overlap */
   border-bottom: 1px solid rgba(0,0,0,0.1);
   gap: 50px;
 }
@@ -81,17 +90,44 @@
 
 .footer-logo {
   font-size: 34px;
+  font-weight: 900;
   margin-bottom: 25px;
 }
 
 .footer-brand p {
   margin-bottom: 35px;
+  color: rgba(0,0,0,0.6);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .social-links {
   display: flex;
   gap: 12px;
-  font-size: 24px;
+}
+
+.social-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #000;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.social-icon.active {
+  background: #000;
+  color: #fff;
+}
+
+.social-icon:hover {
+  background: #000;
+  color: #fff;
 }
 
 .footer-links {
@@ -103,6 +139,8 @@
 .link-group h3 {
   letter-spacing: 3px;
   margin-bottom: 25px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .link-group ul {
@@ -110,13 +148,14 @@
 }
 
 .link-group li {
-  color: var(--text-gray);
+  color: rgba(0,0,0,0.6);
   margin-bottom: 18px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .link-group li:hover {
-  color: var(--primary-black);
+  color: #000;
 }
 
 .footer-bottom {
@@ -129,8 +168,23 @@
   align-items: center;
 }
 
+.bottom-container p {
+  color: rgba(0,0,0,0.6);
+  font-size: 14px;
+}
+
 .payment-methods {
-  font-size: 32px;
+  display: flex;
+  gap: 12px;
+}
+
+.payment-methods img {
+  height: 30px;
+  width: auto;
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 @media (max-width: 992px) {
@@ -145,6 +199,7 @@
   }
   .footer-content {
     flex-direction: column;
+    padding-top: 180px;
   }
   .footer-links {
     flex-wrap: wrap;

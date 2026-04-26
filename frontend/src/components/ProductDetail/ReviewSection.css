@@ -13,14 +13,16 @@
   background: transparent;
   padding: 24px;
   font-size: 20px;
-  color: var(--text-gray);
+  color: rgba(0,0,0,0.6);
+  border: none;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .tab-btn.active {
-  color: var(--primary-black);
-  border-bottom-color: var(--primary-black);
+  color: #000;
+  border-bottom-color: #000;
   font-weight: 600;
 }
 
@@ -33,11 +35,12 @@
 
 .review-count h3 {
   font-size: 24px;
+  font-weight: 700;
 }
 
 .review-count span {
   font-size: 16px;
-  color: var(--text-gray);
+  color: rgba(0,0,0,0.6);
   font-weight: 400;
 }
 
@@ -48,29 +51,38 @@
 }
 
 .filter-btn {
-  background: var(--secondary-gray);
+  background: #F0F0F0;
   width: 48px;
   height: 48px;
   border-radius: 50%;
   font-size: 20px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sort-dropdown {
-  background: var(--secondary-gray);
+  background: #F0F0F0;
   border: none;
   border-radius: 62px;
   padding: 12px 24px;
   font-size: 16px;
   font-weight: 500;
+  outline: none;
+  cursor: pointer;
 }
 
 .write-review-btn {
-  background: var(--primary-black);
-  color: white;
+  background: #000;
+  color: #fff;
   padding: 12px 24px;
   border-radius: 62px;
   font-weight: 500;
   font-size: 16px;
+  border: none;
+  cursor: pointer;
 }
 
 .reviews-grid-detail {
@@ -84,6 +96,7 @@
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 20px;
   padding: 28px 32px;
+  position: relative;
 }
 
 .review-card-header {
@@ -99,7 +112,7 @@
 
 .dots {
   font-size: 24px;
-  color: var(--text-gray);
+  color: rgba(0,0,0,0.4);
   cursor: pointer;
 }
 
@@ -115,9 +128,9 @@
 .reviewer .check {
   background: #01AB31;
   color: white;
-  font-size: 10px;
-  width: 15px;
-  height: 15px;
+  font-size: 8px;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,19 +138,22 @@
 }
 
 .review-text {
-  color: var(--text-gray);
-  line-height: 1.4;
+  color: rgba(0,0,0,0.6);
+  line-height: 1.6;
   margin-bottom: 24px;
+  font-size: 16px;
 }
 
 .review-date {
   font-weight: 500;
-  color: var(--text-gray);
+  color: rgba(0,0,0,0.6);
+  font-size: 14px;
 }
 
 .load-more {
   display: flex;
   justify-content: center;
+  margin-bottom: 60px;
 }
 
 .load-more-btn {
@@ -147,6 +163,12 @@
   border-radius: 62px;
   font-size: 16px;
   font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.load-more-btn:hover {
+  background: rgba(0,0,0,0.05);
 }
 
 @media (max-width: 768px) {

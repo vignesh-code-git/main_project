@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { login } from '@/lib/redux/slices/authSlice';
 import './seller-auth.css';
 import './seller-auth.css';
 
 export default function SellerAuth() {
+  const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -36,9 +39,9 @@ export default function SellerAuth() {
       
       if (!res.ok) throw new Error(data.message || 'Something went wrong');
 
-      // Save token and role
+      // Save token and user info
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      dispatch(login(data.user));
 
       if (data.user.role === 'seller') {
         router.push('/seller/dashboard');

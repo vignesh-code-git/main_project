@@ -6,6 +6,7 @@
   --white: #FFFFFF;
   --max-width: 1400px;
   --padding-x: 20px;
+  --header-total-height: 110px; /* TopBanner (30) + Navbar (80) */
 }
 
 * {
@@ -20,6 +21,19 @@
   z-index: 1000;
   width: 100%;
   background: white;
+}
+
+.panel-fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  width: 100%;
+  background: white;
+}
+
+.panel-content-wrapper {
+  padding-top: var(--header-total-height);
 }
 
 html,

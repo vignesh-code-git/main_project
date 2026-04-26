@@ -1,8 +1,11 @@
 .navbar {
   width: 100%;
-  padding: 16px 0;
+  height: 80px;
+  padding: 0;
+  display: flex;
+  align-items: center;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  background: var(--white);
+  background: #fff;
 }
 
 .nav-container {
@@ -15,7 +18,7 @@
 .logo {
   font-size: 32px;
   font-weight: 900;
-  color: var(--primary-black);
+  color: #000;
 }
 
 .nav-links {
@@ -35,14 +38,15 @@
 }
 
 .nav-links a:hover {
-  color: var(--text-gray);
+  color: #666;
 }
 
 .search-bar {
-  width: 577px;
+  flex: 1;
+  max-width: 577px;
   display: flex;
   align-items: center;
-  background: var(--secondary-gray);
+  background: #F0F0F0;
   padding: 12px 16px;
   border-radius: 62px;
   gap: 12px;
@@ -59,21 +63,22 @@
 
 .nav-icons {
   display: flex;
+  align-items: center;
   gap: 16px;
   font-size: 24px;
-  transform: translateY(3px);
 }
 
 .cart-icon {
   position: relative;
-  transform: translateY(1px);
+  display: flex;
+  align-items: center;
 }
 
 .cart-badge {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: var(--accent-red);
+  background: #FF3333;
   color: white;
   font-size: 10px;
   width: 16px;
@@ -83,29 +88,6 @@
   justify-content: center;
   border-radius: 50%;
   font-weight: bold;
-}
-
-@media (max-width: 1024px) {
-  .nav-links,
-  .search-bar,
-  .become-seller-link {
-    display: none;
-  }
-}
-
-.nav-login-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #000;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
-  transform: translateY(-2px);
-}
-
-.nav-login-link:hover {
-  opacity: 0.7;
 }
 
 .become-seller-link {
@@ -120,42 +102,56 @@
   opacity: 0.6;
 }
 
-/* Dropdown Menu Styles */
-.has-dropdown {
-  position: relative;
-}
-
-.nav-item-with-icon {
+.user-nav-group {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  cursor: pointer;
+  gap: 12px;
 }
 
-.dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  min-width: 180px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  padding: 8px 0;
-  z-index: 1000;
-  margin-top: 10px;
-  list-style: none;
-}
-
-.dropdown-menu li a {
-  padding: 10px 20px !important;
-  display: block !important;
-  color: #000 !important;
-  text-decoration: none;
+.user-greeting {
   font-size: 14px;
-  transition: background 0.2s;
+  font-weight: 500;
+  color: #000;
 }
 
-.dropdown-menu li a:hover {
-  background: #f0f0f0;
+.logout-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #000;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.logout-icon-btn:hover {
+  color: #FF3333;
+}
+
+.dashboard-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000;
+  color: #fff !important;
+  padding: 8px 16px !important;
+  border-radius: 62px;
+  font-size: 14px;
+}
+
+.dashboard-link:hover {
+  opacity: 0.8;
+}
+
+.admin-link {
+  background: #FF3333 !important;
+}
+
+@media (max-width: 1024px) {
+  .nav-links,
+  .search-bar,
+  .become-seller-link {
+    display: none;
+  }
 }

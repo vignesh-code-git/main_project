@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useDispatch } from 'react-redux';
 import { addItem } from '@/lib/redux/slices/cartSlice';
 import './ProductCard.css';
@@ -7,12 +8,14 @@ import './ProductCard.css';
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     dispatch(addItem(product));
   };
 
   return (
-    <div className="product-card">
+    <Link href={`/product/${product.id}`} className="product-card">
       <div className="product-image">
         {product.images && product.images.length > 0 ? (
           <img 
@@ -41,6 +44,6 @@ export default function ProductCard({ product }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

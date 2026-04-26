@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { login } from '@/lib/redux/slices/authSlice';
 import Link from 'next/link';
 import './login.css';
 
 export default function CustomerAuth() {
+  const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -37,7 +40,7 @@ export default function CustomerAuth() {
 
       // Save token and user info
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      dispatch(login(data.user));
 
       // Redirect based on role
       if (data.user.role === 'admin') {

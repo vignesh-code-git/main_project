@@ -1,5 +1,8 @@
 .product-card {
   width: 100%;
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 .product-image {

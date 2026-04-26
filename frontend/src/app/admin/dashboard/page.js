@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('dashboard'); 
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [toast, setToast] = useState({ show: false, message: '' });
   const router = useRouter();
 
@@ -23,15 +23,15 @@ export default function AdminDashboard() {
     if (!user || user.role !== 'admin') {
       router.push('/auth/login');
       return;
-    } 
-    
+    }
+
     setAdmin(user);
     if (savedTab) setActiveTab(savedTab);
 
     const fetchData = async () => {
       try {
         const headers = { 'Authorization': `Bearer ${token}` };
-        
+
         const [usersRes, sellersRes, settingsRes, productsRes] = await Promise.all([
           fetch('http://localhost:5000/api/admin/users', { headers }),
           fetch('http://localhost:5000/api/admin/sellers', { headers }),
@@ -62,12 +62,6 @@ export default function AdminDashboard() {
     localStorage.setItem('adminActiveTab', activeTab);
   }, [activeTab]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/auth/login');
-  };
-
   const showToast = (message) => {
     setToast({ show: true, message });
     setTimeout(() => setToast({ show: false, message: '' }), 3000);
@@ -79,7 +73,7 @@ export default function AdminDashboard() {
 
     // Optimistic UI update / Preview local
     const localPreviewUrl = URL.createObjectURL(file);
-    
+
     const formData = new FormData();
     formData.append('image', file);
     formData.append('key', key);
@@ -95,7 +89,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         const data = await res.json();
-        
+
         // Broadcast the update to other tabs (Homepage, etc.)
         const channel = new BroadcastChannel('admin_settings_update');
         channel.postMessage('refresh');
@@ -131,7 +125,7 @@ export default function AdminDashboard() {
         <div className="nav-brand">
           <h2>ADMIN PANEL</h2>
         </div>
-        
+
         <nav className="nav-tabs">
           {[
             { id: 'dashboard', label: 'Overview' },
@@ -141,7 +135,7 @@ export default function AdminDashboard() {
             { id: 'customers', label: 'Customers' },
             { id: 'settings', label: 'Web Settings' },
           ].map(item => (
-            <div 
+            <div
               key={item.id}
               className={`nav-tab-item ${activeTab === item.id ? 'active' : ''}`}
               onClick={() => setActiveTab(item.id)}
@@ -156,7 +150,6 @@ export default function AdminDashboard() {
             <div className="badge-avatar">{admin.name.charAt(0).toUpperCase()}</div>
             <span style={{ fontSize: '13px', fontWeight: '700' }}>{admin.name}</span>
           </div>
-          <button className="logout-btn-nav" onClick={handleLogout}>Log Out</button>
         </div>
       </header>
 
@@ -326,35 +319,35 @@ export default function AdminDashboard() {
             </header>
             <div className="settings-list-professional">
               {[
-                { 
-                  key: 'hero_bg', 
-                  label: 'Primary Hero Background', 
+                {
+                  key: 'hero_bg',
+                  label: 'Primary Hero Background',
                   desc: 'The flagship visual asset for the homepage. Defines the first impression for all visitors.',
-                  location: 'HOMEPAGE / HERO SECTION' 
+                  location: 'HOMEPAGE / HERO SECTION'
                 },
-                { 
-                  key: 'style_casual', 
-                  label: 'Casual Category Banner', 
+                {
+                  key: 'style_casual',
+                  label: 'Casual Category Banner',
                   desc: 'Featured promotional graphic for the casual style collections.',
-                  location: 'HOMEPAGE / COLLECTIONS / CASUAL' 
+                  location: 'HOMEPAGE / COLLECTIONS / CASUAL'
                 },
-                { 
-                  key: 'style_formal', 
-                  label: 'Formal Category Banner', 
+                {
+                  key: 'style_formal',
+                  label: 'Formal Category Banner',
                   desc: 'Featured promotional graphic for the formal attire collections.',
-                  location: 'HOMEPAGE / COLLECTIONS / FORMAL' 
+                  location: 'HOMEPAGE / COLLECTIONS / FORMAL'
                 },
-                { 
-                  key: 'style_party', 
-                  label: 'Party Category Banner', 
+                {
+                  key: 'style_party',
+                  label: 'Party Category Banner',
                   desc: 'Featured promotional graphic for the party wear collections.',
-                  location: 'HOMEPAGE / COLLECTIONS / PARTY' 
+                  location: 'HOMEPAGE / COLLECTIONS / PARTY'
                 },
-                { 
-                  key: 'style_gym', 
-                  label: 'Gym Category Banner', 
+                {
+                  key: 'style_gym',
+                  label: 'Gym Category Banner',
                   desc: 'Featured promotional graphic for the athletic and gym collections.',
-                  location: 'HOMEPAGE / COLLECTIONS / GYM' 
+                  location: 'HOMEPAGE / COLLECTIONS / GYM'
                 }
               ].map(item => (
                 <div key={item.key} className="setting-row-professional">
@@ -375,10 +368,10 @@ export default function AdminDashboard() {
                       <button className="btn-upload-premium">
                         <span>UPDATE ASSET</span>
                       </button>
-                      <input 
-                        type="file" 
+                      <input
+                        type="file"
                         className="upload-input-hidden"
-                        onChange={(e) => handleUpload(e, item.key, item.label)} 
+                        onChange={(e) => handleUpload(e, item.key, item.label)}
                       />
                     </div>
                   </div>

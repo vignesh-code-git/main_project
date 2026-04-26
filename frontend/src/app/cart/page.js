@@ -1,3 +1,6 @@
+'use client';
+
+import { useSelector } from 'react-redux';
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import CartItem from "@/components/Cart/CartItem";
 import OrderSummary from "@/components/Cart/OrderSummary";
@@ -12,27 +15,29 @@ export default function CartPage() {
   ];
 
   return (
-    <>
-      <Breadcrumbs paths={breadcrumbPaths} />
-      <div className="container cart-main">
-        <h1>YOUR CART</h1>
+    <main className="cart-page-main">
+      <div className="container">
+        <Breadcrumbs paths={breadcrumbPaths} />
+        <h1 className="cart-page-title">YOUR CART</h1>
         
-        <div className="cart-content-wrapper">
-          <div className="cart-items-list">
+        <div className="cart-content-layout">
+          <div className="cart-items-container">
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
                 <CartItem key={item.id} item={item} />
               ))
             ) : (
-              <div className="empty-cart">
+              <div className="empty-cart-message">
                 <p>Your cart is empty.</p>
               </div>
             )}
           </div>
           
-          <OrderSummary />
+          <div className="cart-summary-container">
+            <OrderSummary />
+          </div>
         </div>
       </div>
-    </>
+    </main>
   );
 }

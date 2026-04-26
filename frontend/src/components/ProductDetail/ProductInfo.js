@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { addItem } from '@/lib/redux/slices/cartSlice';
 import './ProductInfo.css';
 
 export default function ProductInfo({ product }) {
+  const dispatch = useDispatch();
   const [selectedColor, setSelectedColor] = useState('green');
   const [selectedSize, setSelectedSize] = useState('Large');
   const [quantity, setQuantity] = useState(1);
@@ -15,6 +18,17 @@ export default function ProductInfo({ product }) {
   ];
 
   const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
+
+  const handleAddToCart = () => {
+    // We add the item 'quantity' times
+    for (let i = 0; i < quantity; i++) {
+      dispatch(addItem({
+        ...product,
+        size: selectedSize,
+        color: selectedColor
+      }));
+    }
+  };
 
   return (
     <div className="product-info-detail">
@@ -71,7 +85,7 @@ export default function ProductInfo({ product }) {
           <span>{quantity}</span>
           <button onClick={() => setQuantity(quantity + 1)}>+</button>
         </div>
-        <button className="add-to-cart-btn">Add to Cart</button>
+        <button className="add-to-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
       </div>
     </div>
   );
