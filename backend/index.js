@@ -50,7 +50,21 @@ app.get('/', (req, res) => {
 
 // Sync database and start server
 sequelize.sync()
-  .then(() => {
+  .then(async () => {
+    // DATA FIX: Assign orphan products to the first seller for demo/testing
+    try {
+      const orphanCount = await Product.count({ where: { sellerId: null } });
+      if (orphanCount > 0) {
+        const firstSeller = await User.findOne({ where: { role: 'seller' } });
+        if (firstSeller) {
+          await Product.update({ sellerId: firstSeller.id }, { where: { sellerId: null } });
+          console.log(`FIXED: Assigned ${orphanCount} orphan products to seller: ${firstSeller.name}`);
+        }
+      }
+    } catch (err) {
+      console.log('Orphan fix failed:', err);
+    }
+
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

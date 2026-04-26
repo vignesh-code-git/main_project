@@ -90,6 +90,39 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
+exports.getSellerOrders = async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+    console.log('Fetching orders for sellerId:', sellerId);
+    
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: OrderItem,
+          include: [
+            {
+              model: Product,
+              where: { sellerId: sellerId }
+            }
+          ]
+        },
+        User
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Filter out orders that don't have any items for this seller 
+    // (though the JOIN should have done this, sometimes associations are tricky)
+    const filteredOrders = orders.filter(order => order.OrderItems && order.OrderItems.length > 0);
+
+    console.log(`Found ${filteredOrders.length} orders for seller`);
+    res.json(filteredOrders);
+  } catch (error) {
+    console.error('getSellerOrders Error:', error);
+    res.status(500).json({ message: 'Error fetching seller orders' });
+  }
+};
+
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;

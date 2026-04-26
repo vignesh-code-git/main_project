@@ -8,10 +8,11 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale } = req.query;
+    const { categoryId, onSale, sellerId } = req.query;
     let where = {};
     if (categoryId) where.CategoryId = categoryId;
     if (onSale) where.originalPrice = { [require('sequelize').Op.ne]: null };
+    if (sellerId) where.sellerId = sellerId;
 
     const products = await Product.findAll({
       where,
@@ -62,7 +63,8 @@ exports.createProduct = async (req, res) => {
       rating,
       description,
       CategoryId,
-      brand
+      brand,
+      sellerId: req.user.id
     });
 
     if (req.files) {
@@ -97,7 +99,8 @@ exports.bulkUploadProducts = async (req, res) => {
             rating: p.rating || 5,
             description: p.description,
             CategoryId: p.CategoryId,
-            brand: p.brand
+            brand: p.brand,
+            sellerId: req.user.id
           });
 
           if (p.images) {
