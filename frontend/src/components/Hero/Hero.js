@@ -9,6 +9,8 @@ export default function Hero() {
   const imagesRef = useRef([]);
   const frameCount = 240;
 
+  const containerRef = useRef(null);
+
   // Preload images
   useEffect(() => {
     const preloadImages = () => {
@@ -44,12 +46,18 @@ export default function Hero() {
 
     // Scroll Animation Logic
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const sectionHeight = canvasRef.current?.parentElement?.offsetHeight || 800;
-      // Animation plays over a certain scroll distance (e.g., 800px or section height)
-      const maxScroll = Math.max(sectionHeight, 800); 
-      const scrollFraction = Math.min(scrollY / maxScroll, 1);
-      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * frameCount)));
+      if (!containerRef.current) return;
+      
+      const container = containerRef.current;
+      const rect = container.getBoundingClientRect();
+      
+      // Calculate how much of the container has been scrolled through
+      // Progress 0 when top is at viewport top, 1 when bottom is at viewport top + viewport height
+      const totalScrollableHeight = container.offsetHeight - window.innerHeight;
+      const currentScroll = -rect.top;
+      
+      const scrollFraction = Math.max(0, Math.min(currentScroll / totalScrollableHeight, 1));
+      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
 
       requestAnimationFrame(() => updateCanvas(frameIndex));
     };
@@ -61,7 +69,6 @@ export default function Hero() {
       const img = imagesRef.current[index];
 
       if (img && img.complete) {
-        // Handle High DPI displays
         const dpr = window.devicePixelRatio || 1;
         if (canvas.width !== canvas.offsetWidth * dpr || canvas.height !== canvas.offsetHeight * dpr) {
           canvas.width = canvas.offsetWidth * dpr;
@@ -90,7 +97,6 @@ export default function Hero() {
       }
     };
 
-    // Preload first frame and draw
     const firstImg = new Image();
     firstImg.src = '/images/hero-animation/ezgif-frame-001.png';
     firstImg.onload = () => {
@@ -98,10 +104,7 @@ export default function Hero() {
     };
 
     window.addEventListener('scroll', handleScroll);
-    
-    const handleResize = () => {
-      handleScroll(); 
-    };
+    const handleResize = () => handleScroll();
     
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -113,43 +116,45 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero">
-      <div className="container hero-container">
-        <div className="hero-content">
-          <h1>FIND CLOTHES THAT MATCHES YOUR STYLE</h1>
-          <p>
-            Browse through our diverse range of meticulously crafted garments, designed<br />
-            to bring out your individuality and cater to your sense of style.
-          </p>
-          <button className="shop-now-btn">Shop Now</button>
+    <div className="hero-sticky-wrapper" ref={containerRef}>
+      <section className="hero">
+        <div className="container hero-container">
+          <div className="hero-content">
+            <h1>FIND CLOTHES THAT MATCHES YOUR STYLE</h1>
+            <p>
+              Browse through our diverse range of meticulously crafted garments, designed<br />
+              to bring out your individuality and cater to your sense of style.
+            </p>
+            <button className="shop-now-btn">Shop Now</button>
 
-          <div className="hero-stats">
-            <div className="stat-item">
-              <h2>{stats.brands}</h2>
-              <p>International Brands</p>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-item">
-              <h2>{stats.products}</h2>
-              <p>High-Quality Products</p>
-            </div>
-            <div className="stat-divider"></div>
-            <div className="stat-item">
-              <h2>{stats.customers}</h2>
-              <p>Happy Customers</p>
+            <div className="hero-stats">
+              <div className="stat-item">
+                <h2>{stats.brands}</h2>
+                <p>International Brands</p>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <h2>{stats.products}</h2>
+                <p>High-Quality Products</p>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-item">
+                <h2>{stats.customers}</h2>
+                <p>Happy Customers</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="hero-image-wrapper">
-        <canvas 
-          ref={canvasRef} 
-          className="hero-animation-canvas"
-        />
-      </div>
-      <div className="star star-large">✦</div>
-      <div className="star star-small">✦</div>
-    </section>
+        <div className="hero-image-wrapper">
+          <canvas 
+            ref={canvasRef} 
+            className="hero-animation-canvas"
+          />
+        </div>
+        <div className="star star-large">✦</div>
+        <div className="star star-small">✦</div>
+      </section>
+    </div>
   );
 }

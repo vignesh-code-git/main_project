@@ -1,13 +1,20 @@
+.hero-sticky-wrapper {
+  height: 400vh; /* Control animation duration here */
+  position: relative;
+}
+
 .hero {
   background-color: #F2F0F1;
-  position: relative;
+  position: sticky;
+  top: 0;
   overflow: hidden;
   width: 100%;
+  height: 100vh;
 }
 
 .hero-container {
   display: flex;
-  min-height: calc(100vh - 160px);
+  min-height: 100vh;
   position: relative;
   z-index: 10;
 }
