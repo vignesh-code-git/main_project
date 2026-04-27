@@ -385,12 +385,7 @@ export default function AdminDashboard() {
             </header>
             <div className="settings-list-professional">
               {[
-                {
-                  key: 'hero_bg',
-                  label: 'Primary Hero Background',
-                  desc: 'The flagship visual asset for the homepage. Defines the first impression for all visitors.',
-                  location: 'HOMEPAGE / HERO SECTION'
-                },
+
                 {
                   key: 'style_casual',
                   label: 'Casual Category Banner',

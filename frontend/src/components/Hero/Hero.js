@@ -4,24 +4,12 @@ import { useState, useEffect } from 'react';
 import './Hero.css';
 
 export default function Hero() {
-  const [heroImg, setHeroImg] = useState(null);
+  const [heroImg, setHeroImg] = useState('/images/hero-bg.png');
   const [stats, setStats] = useState({ brands: '0+', products: '0+', customers: '0+' });
 
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
-        // Fetch hero background
-        const settingsRes = await fetch('http://localhost:5000/api/admin/settings');
-        if (settingsRes.ok) {
-          const settingsData = await settingsRes.json();
-          if (Array.isArray(settingsData)) {
-            const setting = settingsData.find(s => s.key === 'hero_bg');
-            if (setting) {
-              setHeroImg(`http://localhost:5000${setting.value}`);
-            }
-          }
-        }
-
         // Fetch stats
         const statsRes = await fetch('http://localhost:5000/api/products/stats');
         if (statsRes.ok) {
