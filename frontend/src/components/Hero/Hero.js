@@ -1,16 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Hero.css';
 
 export default function Hero() {
-  const [heroImg, setHeroImg] = useState('/images/hero-bg.png');
   const [stats, setStats] = useState({ brands: '0+', products: '0+', customers: '0+' });
+  const canvasRef = useRef(null);
+  const imagesRef = useRef([]);
+  const frameCount = 240;
 
+  // Preload images
   useEffect(() => {
+    const preloadImages = () => {
+      for (let i = 1; i <= frameCount; i++) {
+        const img = new Image();
+        const frameNum = String(i).padStart(3, '0');
+        img.src = `/images/hero-animation/ezgif-frame-${frameNum}.png`;
+        imagesRef.current[i] = img;
+      }
+    };
+
+    preloadImages();
+
     const fetchHeroData = async () => {
       try {
-        // Fetch stats
         const statsRes = await fetch('http://localhost:5000/api/products/stats');
         if (statsRes.ok) {
           const statsData = await statsRes.json();
@@ -29,12 +42,74 @@ export default function Hero() {
 
     fetchHeroData();
 
-    // Listen for real-time updates from Admin Panel
-    const channel = new BroadcastChannel('admin_settings_update');
-    channel.onmessage = () => {
-      fetchHeroData();
+    // Scroll Animation Logic
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const sectionHeight = canvasRef.current?.parentElement?.offsetHeight || 800;
+      // Animation plays over a certain scroll distance (e.g., 800px or section height)
+      const maxScroll = Math.max(sectionHeight, 800); 
+      const scrollFraction = Math.min(scrollY / maxScroll, 1);
+      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * frameCount)));
+
+      requestAnimationFrame(() => updateCanvas(frameIndex));
     };
-    return () => channel.close();
+
+    const updateCanvas = (index) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const context = canvas.getContext('2d');
+      const img = imagesRef.current[index];
+
+      if (img && img.complete) {
+        // Handle High DPI displays
+        const dpr = window.devicePixelRatio || 1;
+        if (canvas.width !== canvas.offsetWidth * dpr || canvas.height !== canvas.offsetHeight * dpr) {
+          canvas.width = canvas.offsetWidth * dpr;
+          canvas.height = canvas.offsetHeight * dpr;
+        }
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const canvasAspect = canvas.width / canvas.height;
+        const imgAspect = img.width / img.height;
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (canvasAspect > imgAspect) {
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / imgAspect;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        } else {
+          drawWidth = canvas.height * imgAspect;
+          drawHeight = canvas.height;
+          offsetX = (canvas.width - drawWidth) / 2;
+          offsetY = 0;
+        }
+
+        context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      }
+    };
+
+    // Preload first frame and draw
+    const firstImg = new Image();
+    firstImg.src = '/images/hero-animation/ezgif-frame-001.png';
+    firstImg.onload = () => {
+      updateCanvas(1);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    const handleResize = () => {
+      handleScroll(); 
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
@@ -68,13 +143,10 @@ export default function Hero() {
       </div>
 
       <div className="hero-image-wrapper">
-        {heroImg && (
-          <img
-            src={heroImg}
-            alt="Fashion Models"
-            className="hero-main-img"
-          />
-        )}
+        <canvas 
+          ref={canvasRef} 
+          className="hero-animation-canvas"
+        />
       </div>
       <div className="star star-large">✦</div>
       <div className="star star-small">✦</div>
