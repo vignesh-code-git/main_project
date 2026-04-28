@@ -36,7 +36,13 @@ export default function ProductGallery({ images, selectedColor }) {
       </div>
       <div className="main-image">
         {currentActive ? (
-          <img src={currentActive.url} alt="Product" className="main-img" />
+          <img 
+            src={currentActive.url} 
+            alt="Product" 
+            className="main-img" 
+            loading="eager"
+            fetchPriority="high"
+          />
         ) : (
           <div className="main-img-placeholder"></div>
         )}

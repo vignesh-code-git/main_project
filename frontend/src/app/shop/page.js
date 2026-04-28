@@ -41,7 +41,7 @@ export default function ShopPage() {
 
         const res = await fetch(url);
         const data = await res.json();
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch products:", err);
       } finally {
