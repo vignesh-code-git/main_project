@@ -15,6 +15,7 @@ export default function EditProductPage() {
     CategoryId: '',
     style: '',
     brand: '',
+    colors: ['Black'],
   });
 
   const [categories, setCategories] = useState([]);
@@ -41,6 +42,7 @@ export default function EditProductPage() {
           CategoryId: productData.CategoryId,
           style: productData.style || '',
           brand: productData.brand || '',
+          colors: productData.color ? productData.color.split(',') : ['Black'],
         });
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -66,13 +68,19 @@ export default function EditProductPage() {
     setStatus({ type: 'loading', message: 'Updating product...' });
 
     try {
+      const submitData = {
+        ...formData,
+        color: formData.colors.join(',')
+      };
+      delete submitData.colors;
+
       const response = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -153,16 +161,38 @@ export default function EditProductPage() {
             </select>
           </div>
 
-          <div className="form-group">
-            <label>Brand</label>
-            <select name="brand" value={formData.brand} onChange={handleChange} required>
-              <option value="">Select Brand</option>
-              <option value="ZARA">ZARA</option>
-              <option value="GUCCI">GUCCI</option>
-              <option value="PRADA">PRADA</option>
-              <option value="VERSACE">VERSACE</option>
-              <option value="Calvin Klein">Calvin Klein</option>
-            </select>
+          <div className="form-group color-chooser-group">
+            <label>Product Colors</label>
+            <div className="color-presets">
+              {[
+                { name: 'Olive', value: '#4F4F31' },
+                { name: 'Navy', value: '#1A237E' },
+                { name: 'Black', value: '#000000' },
+                { name: 'White', value: '#FFFFFF' },
+                { name: 'Gray', value: '#808080' },
+                { name: 'Red', value: '#FF0000' },
+                { name: 'Blue', value: '#0000FF' }
+              ].map(color => (
+                <div 
+                  key={color.name}
+                  className={`color-preset-item ${formData.colors.includes(color.name) ? 'selected' : ''}`}
+                  onClick={() => {
+                    setFormData(prev => {
+                      const isSelected = prev.colors.includes(color.name);
+                      if (isSelected) {
+                        return { ...prev, colors: prev.colors.filter(c => c !== color.name) };
+                      } else {
+                        return { ...prev, colors: [...prev.colors, color.name] };
+                      }
+                    });
+                  }}
+                  title={color.name}
+                >
+                  <div className="color-swatch-circle" style={{ backgroundColor: color.value }}></div>
+                  <span>{color.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="form-group">

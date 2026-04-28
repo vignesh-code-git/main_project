@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
 });
 
 // Sync database and start server
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(async () => {
     // DATA FIX: Assign orphan products to the first seller for demo/testing
     try {

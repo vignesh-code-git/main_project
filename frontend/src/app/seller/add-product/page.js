@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import './seller.css';
+import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
 export default function AddProductPage() {
   const [formData, setFormData] = useState({
@@ -10,14 +11,27 @@ export default function AddProductPage() {
     originalPrice: '',
     description: '',
     CategoryId: '',
+    style: '',
+    brand: '',
+    colors: ['Black'],
     isNewArrival: false,
     isTopSelling: false,
   });
 
-  const [files, setFiles] = useState([]);
+  const [colorFiles, setColorFiles] = useState({}); // { 'Olive': [file1, file2, file3], ... }
   const [bulkFile, setBulkFile] = useState(null);
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState({ type: '', message: '' });
+
+  const colorPresets = [
+    { name: 'Olive', value: '#4F4F31' },
+    { name: 'Navy', value: '#1A237E' },
+    { name: 'Black', value: '#000000' },
+    { name: 'White', value: '#FFFFFF' },
+    { name: 'Gray', value: '#808080' },
+    { name: 'Red', value: '#FF0000' },
+    { name: 'Blue', value: '#0000FF' }
+  ];
 
   useEffect(() => {
     fetch('http://localhost:5000/api/products/categories')
@@ -34,8 +48,17 @@ export default function AddProductPage() {
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFiles(Array.from(e.target.files));
+  const handleColorFileChange = (e, color) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length !== 3) {
+      alert(`Please upload exactly 3 images for the ${color} variant.`);
+      e.target.value = null;
+      return;
+    }
+    setColorFiles(prev => ({
+      ...prev,
+      [color]: selectedFiles
+    }));
   };
 
   const handleBulkSubmit = async (e) => {
@@ -73,9 +96,21 @@ export default function AddProductPage() {
     e.preventDefault();
     setStatus({ type: 'loading', message: 'Adding product...' });
 
-    const data = new FormData();
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    files.forEach(file => data.append('files', file));
+    const submitData = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (key === 'colors') {
+        submitData.append('color', formData.colors.join(','));
+      } else {
+        submitData.append(key, formData[key]);
+      }
+    });
+    
+    // Append files with color prefix
+    Object.keys(colorFiles).forEach(color => {
+      colorFiles[color].forEach(file => {
+        submitData.append(`images_${color}`, file);
+      });
+    });
 
     try {
       const response = await fetch('http://localhost:5000/api/products', {
@@ -83,7 +118,7 @@ export default function AddProductPage() {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: data,
+        body: submitData,
       });
 
       if (response.ok) {
@@ -94,10 +129,13 @@ export default function AddProductPage() {
           originalPrice: '',
           description: '',
           CategoryId: '',
+          style: '',
+          brand: '',
+          colors: ['Black'],
           isNewArrival: false,
           isTopSelling: false,
         });
-        setFiles([]);
+        setColorFiles({});
         e.target.reset();
       } else {
         const errorData = await response.json();
@@ -158,63 +196,105 @@ export default function AddProductPage() {
 
             <div className="form-group">
               <label>Main Category</label>
-              <select name="CategoryId" value={formData.CategoryId} onChange={handleChange} required>
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
+              <CustomSelect 
+                options={categories}
+                value={formData.CategoryId}
+                onChange={(e) => setFormData(prev => ({ ...prev, CategoryId: e.target.value }))}
+                placeholder="Select Category"
+                labelKey="name"
+                valueKey="id"
+              />
             </div>
 
             <div className="form-group">
               <label>Dress Style</label>
-              <select name="style" value={formData.style} onChange={handleChange} required>
-                <option value="">Select Style</option>
-                <option value="Casual">Casual</option>
-                <option value="Formal">Formal</option>
-                <option value="Party">Party</option>
-                <option value="Gym">Gym</option>
-              </select>
+              <CustomSelect 
+                options={['Casual', 'Formal', 'Party', 'Gym']}
+                value={formData.style}
+                onChange={(e) => setFormData(prev => ({ ...prev, style: e.target.value }))}
+                placeholder="Select Style"
+              />
             </div>
 
             <div className="form-group">
               <label>Brand</label>
-              <select name="brand" value={formData.brand} onChange={handleChange} required>
-                <option value="">Select Brand</option>
-                <option value="ZARA">ZARA</option>
-                <option value="GUCCI">GUCCI</option>
-                <option value="PRADA">PRADA</option>
-                <option value="VERSACE">VERSACE</option>
-                <option value="Calvin Klein">Calvin Klein</option>
-              </select>
+              <CustomSelect 
+                options={['ZARA', 'GUCCI', 'PRADA', 'VERSACE', 'Calvin Klein']}
+                value={formData.brand}
+                onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+                placeholder="Select Brand"
+              />
             </div>
 
-            <div className="form-group">
-              <label>Product Assets</label>
-              <div className="custom-upload-wrapper">
-                <div className="upload-btn-row">
-                  <label htmlFor="product-files" className="stylish-upload-btn">
-                    Upload Assets
-                  </label>
-                  <span className="upload-description">Images, Videos, GIFs</span>
-                </div>
-                <input
-                  id="product-files"
-                  type="file"
-                  name="files"
-                  onChange={handleFileChange}
-                  accept="image/*,video/*,.gif"
-                  multiple
-                  required
-                  style={{ display: 'none' }}
-                />
-                {files.length > 0 && (
-                  <div className="file-count-badge">
-                    {files.length} file(s) selected
+            <div className="form-group color-chooser-group">
+              <label>Product Colors</label>
+              <div className="color-presets">
+                {colorPresets.map(color => (
+                  <div 
+                    key={color.name}
+                    className={`color-preset-item ${formData.colors.includes(color.name) ? 'selected' : ''}`}
+                    onClick={() => {
+                      setFormData(prev => {
+                        const isSelected = prev.colors.includes(color.name);
+                        if (isSelected) {
+                          return { ...prev, colors: prev.colors.filter(c => c !== color.name) };
+                        } else {
+                          return { ...prev, colors: [...prev.colors, color.name] };
+                        }
+                      });
+                    }}
+                    title={color.name}
+                  >
+                    <div className="color-swatch-circle" style={{ backgroundColor: color.value }}></div>
+                    <span>{color.name}</span>
                   </div>
-                )}
+                ))}
               </div>
-              <small className="file-info">Maximum total size: 100MB</small>
+            </div>
+
+            <div className="form-group color-assets-section">
+              <label>Color Specific Images (3 images per color)</label>
+              {formData.colors.map(color => (
+                <div key={color} className="color-upload-box">
+                  <div className="color-upload-header">
+                    <div 
+                      className="color-indicator" 
+                      style={{ 
+                        backgroundColor: colorPresets.find(p => p.name === color)?.value || '#808080' 
+                      }}
+                    ></div>
+                    <span>{color} Gallery</span>
+                  </div>
+                  
+                  <div className="custom-upload-wrapper">
+                    <div className="upload-btn-row">
+                      <label htmlFor={`files-${color}`} className="stylish-upload-btn">
+                        Upload 3 {color} Images
+                      </label>
+                    </div>
+                    <input
+                      id={`files-${color}`}
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={(e) => handleColorFileChange(e, color)}
+                      style={{ display: 'none' }}
+                      required
+                    />
+                    
+                    {colorFiles[color] && (
+                      <div className="image-preview-grid">
+                        {Array.from(colorFiles[color]).map((file, idx) => (
+                          <div key={idx} className="preview-item">
+                            <img src={URL.createObjectURL(file)} alt="preview" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {formData.colors.length === 0 && <p className="no-colors-msg">Please select colors first to upload images.</p>}
             </div>
 
             <div className="form-group">

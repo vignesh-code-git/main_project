@@ -352,3 +352,121 @@
   font-size: 20px;
   font-weight: 700;
 }
+
+/* Color Chooser Styles */
+.color-chooser-group {
+  background: #FAFAFA;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.color-preset-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  background: #FFF;
+  width: 70px;
+}
+
+.color-preset-item:hover {
+  border-color: #EEE;
+}
+
+.color-preset-item.selected {
+  border-color: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.color-swatch-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.color-preset-item span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+}
+
+.color-preset-item.selected span {
+  color: #000;
+}
+
+/* Color Specific Image Uploads */
+.color-assets-section {
+  margin-top: 20px;
+  background: #FFF;
+  border-radius: 12px;
+}
+
+.color-upload-box {
+  background: #FAFAFA;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.color-upload-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.color-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.no-colors-msg {
+  color: #999;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+  background: #F9F9F9;
+  border-radius: 8px;
+  border: 1px dashed #CCC;
+}
+
+/* Image Preview Grid */
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.preview-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

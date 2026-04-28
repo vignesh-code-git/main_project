@@ -3,31 +3,40 @@
 import { useState } from 'react';
 import './ProductGallery.css';
 
-export default function ProductGallery({ images }) {
-  const [activeImage, setActiveImage] = useState(images[0] || null);
+export default function ProductGallery({ images, selectedColor }) {
+  // Filter images based on selected color
+  const filteredImages = images.filter(img => img.color === selectedColor || !img.color);
+  
+  // Use a fallback if no images match the selected color
+  const displayImages = filteredImages.length > 0 ? filteredImages : images.slice(0, 3);
+  
+  const [activeImage, setActiveImage] = useState(null);
+
+  // Update active image when filtered list or selected color changes
+  const currentActive = activeImage && displayImages.includes(activeImage) ? activeImage : displayImages[0];
 
   return (
     <div className="product-gallery">
       <div className="thumbnails">
-        {images.map((img, index) => (
+        {displayImages.map((img, index) => (
           <div
             key={index}
-            className={`thumb-item ${activeImage === img ? 'active' : ''}`}
+            className={`thumb-item ${currentActive === img ? 'active' : ''}`}
             onClick={() => setActiveImage(img)}
           >
             <img src={img.url} alt={`Thumbnail ${index + 1}`} />
           </div>
         ))}
         {/* Fallback if no images */}
-        {images.length === 0 && (
+        {displayImages.length === 0 && (
           <div className="thumb-item active">
             <div className="thumb-placeholder"></div>
           </div>
         )}
       </div>
       <div className="main-image">
-        {activeImage ? (
-          <img src={activeImage.url} alt="Product" className="main-img" />
+        {currentActive ? (
+          <img src={currentActive.url} alt="Product" className="main-img" />
         ) : (
           <div className="main-img-placeholder"></div>
         )}

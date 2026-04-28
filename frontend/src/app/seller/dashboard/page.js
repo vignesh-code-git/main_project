@@ -83,7 +83,7 @@ export default function SellerDashboard() {
 
   const deleteProduct = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
-    
+
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/products/${id}`, {
@@ -92,7 +92,7 @@ export default function SellerDashboard() {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (res.ok) {
         setProducts(products.filter(p => p.id !== id));
       } else {
@@ -141,14 +141,14 @@ export default function SellerDashboard() {
           </div>
 
           <div className="dashboard-tabs">
-            <button 
-              className={activeTab === 'inventory' ? 'active' : ''} 
+            <button
+              className={activeTab === 'inventory' ? 'active' : ''}
               onClick={() => setActiveTab('inventory')}
             >
               Inventory
             </button>
-            <button 
-              className={activeTab === 'orders' ? 'active' : ''} 
+            <button
+              className={activeTab === 'orders' ? 'active' : ''}
               onClick={() => setActiveTab('orders')}
             >
               Recent Orders
@@ -176,18 +176,20 @@ export default function SellerDashboard() {
                       products.map((product) => (
                         <tr key={product.id}>
                           <td>
-                            <div className="product-cell">
-                              <img 
-                                src={product.images?.[0]?.url || '/placeholder.png'} 
-                                alt={product.name} 
-                                className="product-img-small"
-                              />
-                              <span>{product.name}</span>
-                            </div>
+                            <Link href={`/product/${product.id}`} className="product-cell-link">
+                              <div className="product-cell">
+                                <img
+                                  src={product.images?.[0]?.url || '/placeholder.png'}
+                                  alt={product.name}
+                                  className="product-img-small"
+                                />
+                                <span>{product.name}</span>
+                              </div>
+                            </Link>
                           </td>
                           <td>{product.Category?.name || 'General'}</td>
                           <td>{product.style || 'N/A'}</td>
-                          <td style={{fontWeight: '700'}}>{product.brand || 'N/A'}</td>
+                          <td style={{ fontWeight: '700' }}>{product.brand || 'N/A'}</td>
                           <td>₹{product.price}</td>
                           <td><span className="status-badge">Active</span></td>
                           <td>
@@ -200,7 +202,7 @@ export default function SellerDashboard() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" style={{textAlign: 'center', padding: '40px'}}>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
                           No products listed yet. Start by adding your first item!
                         </td>
                       </tr>
@@ -231,7 +233,7 @@ export default function SellerDashboard() {
                     {orders.length > 0 ? (
                       orders.map((order) => (
                         <tr key={order.id}>
-                          <td style={{fontWeight: '800', fontFamily: 'monospace'}}>#{order.id.split('-')[0].toUpperCase()}</td>
+                          <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
                           <td>{order.User?.name}</td>
                           <td>
                             <div className="mini-item-list-seller">
@@ -252,7 +254,7 @@ export default function SellerDashboard() {
                             </span>
                           </td>
                           <td>
-                            <select 
+                            <select
                               className="status-dropdown-seller"
                               value={order.status}
                               onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
@@ -268,7 +270,7 @@ export default function SellerDashboard() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" style={{textAlign: 'center', padding: '40px'}}>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
                           No orders received yet.
                         </td>
                       </tr>

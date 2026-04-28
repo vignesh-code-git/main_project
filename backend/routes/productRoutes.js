@@ -14,7 +14,7 @@ router.get('/stats', productController.getStats);
 router.get('/:id', productController.getProductById);
 
 // Protected routes
-router.post('/', protect, isSeller, upload.array('files', 10), productController.createProduct);
+router.post('/', protect, isSeller, upload.any(), productController.createProduct);
 router.post('/bulk', protect, isSeller, upload.single('file'), productController.bulkUploadProducts);
 router.put('/:id', protect, isSeller, productController.updateProduct);
 router.delete('/:id', protect, isSeller, productController.deleteProduct);

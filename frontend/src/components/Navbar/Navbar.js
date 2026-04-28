@@ -56,7 +56,13 @@ export default function Navbar() {
 
         <ul className="nav-links">
           <li className="has-dropdown">
-            <Link href="/category/casual">Shop <ChevronDown size={16} /></Link>
+            <Link href="/shop" className="dropdown-trigger">Shop <ChevronDown size={16} /></Link>
+            <ul className="dropdown-menu">
+              <li><Link href="/category/1">Casual</Link></li>
+              <li><Link href="/category/2">Formal</Link></li>
+              <li><Link href="/category/3">Party</Link></li>
+              <li><Link href="/category/4">Gym</Link></li>
+            </ul>
           </li>
           <li><Link href="/category/on-sale">On Sale</Link></li>
           <li><Link href="/category/new-arrivals">New Arrivals</Link></li>

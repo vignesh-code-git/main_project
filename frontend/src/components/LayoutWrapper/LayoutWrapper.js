@@ -18,7 +18,7 @@ export default function LayoutWrapper({ children }) {
         <TopBanner />
         <Navbar />
       </header>
-      <div className={isPanelRoute ? "panel-content-wrapper" : ""}>
+      <div className="main-content-wrapper">
         {children}
       </div>
       {!isPanelRoute && <Footer />}

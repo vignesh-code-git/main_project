@@ -50,7 +50,7 @@
 
 .stat-card h3 {
   font-size: 14px;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   margin-bottom: 8px;
   text-transform: uppercase;
 }
@@ -61,7 +61,8 @@
   color: #000;
 }
 
-.inventory-section h2, .orders-section h2 {
+.inventory-section h2,
+.orders-section h2 {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 24px;
@@ -97,15 +98,33 @@
 .product-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+}
+
+.product-cell-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-cell-link:hover .product-cell span {
+  color: #000;
 }
 
 .product-img-small {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
   object-fit: cover;
-  background: #eee;
+  background: #f8fafc;
+  border: 1px solid #E2E8F0;
+  padding: 4px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-cell-link:hover .product-img-small {
+  border-color: #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .status-badge {
@@ -203,10 +222,25 @@
   text-transform: uppercase;
 }
 
-.status-pill.pending { background: #FEF3C7; color: #92400E; }
-.status-pill.processing { background: #DBEAFE; color: #1E40AF; }
-.status-pill.shipped { background: #E0E7FF; color: #3730A3; }
-.status-pill.delivered { background: #DCFCE7; color: #166534; }
+.status-pill.pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-pill.processing {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.status-pill.shipped {
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+.status-pill.delivered {
+  background: #DCFCE7;
+  color: #166534;
+}
 
 /* Dropdown */
 .status-dropdown-seller {

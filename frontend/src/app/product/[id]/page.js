@@ -14,6 +14,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [selectedColor, setSelectedColor] = useState('');
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -27,6 +28,9 @@ export default function ProductDetailPage() {
         const data = await res.json();
         console.log("Fetched Product Detail Data:", data);
         setProduct(data);
+        if (data.color) {
+          setSelectedColor(data.color.split(',')[0]);
+        }
 
         // Fetch related products (e.g. from same category)
         if (data.CategoryId) {
@@ -58,8 +62,8 @@ export default function ProductDetailPage() {
     <>
       <Breadcrumbs paths={breadcrumbPaths} />
       <section className="product-detail-main container">
-        <ProductGallery images={product.images || []} />
-        <ProductInfo product={product} />
+        <ProductGallery images={product.images || []} selectedColor={selectedColor} />
+        <ProductInfo product={product} selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
       </section>
       <ReviewSection reviews={product.Reviews || []} />
       <ProductSection title="YOU MIGHT ALSO LIKE" products={relatedProducts} />

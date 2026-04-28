@@ -10,6 +10,7 @@ export default function Hero() {
   const frameCount = 240;
 
   const containerRef = useRef(null);
+  const heroContentRef = useRef(null);
 
   // Preload images
   useEffect(() => {
@@ -45,21 +46,43 @@ export default function Hero() {
     fetchHeroData();
 
     // Scroll Animation Logic
+    const targetFrameRef = { current: 1 };
+    const currentFrameRef = { current: 1 };
+    const animationFrameRef = { current: null };
+
+    // Smooth lerp animation loop
+    const smoothAnimate = () => {
+      const diff = targetFrameRef.current - currentFrameRef.current;
+
+      // If the difference is significant, interpolate
+      if (Math.abs(diff) > 0.1) {
+        currentFrameRef.current += diff * 0.1; // Smoothness factor
+        const frameIndex = Math.round(currentFrameRef.current);
+        updateCanvas(frameIndex);
+        animationFrameRef.current = requestAnimationFrame(smoothAnimate);
+      } else {
+        currentFrameRef.current = targetFrameRef.current;
+        const frameIndex = Math.round(currentFrameRef.current);
+        updateCanvas(frameIndex);
+        animationFrameRef.current = null;
+      }
+    };
+
     const handleScroll = () => {
       if (!containerRef.current) return;
-      
+
       const container = containerRef.current;
-      const rect = container.getBoundingClientRect();
-      
-      // Calculate how much of the container has been scrolled through
-      // Progress 0 when top is at viewport top, 1 when bottom is at viewport top + viewport height
       const totalScrollableHeight = container.offsetHeight - window.innerHeight;
-      const currentScroll = -rect.top;
-      
+      const currentScroll = window.scrollY;
+
       const scrollFraction = Math.max(0, Math.min(currentScroll / totalScrollableHeight, 1));
       const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
 
-      requestAnimationFrame(() => updateCanvas(frameIndex));
+      targetFrameRef.current = frameIndex;
+
+      if (!animationFrameRef.current) {
+        animationFrameRef.current = requestAnimationFrame(smoothAnimate);
+      }
     };
 
     const updateCanvas = (index) => {
@@ -76,22 +99,25 @@ export default function Hero() {
         }
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const canvasAspect = canvas.width / canvas.height;
+
+        const headerHeight = 0; // Removed internal clearance to put it up
+        const visibleHeight = canvas.height - (headerHeight * dpr);
+        const canvasAspect = canvas.width / visibleHeight;
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
+        const scale = 1.28;
         if (canvasAspect > imgAspect) {
-          drawWidth = canvas.width;
-          drawHeight = canvas.width / imgAspect;
-          offsetX = 0;
-          offsetY = (canvas.height - drawHeight) / 2;
+          drawHeight = visibleHeight * scale;
+          drawWidth = drawHeight * imgAspect;
         } else {
-          drawWidth = canvas.height * imgAspect;
-          drawHeight = canvas.height;
-          offsetX = (canvas.width - drawWidth) / 2;
-          offsetY = 0;
+          drawWidth = canvas.width * scale;
+          drawHeight = drawWidth / imgAspect;
         }
+
+        // Center horizontally with a small right-shift (5%), and maintain downward offset (10%)
+        offsetX = ((canvas.width - drawWidth) / 2) + (canvas.width * 0.05);
+        offsetY = (headerHeight * dpr) + (visibleHeight - drawHeight) / 2 + (canvas.height * 0.10);
 
         context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
       }
@@ -105,7 +131,7 @@ export default function Hero() {
 
     window.addEventListener('scroll', handleScroll);
     const handleResize = () => handleScroll();
-    
+
     handleResize();
     window.addEventListener('resize', handleResize);
 
@@ -119,8 +145,8 @@ export default function Hero() {
     <div className="hero-sticky-wrapper" ref={containerRef}>
       <section className="hero">
         <div className="container hero-container">
-          <div className="hero-content">
-            <h1>FIND CLOTHES THAT MATCHES YOUR STYLE</h1>
+          <div className="hero-content" ref={heroContentRef}>
+            <h1>FIND CLOTHES<br />THAT MATCHES<br />YOUR STYLE</h1>
             <p>
               Browse through our diverse range of meticulously crafted garments, designed<br />
               to bring out your individuality and cater to your sense of style.
@@ -147,13 +173,13 @@ export default function Hero() {
         </div>
 
         <div className="hero-image-wrapper">
-          <canvas 
-            ref={canvasRef} 
+          <canvas
+            ref={canvasRef}
             className="hero-animation-canvas"
           />
         </div>
-        <div className="star star-large">✦</div>
-        <div className="star star-small">✦</div>
+        <div className="star star-large star-large-right">✦</div>
+        <div className="star star-small star-large-middle">✦</div>
       </section>
     </div>
   );

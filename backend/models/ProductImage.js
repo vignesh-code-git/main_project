@@ -5,6 +5,10 @@ const ProductImage = sequelize.define('ProductImage', {
   url: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

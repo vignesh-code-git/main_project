@@ -8,11 +8,27 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale, sellerId } = req.query;
+    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style } = req.query;
+    const { Op } = require('sequelize');
     let where = {};
+
     if (categoryId) where.CategoryId = categoryId;
-    if (onSale) where.originalPrice = { [require('sequelize').Op.ne]: null };
+    if (onSale) where.originalPrice = { [Op.ne]: null };
     if (sellerId) where.sellerId = sellerId;
+
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    if (color) {
+      where.color = { [Op.like]: `%${color}%` };
+    }
+
+    if (style) {
+      where.style = { [Op.like]: `%${style}%` };
+    }
 
     const products = await Product.findAll({
       where,
@@ -31,7 +47,7 @@ exports.getNewArrivals = async (req, res) => {
   try {
     const products = await Product.findAll({
       order: [['createdAt', 'DESC']],
-      limit: 4,
+      limit: 8,
       include: [{ model: ProductImage, as: 'images' }]
     });
     res.json(products);
@@ -44,7 +60,7 @@ exports.getTopSelling = async (req, res) => {
   try {
     const products = await Product.findAll({
       order: [['rating', 'DESC']],
-      limit: 4,
+      limit: 8,
       include: [{ model: ProductImage, as: 'images' }]
     });
     res.json(products);
@@ -55,7 +71,7 @@ exports.getTopSelling = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, originalPrice, rating, description, CategoryId, brand } = req.body;
+    const { name, price, originalPrice, rating, description, CategoryId, brand, style, color } = req.body;
     const product = await Product.create({
       name,
       price,
@@ -64,14 +80,21 @@ exports.createProduct = async (req, res) => {
       description,
       CategoryId,
       brand,
+      style,
+      color,
       sellerId: req.user.id
     });
 
     if (req.files) {
-      const images = req.files.map(file => ({
-        url: `http://localhost:5000/uploads/${file.filename}`,
-        ProductId: product.id
-      }));
+      const images = req.files.map(file => {
+        // Expecting fieldname like "images_Olive" or "images_Black"
+        const colorMatch = file.fieldname.match(/^images_(.+)$/);
+        return {
+          url: `http://localhost:5000/uploads/${file.filename}`,
+          ProductId: product.id,
+          color: colorMatch ? colorMatch[1] : null
+        };
+      });
       await ProductImage.bulkCreate(images);
     }
 
@@ -173,7 +196,7 @@ exports.getStats = async (req, res) => {
     res.json({
       products: productCount || 0,
       brands: brandCount || 0,
-      customers: (userCount || 0) + 30000
+      customers: userCount || 0
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -182,7 +205,7 @@ exports.getStats = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    const { name, price, originalPrice, description, CategoryId, brand, style } = req.body;
+    const { name, price, originalPrice, description, CategoryId, brand, style, color } = req.body;
     const product = await Product.findByPk(req.params.id);
 
     if (!product) {
@@ -196,7 +219,8 @@ exports.updateProduct = async (req, res) => {
       description,
       CategoryId,
       brand,
-      style
+      style,
+      color
     });
 
     res.json(product);

@@ -8,22 +8,27 @@ import { Loader2 } from 'lucide-react';
 import RazorpayDemo from '../Payment/RazorpayDemo';
 import './ProductInfo.css';
 
-export default function ProductInfo({ product }) {
+export default function ProductInfo({ product, selectedColor, setSelectedColor }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showRazorpay, setShowRazorpay] = useState(false);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  const [selectedColor, setSelectedColor] = useState('green');
   const [selectedSize, setSelectedSize] = useState('Large');
   const [quantity, setQuantity] = useState(1);
 
-  const colors = [
-    { id: 'green', value: '#4F4631' },
-    { id: 'blue', value: '#314F4A' },
-    { id: 'darkblue', value: '#31344F' },
-  ];
+  const colorMap = {
+    'Olive': '#4F4F31',
+    'Navy': '#1A237E',
+    'Black': '#000000',
+    'White': '#FFFFFF',
+    'Gray': '#808080',
+    'Red': '#FF0000',
+    'Blue': '#0000FF'
+  };
+
+  const productColors = product.color ? product.color.split(',') : [];
 
   const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
@@ -103,16 +108,20 @@ export default function ProductInfo({ product }) {
       <div className="selection-group">
         <h4>Select Colors</h4>
         <div className="color-swatches">
-          {colors.map(color => (
-            <div 
-              key={color.id} 
-              className={`color-swatch ${selectedColor === color.id ? 'active' : ''}`}
-              style={{ backgroundColor: color.value }}
-              onClick={() => setSelectedColor(color.id)}
-            >
-              {selectedColor === color.id && <span className="check">✓</span>}
-            </div>
-          ))}
+          {productColors.length > 0 ? (
+            productColors.map(colorName => (
+              <div 
+                key={colorName} 
+                className={`color-swatch ${selectedColor === colorName ? 'active' : ''}`}
+                style={{ backgroundColor: colorMap[colorName] || '#CCC' }}
+                onClick={() => setSelectedColor(colorName)}
+              >
+                {selectedColor === colorName && <span className="check">✓</span>}
+              </div>
+            ))
+          ) : (
+            <p>No colors specified</p>
+          )}
         </div>
       </div>
 
@@ -132,21 +141,23 @@ export default function ProductInfo({ product }) {
       </div>
 
       <div className="actions-group-container">
-        <div className="actions-group">
+        <div className="quantity-row">
           <div className="quantity-selector">
             <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
             <span>{quantity}</span>
             <button onClick={() => setQuantity(quantity + 1)}>+</button>
           </div>
-          <button className="add-to-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
         </div>
-        <button 
-          className="buy-now-btn" 
-          onClick={handleBuyNow} 
-          disabled={loading}
-        >
-          {loading ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : 'Buy Now'}
-        </button>
+        <div className="actions-group">
+          <button className="add-to-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
+          <button 
+            className="buy-now-btn" 
+            onClick={handleBuyNow} 
+            disabled={loading}
+          >
+            {loading ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : 'Buy Now'}
+          </button>
+        </div>
       </div>
 
       {showRazorpay && (

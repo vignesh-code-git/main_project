@@ -41,6 +41,10 @@ const Product = sequelize.define('Product', {
   style: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 });
 
