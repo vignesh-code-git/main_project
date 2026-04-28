@@ -73,6 +73,19 @@
 
 @media (max-width: 1024px) {
   .reviews-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .testimonials {
+    padding: 60px 0 100px;
+  }
+  .testimonials-header h2 {
+    font-size: 28px;
+  }
+  .reviews-grid {
     grid-template-columns: 1fr;
   }
 }
+

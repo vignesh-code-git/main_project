@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { addItem } from '@/lib/redux/slices/cartSlice';
 import './ProductCard.css';
@@ -18,10 +19,13 @@ export default function ProductCard({ product }) {
     <Link href={`/product/${product.id}`} className="product-card">
       <div className="product-image">
         {product.images && product.images.length > 0 ? (
-          <img 
+          <Image 
             src={product.images[0].url} 
             alt={product.name} 
             className="real-product-img" 
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
           />
         ) : (
           <div className="img-placeholder"></div>

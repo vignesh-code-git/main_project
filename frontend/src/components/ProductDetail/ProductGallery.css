@@ -1,20 +1,20 @@
 .product-gallery {
   display: flex;
   gap: 14px;
-  height: 530px;
+  height: 480px;
 }
 
 .thumbnails {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  width: 152px;
+  gap: 12px;
+  width: 120px;
 }
 
 .thumb-item {
-  height: 167px;
+  height: 150px;
   background: var(--secondary-gray);
-  border-radius: 20px;
+  border-radius: 16px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: border-color 0.2s;
@@ -28,7 +28,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 16px;
 }
 
 .thumb-placeholder {
@@ -40,7 +40,7 @@
 .main-image {
   flex: 1;
   background: var(--secondary-gray);
-  border-radius: 20px;
+  border-radius: 16px;
   overflow: hidden;
 }
 

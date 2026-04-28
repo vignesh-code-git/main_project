@@ -1,72 +1,54 @@
-'use client';
+import ProductDetailClient from './ProductDetailClient';
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
-import ProductGallery from "@/components/ProductDetail/ProductGallery";
-import ProductInfo from "@/components/ProductDetail/ProductInfo";
-import ReviewSection from "@/components/ProductDetail/ReviewSection";
-import ProductSection from "@/components/ProductSection/ProductSection";
-import './product-detail.css';
+async function getProduct(id) {
+  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+    next: { revalidate: 3600 } // Revalidate every hour
+  });
+  
+  if (!res.ok) return null;
+  return res.json();
+}
 
-export default function ProductDetailPage() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [selectedColor, setSelectedColor] = useState('');
+async function getRelatedProducts(categoryId, currentProductId) {
+  const res = await fetch(`http://localhost:5000/api/products?categoryId=${categoryId}`, {
+    next: { revalidate: 3600 }
+  });
+  
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.filter(p => p.id !== parseInt(currentProductId)).slice(0, 4);
+}
 
-  useEffect(() => {
-    const fetchProductData = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/products/${id}`);
-        if (!res.ok) {
-          setProduct(null);
-          setLoading(false);
-          return;
-        }
-        const data = await res.json();
-        console.log("Fetched Product Detail Data:", data);
-        setProduct(data);
-        if (data.color) {
-          setSelectedColor(data.color.split(',')[0]);
-        }
-
-        // Fetch related products (e.g. from same category)
-        if (data.CategoryId) {
-          const relatedRes = await fetch(`http://localhost:5000/api/products?categoryId=${data.CategoryId}`);
-          const relatedData = await relatedRes.json();
-          setRelatedProducts(relatedData.filter(p => p.id !== parseInt(id)).slice(0, 4));
-        }
-      } catch (err) {
-        console.error("Failed to fetch product:", err);
-      } finally {
-        setLoading(false);
-      }
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const product = await getProduct(id);
+  
+  if (!product) {
+    return {
+      title: 'Product Not Found | Storefront',
     };
+  }
 
-    fetchProductData();
-  }, [id]);
+  return {
+    title: `${product.name} | Storefront`,
+    description: product.description?.substring(0, 160),
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: product.images?.[0]?.url ? [product.images[0].url] : [],
+    },
+  };
+}
 
-  if (loading) return <div className="loading">Loading Product...</div>;
-  if (!product) return <div className="error">Product not found.</div>;
+export default async function ProductDetailPage({ params }) {
+  const { id } = await params;
+  const product = await getProduct(id);
+  
+  if (!product) {
+    return <div className="error container" style={{padding: '100px 0', textAlign: 'center'}}>Product not found.</div>;
+  }
 
-  const breadcrumbPaths = [
-    { name: 'Home', url: '/' },
-    { name: 'Shop', url: '/shop' },
-    { name: product.Category?.name || 'Category', url: `/category/${product.CategoryId}` },
-    { name: product.name, url: '#' },
-  ];
+  const relatedProducts = await getRelatedProducts(product.CategoryId, id);
 
-  return (
-    <>
-      <Breadcrumbs paths={breadcrumbPaths} />
-      <section className="product-detail-main container">
-        <ProductGallery images={product.images || []} selectedColor={selectedColor} />
-        <ProductInfo product={product} selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
-      </section>
-      <ReviewSection reviews={product.Reviews || []} />
-      <ProductSection title="YOU MIGHT ALSO LIKE" products={relatedProducts} />
-    </>
-  );
+  return <ProductDetailClient product={product} relatedProducts={relatedProducts} id={id} />;
 }

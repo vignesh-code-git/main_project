@@ -8,13 +8,24 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style } = req.query;
+    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand } = req.query;
     const { Op } = require('sequelize');
     let where = {};
 
     if (categoryId) where.CategoryId = categoryId;
     if (onSale) where.originalPrice = { [Op.ne]: null };
     if (sellerId) where.sellerId = sellerId;
+
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } }
+      ];
+    }
+
+    if (brand) {
+      where.brand = { [Op.like]: `%${brand}%` };
+    }
 
     if (minPrice || maxPrice) {
       where.price = {};

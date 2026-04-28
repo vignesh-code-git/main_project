@@ -30,6 +30,10 @@ const User = sequelize.define('User', {
   storeName: {
     type: DataTypes.STRING,
     allowNull: true // Only for sellers
+  },
+  avatar: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

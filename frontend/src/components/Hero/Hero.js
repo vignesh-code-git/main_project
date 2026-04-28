@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Skeleton from '../Skeleton/Skeleton';
 import './Hero.css';
 
 export default function Hero() {
   const [stats, setStats] = useState({ brands: '0+', products: '0+', customers: '0+' });
+  const [loading, setLoading] = useState(true);
   const canvasRef = useRef(null);
   const imagesRef = useRef([]);
   const frameCount = 240;
@@ -40,6 +42,8 @@ export default function Hero() {
         }
       } catch (err) {
         console.error("Failed to fetch hero data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -155,17 +159,17 @@ export default function Hero() {
 
             <div className="hero-stats">
               <div className="stat-item">
-                <h2>{stats.brands}</h2>
+                {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.brands}</h2>}
                 <p>International Brands</p>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
-                <h2>{stats.products}</h2>
+                {loading ? <Skeleton width="120px" height="40px" /> : <h2>{stats.products}</h2>}
                 <p>High-Quality Products</p>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
-                <h2>{stats.customers}</h2>
+                {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.customers}</h2>}
                 <p>Happy Customers</p>
               </div>
             </div>

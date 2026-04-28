@@ -2,6 +2,7 @@ import { Outfit } from "next/font/google";
 import Script from 'next/script';
 import "./globals.css";
 import ReduxProvider from "@/lib/redux/ReduxProvider";
+import { ToastProvider } from "@/context/ToastContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -21,9 +22,11 @@ export default function RootLayout({ children }) {
       <body>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         <ReduxProvider>
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          <ToastProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </ToastProvider>
         </ReduxProvider>
       </body>
     </html>

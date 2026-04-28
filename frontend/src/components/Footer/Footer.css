@@ -206,3 +206,19 @@
     gap: 30px;
   }
 }
+
+@media (max-width: 480px) {
+  .footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .bottom-container {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  .newsletter-form {
+    width: 100%;
+  }
+}
+
