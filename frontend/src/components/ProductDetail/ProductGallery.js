@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import './ProductGallery.css';
 
 export default function ProductGallery({ images, selectedColor }) {
@@ -36,12 +37,14 @@ export default function ProductGallery({ images, selectedColor }) {
       </div>
       <div className="main-image">
         {currentActive ? (
-          <img 
+          <Image 
             src={currentActive.url} 
             alt="Product" 
             className="main-img" 
-            loading="eager"
-            fetchPriority="high"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            style={{ objectFit: 'cover' }}
           />
         ) : (
           <div className="main-img-placeholder"></div>

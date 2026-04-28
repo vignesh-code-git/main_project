@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { addItem } from '@/lib/redux/slices/cartSlice';
 import './ProductCard.css';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, priority = false }) {
   const dispatch = useDispatch();
 
   const handleAddToCart = (e) => {
@@ -24,6 +24,7 @@ export default function ProductCard({ product }) {
             alt={product.name} 
             className="real-product-img" 
             fill
+            priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
           />

@@ -140,15 +140,7 @@ export default function EditProductPage() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label>Main Category</label>
-            <select name="CategoryId" value={formData.CategoryId} onChange={handleChange} required>
-              <option value="">Select Category</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
+
 
           <div className="form-group">
             <label>Dress Style</label>

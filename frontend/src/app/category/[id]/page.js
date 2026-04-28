@@ -78,7 +78,7 @@ export default function CategoryPage() {
     <div className="category-page">
       <div className="container">
         <Breadcrumbs paths={breadcrumbPaths} />
-        
+
         <div className="category-layout">
           <aside className="category-sidebar">
             <Sidebar onApplyFilter={handleApplyFilter} />
@@ -95,7 +95,7 @@ export default function CategoryPage() {
               <div className="header-right">
                 <span className="sort-label">Sort by:</span>
                 <div className="category-sort-wrapper">
-                  <CustomSelect 
+                  <CustomSelect
                     options={['Most Popular', 'Newest', 'Price: Low to High', 'Price: High to Low']}
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -110,8 +110,12 @@ export default function CategoryPage() {
             ) : products.length > 0 ? (
               <>
                 <div className="category-products-grid">
-                  {products.map(product => (
-                    <ProductCard key={product.id} product={product} />
+                  {products.map((product, index) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      priority={index < 4}
+                    />
                   ))}
                 </div>
                 <div className="pagination-wrapper">

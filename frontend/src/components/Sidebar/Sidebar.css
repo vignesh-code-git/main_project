@@ -12,13 +12,14 @@
 }
 
 .sidebar-header h3 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #000;
 }
 
 .filter-icon {
-  opacity: 0.6;
+  opacity: 0.4;
+  color: #000;
 }
 
 .filter-section {
@@ -28,6 +29,7 @@
 }
 
 .category-links {
+  margin-top: 24px;
   border-bottom: 1px solid rgba(0,0,0,0.1);
   margin-bottom: 24px;
 }
@@ -42,7 +44,7 @@
   justify-content: space-between;
   align-items: center;
   color: rgba(0, 0, 0, 0.6);
-  padding: 12px 0;
+  padding: 16px 0;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
@@ -50,11 +52,11 @@
 
 .category-list li:hover {
   color: #000;
-  transform: translateX(5px);
 }
 
 .category-list li svg {
   opacity: 0.4;
+  stroke-width: 1.5;
 }
 
 .category-list li:hover,

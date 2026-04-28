@@ -194,17 +194,7 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Main Category</label>
-              <CustomSelect 
-                options={categories}
-                value={formData.CategoryId}
-                onChange={(e) => setFormData(prev => ({ ...prev, CategoryId: e.target.value }))}
-                placeholder="Select Category"
-                labelKey="name"
-                valueKey="id"
-              />
-            </div>
+
 
             <div className="form-group">
               <label>Dress Style</label>

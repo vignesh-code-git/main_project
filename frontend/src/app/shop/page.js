@@ -12,7 +12,7 @@ export default function ShopPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  
+
   // Filter States
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
@@ -64,9 +64,9 @@ export default function ShopPage() {
   return (
     <div className="shop-page">
       <Breadcrumbs paths={breadcrumbPaths} />
-      
-      <button 
-        className="mobile-filter-trigger" 
+
+      <button
+        className="mobile-filter-trigger"
         onClick={() => setShowMobileFilters(true)}
       >
         Filters <SlidersHorizontal size={18} />
@@ -82,18 +82,18 @@ export default function ShopPage() {
               </button>
               <SlidersHorizontal size={20} className="desktop-only" />
             </div>
-            
+
             <div className="filter-section">
               <h4>Categories</h4>
               <ul className="category-list">
-                <li 
-                  className={selectedCategory === '' ? 'active' : ''} 
+                <li
+                  className={selectedCategory === '' ? 'active' : ''}
                   onClick={() => setSelectedCategory('')}
                 >
                   All Products <ChevronRight size={16} />
                 </li>
                 {categories.map(cat => (
-                  <li 
+                  <li
                     key={cat.id}
                     className={selectedCategory === cat.id ? 'active' : ''}
                     onClick={() => setSelectedCategory(cat.id)}
@@ -108,13 +108,13 @@ export default function ShopPage() {
               <h4>Price Range</h4>
               <div className="price-inputs">
                 <span>₹{minPrice}</span>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="10000" 
+                <input
+                  type="range"
+                  min="0"
+                  max="10000"
                   step="100"
-                  value={maxPrice} 
-                  onChange={(e) => setMaxPrice(parseInt(e.target.value))} 
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(parseInt(e.target.value))}
                 />
                 <span>₹{maxPrice}</span>
               </div>
@@ -124,7 +124,7 @@ export default function ShopPage() {
               <h4>Style</h4>
               <div className="tag-filters">
                 {['Casual', 'Formal', 'Party', 'Gym'].map(style => (
-                  <button 
+                  <button
                     key={style}
                     className={selectedStyle === style ? 'active' : ''}
                     onClick={() => setSelectedStyle(selectedStyle === style ? '' : style)}
@@ -145,9 +145,9 @@ export default function ShopPage() {
             </div>
             <div className="shop-search">
               <Search size={20} className="search-icon" />
-              <input 
-                type="text" 
-                placeholder="Search products..." 
+              <input
+                type="text"
+                placeholder="Search products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -167,8 +167,12 @@ export default function ShopPage() {
             </div>
           ) : products.length > 0 ? (
             <div className="products-grid">
-              {products.map(product => (
-                <ProductCard key={product.id} product={product} />
+              {products.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  priority={index < 4}
+                />
               ))}
             </div>
           ) : (
