@@ -17,6 +17,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
 
   const [selectedSize, setSelectedSize] = useState('Large');
   const [quantity, setQuantity] = useState(1);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const colorMap = {
     'Olive': '#4F4F31',
@@ -33,13 +34,19 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      dispatch(addItem({
-        ...product,
-        size: selectedSize,
-        color: selectedColor
-      }));
-    }
+    setLoading(true);
+    setTimeout(() => {
+      for (let i = 0; i < quantity; i++) {
+        dispatch(addItem({
+          ...product,
+          size: selectedSize,
+          color: selectedColor
+        }));
+      }
+      setLoading(false);
+      setSuccessMsg('Added to cart successfully!');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    }, 500);
   };
 
   const handleBuyNow = () => {
@@ -99,7 +106,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         {product.originalPrice && (
           <>
             <span className="original-price">₹{product.originalPrice}</span>
-            <span className="discount-tag">-{Math.round((1 - product.price/product.originalPrice) * 100)}%</span>
+            <span className="discount-tag">-{Math.round((1 - product.price / product.originalPrice) * 100)}%</span>
           </>
         )}
       </div>
@@ -110,8 +117,8 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         <div className="color-swatches">
           {productColors.length > 0 ? (
             productColors.map(colorName => (
-              <div 
-                key={colorName} 
+              <div
+                key={colorName}
                 className={`color-swatch ${selectedColor === colorName ? 'active' : ''}`}
                 style={{ backgroundColor: colorMap[colorName] || '#CCC' }}
                 onClick={() => setSelectedColor(colorName)}
@@ -129,7 +136,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         <h4>Choose Size</h4>
         <div className="size-buttons">
           {sizes.map(size => (
-            <button 
+            <button
               key={size}
               className={`size-btn ${selectedSize === size ? 'active' : ''}`}
               onClick={() => setSelectedSize(size)}
@@ -141,28 +148,36 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       </div>
 
       <div className="actions-group-container">
-        <div className="quantity-row">
+        <div className="all-actions-row">
           <div className="quantity-selector">
             <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
             <span>{quantity}</span>
             <button onClick={() => setQuantity(quantity + 1)}>+</button>
           </div>
-        </div>
-        <div className="actions-group">
-          <button className="add-to-cart-btn" onClick={handleAddToCart}>Add to Cart</button>
+          
+          <button 
+            className="add-to-cart-btn" 
+            onClick={handleAddToCart}
+            disabled={loading}
+          >
+            {loading && !showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Add to Cart'}
+          </button>
+
           <button 
             className="buy-now-btn" 
             onClick={handleBuyNow} 
             disabled={loading}
           >
-            {loading ? <><Loader2 className="animate-spin" size={20} /> Processing...</> : 'Buy Now'}
+            {loading && showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Buy Now'}
           </button>
         </div>
+        
+        {successMsg && <div className="success-message">{successMsg}</div>}
       </div>
 
       {showRazorpay && (
-        <RazorpayDemo 
-          amount={product.price * quantity * 100} 
+        <RazorpayDemo
+          amount={product.price * quantity * 100}
           onSuccess={handlePaymentSuccess}
           onCancel={() => setShowRazorpay(false)}
         />

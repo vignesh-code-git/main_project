@@ -25,7 +25,7 @@ export default function ProductDetailClient({ product, relatedProducts, id }) {
         <ProductGallery images={product.images || []} selectedColor={selectedColor} />
         <ProductInfo product={product} selectedColor={selectedColor} setSelectedColor={setSelectedColor} />
       </section>
-      <ReviewSection reviews={product.Reviews || []} />
+      <ReviewSection productId={product.id} />
       <ProductSection title="YOU MIGHT ALSO LIKE" products={relatedProducts} />
     </>
   );

@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const path = require('path');
 
 // Models for associations
@@ -18,6 +19,7 @@ const User = require('./models/User');
 const Order = require('./models/Order');
 const OrderItem = require('./models/OrderItem');
 const Product = require('./models/Product');
+const Review = require('./models/Review');
 
 // Associations
 User.hasMany(Order, { foreignKey: 'userId' });
@@ -38,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Test DB Connection
 sequelize.authenticate()
