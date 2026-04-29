@@ -17,7 +17,7 @@ router.get('/:id', productController.getProductById);
 // Protected routes
 router.post('/', protect, isSeller, upload.any(), validateProduct, productController.createProduct);
 router.post('/bulk', protect, isSeller, upload.single('file'), productController.bulkUploadProducts);
-router.put('/:id', protect, isSeller, productController.updateProduct);
+router.put('/:id', protect, isSeller, upload.any(), validateProduct, productController.updateProduct);
 router.delete('/:id', protect, isSeller, productController.deleteProduct);
 
 module.exports = router;

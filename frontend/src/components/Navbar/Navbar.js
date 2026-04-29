@@ -43,7 +43,7 @@ export default function Navbar() {
         </Link>
       );
     }
-    
+
     if (!isAuthenticated || (user && user.role !== 'admin')) {
       return <Link href="/seller/auth" className="become-seller-link">Become a Seller</Link>;
     }
@@ -55,8 +55,8 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container nav-container">
         <div className="nav-left">
-          <button 
-            className="mobile-menu-btn" 
+          <button
+            className="mobile-menu-btn"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -65,20 +65,29 @@ export default function Navbar() {
         </div>
 
         <ul className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-          <li className="mobile-only logo-mobile"><Link href="/" onClick={() => setMobileMenuOpen(false)}>SHOP.CO</Link></li>
-          <li className="has-dropdown">
-            <Link href="/shop" className="dropdown-trigger">Shop <ChevronDown size={16} /></Link>
-            <ul className="dropdown-menu">
-              <li><Link href="/category/1">Casual</Link></li>
-              <li><Link href="/category/2">Formal</Link></li>
-              <li><Link href="/category/3">Party</Link></li>
-              <li><Link href="/category/4">Gym</Link></li>
-            </ul>
+          <div className="mobile-menu-header mobile-only">
+            <Link href="/" className="logo-mobile" onClick={() => setMobileMenuOpen(false)}>SHOP.CO</Link>
+            <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
+              <X size={28} />
+            </button>
+          </div>
+
+          <li className="mobile-link-item">
+            <Link href="/shop" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
           </li>
-          <li><Link href="/category/on-sale">On Sale</Link></li>
-          <li><Link href="/category/new-arrivals">New Arrivals</Link></li>
-          <li><Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link></li>
+          <li className="mobile-link-item">
+            <Link href="/category/on-sale" onClick={() => setMobileMenuOpen(false)}>On Sale</Link>
+          </li>
+          <li className="mobile-link-item">
+            <Link href="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)}>New Arrivals</Link>
+          </li>
+          <li className="mobile-link-item">
+            <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
+          </li>
+
+
         </ul>
+
 
         <div className="search-bar desktop-only">
           <Search size={20} className="search-icon" />
@@ -94,11 +103,11 @@ export default function Navbar() {
               <ShoppingCart size={24} />
               {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
             </Link>
-            
+
             {mounted && isAuthenticated ? (
               <div className="user-dropdown-container">
-                <button 
-                  className="user-trigger" 
+                <button
+                  className="user-trigger"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 >
                   {mounted && user?.avatar ? (

@@ -39,10 +39,17 @@
 
 html,
 body {
+  width: 100%;
   max-width: 100vw;
+  overflow-x: clip; /* Changed from hidden to prevent breaking sticky */
   color: var(--primary-black);
   background-color: var(--white);
+  margin: 0;
+  padding: 0;
 }
+
+
+
 
 a {
   color: inherit;
@@ -100,5 +107,6 @@ p {
 
   h2 {
     font-size: 32px;
+    margin-bottom: 24px;
   }
 }

@@ -36,8 +36,18 @@ export default function AddProductPage() {
   useEffect(() => {
     fetch('http://localhost:5000/api/products/categories')
       .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Error fetching categories:', err));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          console.error('Expected array for categories, got:', data);
+          setCategories([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching categories:', err);
+        setCategories([]);
+      });
   }, []);
 
   const handleChange = (e) => {
@@ -50,8 +60,10 @@ export default function AddProductPage() {
 
   const handleColorFileChange = (e, color) => {
     const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length !== 3) {
-      alert(`Please upload exactly 3 images for the ${color} variant.`);
+    if (selectedFiles.length === 0) return;
+    
+    if (selectedFiles.length > 3) {
+      alert(`Maximum 3 images allowed for the ${color} variant.`);
       e.target.value = null;
       return;
     }
@@ -138,11 +150,25 @@ export default function AddProductPage() {
         setColorFiles({});
         e.target.reset();
       } else {
-        const errorData = await response.json();
-        setStatus({ type: 'error', message: errorData.message || 'Failed to add product.' });
+        let errorMsg = 'Failed to add product.';
+        try {
+          const errorData = await response.json();
+          if (Array.isArray(errorData)) {
+            errorMsg = errorData.map(e => e.message).join(', ');
+          } else {
+            errorMsg = errorData.message || errorMsg;
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+              errorMsg = errorData.errors.map(e => e.message).join(', ');
+            }
+          }
+        } catch (parseErr) {
+          errorMsg = `Server error: ${response.status} ${response.statusText}`;
+        }
+        setStatus({ type: 'error', message: errorMsg });
       }
     } catch (err) {
-      setStatus({ type: 'error', message: 'Server error. Please try again later.' });
+      console.error('Product creation error:', err);
+      setStatus({ type: 'error', message: 'Connection error. Please check if the server is running.' });
     }
   };
 
@@ -165,7 +191,6 @@ export default function AddProductPage() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="e.g. Graphic T-shirt"
                 required
               />
             </div>
@@ -178,7 +203,6 @@ export default function AddProductPage() {
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  placeholder="2499"
                   required
                 />
               </div>
@@ -189,12 +213,21 @@ export default function AddProductPage() {
                   name="originalPrice"
                   value={formData.originalPrice}
                   onChange={handleChange}
-                  placeholder="2999"
                 />
               </div>
             </div>
 
 
+
+            <div className="form-group">
+              <label>Category</label>
+              <CustomSelect 
+                options={categories}
+                value={formData.CategoryId}
+                onChange={(e) => setFormData(prev => ({ ...prev, CategoryId: e.target.value }))}
+                placeholder="Select Category"
+              />
+            </div>
 
             <div className="form-group">
               <label>Dress Style</label>
@@ -274,7 +307,7 @@ export default function AddProductPage() {
                     
                     {colorFiles[color] && (
                       <div className="image-preview-grid">
-                        {Array.from(colorFiles[color]).map((file, idx) => (
+                        {Array.from(colorFiles[color] || []).map((file, idx) => (
                           <div key={idx} className="preview-item">
                             <img src={URL.createObjectURL(file)} alt="preview" />
                           </div>

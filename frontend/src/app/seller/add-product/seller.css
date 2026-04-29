@@ -470,3 +470,35 @@
   height: 100%;
   object-fit: cover;
 }
+
+.existing-images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.preview-item.new-file {
+  border: 2px solid #000;
+  position: relative;
+}
+
+.new-tag {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #000;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.preview-item.existing-file {
+  opacity: 0.7;
+}
+
+.preview-item.existing-file:hover {
+  opacity: 1;
+}

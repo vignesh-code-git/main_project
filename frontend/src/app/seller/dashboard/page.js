@@ -126,10 +126,10 @@ export default function SellerDashboard() {
             </div>
             <div className="stat-card">
               <h3>Total Revenue</h3>
-              <p>₹{orders.reduce((acc, order) => {
+              <p>₹{(orders || []).reduce((acc, order) => {
                 // Sum items that belong to this seller
-                const sellerTotal = order.OrderItems
-                  ?.filter(item => item.Product?.sellerId === user.id)
+                const sellerTotal = (order.OrderItems || [])
+                  .filter(item => item.Product?.sellerId === user?.id)
                   .reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 return acc + (sellerTotal || 0);
               }, 0).toFixed(2)}</p>
@@ -172,7 +172,7 @@ export default function SellerDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {products.length > 0 ? (
+                    {Array.isArray(products) && products.length > 0 ? (
                       products.map((product) => (
                         <tr key={product.id}>
                           <td>
@@ -230,15 +230,15 @@ export default function SellerDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.length > 0 ? (
+                    {Array.isArray(orders) && orders.length > 0 ? (
                       orders.map((order) => (
                         <tr key={order.id}>
                           <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
                           <td>{order.User?.name}</td>
                           <td>
                             <div className="mini-item-list-seller">
-                              {order.OrderItems
-                                ?.filter(item => item.Product?.sellerId === user.id)
+                              {(order.OrderItems || [])
+                                .filter(item => item.Product?.sellerId === user?.id)
                                 .map((item, idx) => (
                                   <div key={idx} className="seller-mini-item">
                                     {item.Product?.name} (x{item.quantity})

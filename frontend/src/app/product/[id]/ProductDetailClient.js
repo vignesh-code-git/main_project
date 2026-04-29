@@ -9,7 +9,7 @@ import ProductSection from "@/components/ProductSection/ProductSection";
 import './product-detail.css';
 
 export default function ProductDetailClient({ product, relatedProducts, id }) {
-  const [selectedColor, setSelectedColor] = useState(product.color ? product.color.split(',')[0] : '');
+  const [selectedColor, setSelectedColor] = useState(product.color ? product.color.split(',')[0].trim() : '');
 
   const breadcrumbPaths = [
     { name: 'Home', url: '/' },

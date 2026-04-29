@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import '../../add-product/seller.css';
+import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
 export default function EditProductPage() {
   const { id } = useParams();
@@ -18,9 +19,21 @@ export default function EditProductPage() {
     colors: ['Black'],
   });
 
+  const [colorFiles, setColorFiles] = useState({}); // { 'Olive': [file1, file2, file3], ... }
+  const [existingImages, setExistingImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(true);
+
+  const colorPresets = [
+    { name: 'Olive', value: '#4F4F31' },
+    { name: 'Navy', value: '#1A237E' },
+    { name: 'Black', value: '#000000' },
+    { name: 'White', value: '#FFFFFF' },
+    { name: 'Gray', value: '#808080' },
+    { name: 'Red', value: '#FF0000' },
+    { name: 'Blue', value: '#0000FF' }
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +46,10 @@ export default function EditProductPage() {
         const categoriesData = await catRes.json();
         const productData = await prodRes.json();
 
-        setCategories(categoriesData);
+        if (Array.isArray(categoriesData)) {
+          setCategories(categoriesData);
+        }
+
         setFormData({
           name: productData.name,
           price: productData.price,
@@ -44,6 +60,10 @@ export default function EditProductPage() {
           brand: productData.brand || '',
           colors: productData.color ? productData.color.split(',') : ['Black'],
         });
+        
+        if (productData.images) {
+          setExistingImages(productData.images);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
         setStatus({ type: 'error', message: 'Failed to load product data.' });
@@ -63,34 +83,72 @@ export default function EditProductPage() {
     }));
   };
 
+  const handleColorFileChange = (e, color) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length === 0) return;
+    
+    if (selectedFiles.length > 3) {
+      alert(`Maximum 3 images allowed for the ${color} variant.`);
+      e.target.value = null;
+      return;
+    }
+    setColorFiles(prev => ({
+      ...prev,
+      [color]: selectedFiles
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: 'loading', message: 'Updating product...' });
 
-    try {
-      const submitData = {
-        ...formData,
-        color: formData.colors.join(',')
-      };
-      delete submitData.colors;
+    const submitData = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (key === 'colors') {
+        submitData.append('color', formData.colors.join(','));
+      } else {
+        submitData.append(key, formData[key]);
+      }
+    });
+    
+    // Append new files with color prefix
+    Object.keys(colorFiles).forEach(color => {
+      colorFiles[color].forEach(file => {
+        submitData.append(`images_${color}`, file);
+      });
+    });
 
+    try {
       const response = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(submitData),
+        body: submitData,
       });
 
       if (response.ok) {
         setStatus({ type: 'success', message: 'Product updated successfully!' });
         setTimeout(() => router.push('/seller/dashboard'), 1500);
       } else {
-        const errorData = await response.json();
-        setStatus({ type: 'error', message: errorData.message || 'Failed to update product.' });
+        let errorMsg = 'Failed to update product.';
+        try {
+          const errorData = await response.json();
+          if (Array.isArray(errorData)) {
+            errorMsg = errorData.map(e => e.message).join(', ');
+          } else {
+            errorMsg = errorData.message || errorMsg;
+            if (errorData.errors && Array.isArray(errorData.errors)) {
+              errorMsg = errorData.errors.map(e => e.message).join(', ');
+            }
+          }
+        } catch (parseErr) {
+          errorMsg = `Server error: ${response.status} ${response.statusText}`;
+        }
+        setStatus({ type: 'error', message: errorMsg });
       }
     } catch (err) {
+      console.error('Update error:', err);
       setStatus({ type: 'error', message: 'Server error. Please try again later.' });
     }
   };
@@ -140,31 +198,40 @@ export default function EditProductPage() {
             </div>
           </div>
 
-
+          <div className="form-group">
+            <label>Category</label>
+            <CustomSelect 
+              options={categories}
+              value={formData.CategoryId}
+              onChange={(e) => setFormData(prev => ({ ...prev, CategoryId: e.target.value }))}
+              placeholder="Select Category"
+            />
+          </div>
 
           <div className="form-group">
             <label>Dress Style</label>
-            <select name="style" value={formData.style} onChange={handleChange} required>
-              <option value="">Select Style</option>
-              <option value="Casual">Casual</option>
-              <option value="Formal">Formal</option>
-              <option value="Party">Party</option>
-              <option value="Gym">Gym</option>
-            </select>
+            <CustomSelect 
+              options={['Casual', 'Formal', 'Party', 'Gym']}
+              value={formData.style}
+              onChange={(e) => setFormData(prev => ({ ...prev, style: e.target.value }))}
+              placeholder="Select Style"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Brand</label>
+            <CustomSelect 
+              options={['ZARA', 'GUCCI', 'PRADA', 'VERSACE', 'Calvin Klein']}
+              value={formData.brand}
+              onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
+              placeholder="Select Brand"
+            />
           </div>
 
           <div className="form-group color-chooser-group">
             <label>Product Colors</label>
             <div className="color-presets">
-              {[
-                { name: 'Olive', value: '#4F4F31' },
-                { name: 'Navy', value: '#1A237E' },
-                { name: 'Black', value: '#000000' },
-                { name: 'White', value: '#FFFFFF' },
-                { name: 'Gray', value: '#808080' },
-                { name: 'Red', value: '#FF0000' },
-                { name: 'Blue', value: '#0000FF' }
-              ].map(color => (
+              {colorPresets.map(color => (
                 <div 
                   key={color.name}
                   className={`color-preset-item ${formData.colors.includes(color.name) ? 'selected' : ''}`}
@@ -185,6 +252,63 @@ export default function EditProductPage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="form-group color-assets-section">
+            <label>Add New Color Images (Optional)</label>
+            {formData.colors.map(color => (
+              <div key={color} className="color-upload-box">
+                <div className="color-upload-header">
+                  <div 
+                    className="color-indicator" 
+                    style={{ 
+                      backgroundColor: colorPresets.find(p => p.name === color)?.value || '#808080' 
+                    }}
+                  ></div>
+                  <span>{color} Gallery</span>
+                </div>
+                
+                <div className="custom-upload-wrapper">
+                  <div className="upload-btn-row">
+                    <label htmlFor={`files-${color}`} className="stylish-upload-btn">
+                      Upload New {color} Images
+                    </label>
+                  </div>
+                  <input
+                    id={`files-${color}`}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => handleColorFileChange(e, color)}
+                    style={{ display: 'none' }}
+                  />
+                  
+                  {/* Preview new files */}
+                  {colorFiles[color] && (
+                    <div className="image-preview-grid">
+                      {Array.from(colorFiles[color] || []).map((file, idx) => (
+                        <div key={idx} className="preview-item new-file">
+                          <img src={URL.createObjectURL(file)} alt="preview" />
+                          <span className="new-tag">NEW</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Show existing images for this color */}
+                  <div className="existing-images-grid">
+                    {existingImages
+                      .filter(img => img.color === color || (!img.color && color === 'Black' && existingImages.length === 1))
+                      .map((img, idx) => (
+                        <div key={idx} className="preview-item existing-file">
+                          <img src={img.url} alt="existing" />
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="form-group">

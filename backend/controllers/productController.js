@@ -96,7 +96,7 @@ exports.createProduct = async (req, res) => {
       sellerId: req.user.id
     });
 
-    if (req.files) {
+    if (req.files && Array.isArray(req.files)) {
       const images = req.files.map(file => {
         // Expecting fieldname like "images_Olive" or "images_Black"
         const colorMatch = file.fieldname.match(/^images_(.+)$/);
@@ -139,10 +139,10 @@ exports.bulkUploadProducts = async (req, res) => {
 
           if (p.images) {
             const imageLinks = p.images.split(',');
-            const imageRecords = imageLinks.map(url => ({
+            const imageRecords = Array.isArray(imageLinks) ? imageLinks.map(url => ({
               url: url.trim(),
               ProductId: product.id
-            }));
+            })) : [];
             await ProductImage.bulkCreate(imageRecords);
           }
           createdProducts.push(product);
@@ -171,7 +171,7 @@ exports.getBrands = async (req, res) => {
       attributes: [[Product.sequelize.fn('DISTINCT', Product.sequelize.col('brand')), 'brand']],
       raw: true
     });
-    res.json(products.map(p => p.brand).filter(b => b));
+    res.json(Array.isArray(products) ? products.map(p => p.brand).filter(b => b) : []);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -233,6 +233,20 @@ exports.updateProduct = async (req, res) => {
       style,
       color
     });
+
+    // Handle new image uploads
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const ProductImage = require('../models/ProductImage');
+      const images = req.files.map(file => {
+        const colorMatch = file.fieldname.match(/^images_(.+)$/);
+        return {
+          url: `http://localhost:5000/uploads/${file.filename}`,
+          ProductId: product.id,
+          color: colorMatch ? colorMatch[1] : null
+        };
+      });
+      await ProductImage.bulkCreate(images);
+    }
 
     res.json(product);
   } catch (err) {

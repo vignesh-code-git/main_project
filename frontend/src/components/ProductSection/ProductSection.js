@@ -8,7 +8,7 @@ export default function ProductSection({ title, products, viewAllHref }) {
       <div className="container">
         <h2>{title}</h2>
         <div className="product-grid">
-          {products.map((product) => (
+          {Array.isArray(products) && products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

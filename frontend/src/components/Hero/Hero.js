@@ -110,7 +110,8 @@ export default function Hero() {
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        const scale = 1.28;
+        const isMobile = window.innerWidth <= 992;
+        const scale = isMobile ? 1.5 : 1.28;
         if (canvasAspect > imgAspect) {
           drawHeight = visibleHeight * scale;
           drawWidth = drawHeight * imgAspect;
@@ -119,9 +120,15 @@ export default function Hero() {
           drawHeight = drawWidth / imgAspect;
         }
 
-        // Center horizontally with a small right-shift (5%), and maintain downward offset (10%)
-        offsetX = ((canvas.width - drawWidth) / 2) + (canvas.width * 0.05);
-        offsetY = (headerHeight * dpr) + (visibleHeight - drawHeight) / 2 + (canvas.height * 0.10);
+        if (isMobile) {
+          // Perfectly centered with a moderate left shift (12%) and further up (20%)
+          offsetX = ((canvas.width - drawWidth) / 2) - (canvas.width * 0.12);
+          offsetY = ((visibleHeight - drawHeight) / 2) - (canvas.height * 0.20);
+        } else {
+          // Center horizontally with a small right-shift (5%), and maintain downward offset (10%)
+          offsetX = ((canvas.width - drawWidth) / 2) + (canvas.width * 0.05);
+          offsetY = (headerHeight * dpr) + (visibleHeight - drawHeight) / 2 + (canvas.height * 0.10);
+        }
 
         context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
       }
@@ -150,9 +157,9 @@ export default function Hero() {
       <section className="hero">
         <div className="container hero-container">
           <div className="hero-content" ref={heroContentRef}>
-            <h1>FIND CLOTHES<br />THAT MATCHES<br />YOUR STYLE</h1>
-            <p>
-              Browse through our diverse range of meticulously crafted garments, designed<br />
+            <h1 className="hero-title">FIND CLOTHES <span className="hide-mobile"><br /></span>THAT MATCHES <span className="hide-mobile"><br /></span>YOUR STYLE</h1>
+            <p className="hero-description">
+              Browse through our diverse range of meticulously crafted garments, designed <span className="hide-mobile"><br /></span>
               to bring out your individuality and cater to your sense of style.
             </p>
             <button className="shop-now-btn">Shop Now</button>
@@ -181,9 +188,9 @@ export default function Hero() {
             ref={canvasRef}
             className="hero-animation-canvas"
           />
+          <div className="star star-large star-large-right">✦</div>
+          <div className="star star-small star-large-middle">✦</div>
         </div>
-        <div className="star star-large star-large-right">✦</div>
-        <div className="star star-small star-large-middle">✦</div>
       </section>
     </div>
   );

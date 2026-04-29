@@ -51,6 +51,15 @@ app.get('/', (req, res) => {
   res.send('SHOP.CO API is running...');
 });
 
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'An unexpected error occurred',
+    errors: err.errors || null
+  });
+});
+
 // Sync database and start server
 sequelize.sync({ alter: true })
   .then(async () => {

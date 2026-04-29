@@ -19,7 +19,7 @@ const validateProduct = (req, res, next) => {
   } catch (error) {
     return res.status(400).json({ 
       message: "Validation failed", 
-      errors: error.errors.map(err => ({ field: err.path[0], message: err.message }))
+      errors: Array.isArray(error.errors) ? error.errors.map(err => ({ field: err.path[0], message: err.message })) : [{ message: error.message }]
     });
   }
 };

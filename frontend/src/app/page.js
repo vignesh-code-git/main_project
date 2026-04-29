@@ -15,13 +15,19 @@ export default function Home() {
     // Fetch New Arrivals
     fetch('http://localhost:5000/api/products/new-arrivals')
       .then(res => res.json())
-      .then(data => setNewArrivals(data))
+      .then(data => {
+        if (Array.isArray(data)) setNewArrivals(data);
+        else console.error('Expected array for new arrivals:', data);
+      })
       .catch(err => console.error('Error fetching new arrivals:', err));
 
     // Fetch Top Selling
     fetch('http://localhost:5000/api/products/top-selling')
       .then(res => res.json())
-      .then(data => setTopSelling(data))
+      .then(data => {
+        if (Array.isArray(data)) setTopSelling(data);
+        else console.error('Expected array for top selling:', data);
+      })
       .catch(err => console.error('Error fetching top selling:', err));
   }, []);
 

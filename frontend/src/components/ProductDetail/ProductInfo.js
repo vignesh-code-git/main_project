@@ -29,7 +29,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
     'Blue': '#0000FF'
   };
 
-  const productColors = product.color ? product.color.split(',') : [];
+  const productColors = product.color ? product.color.split(',').map(c => c.trim()) : [];
 
   const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
