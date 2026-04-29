@@ -12,6 +12,8 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
   const cartItemsCount = useSelector((state) => state.cart.totalQuantity);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
@@ -31,7 +33,7 @@ export default function Navbar() {
     if (user && user.role === 'admin') {
       return (
         <Link href="/admin/dashboard" className="become-seller-link dashboard-link admin-link">
-          <LayoutDashboard size={16} /> Admin Panel
+          <LayoutDashboard size={14} /> <span className="nav-link-text">Admin Panel</span>
         </Link>
       );
     }
@@ -39,7 +41,7 @@ export default function Navbar() {
     if (user && user.role === 'seller') {
       return (
         <Link href="/seller/dashboard" className="become-seller-link dashboard-link">
-          <LayoutDashboard size={16} /> Seller Panel
+          <LayoutDashboard size={14} /> <span className="nav-link-text">Seller Panel</span>
         </Link>
       );
     }
@@ -53,105 +55,127 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="container nav-container">
-        <div className="nav-left">
-          <button
-            className="mobile-menu-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-          <Link href="/" className="logo">SHOP.CO</Link>
-        </div>
-
-        <ul className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-          <div className="mobile-menu-header mobile-only">
-            <Link href="/" className="logo-mobile" onClick={() => setMobileMenuOpen(false)}>SHOP.CO</Link>
-            <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
-              <X size={28} />
+      {!mobileSearchOpen ? (
+        <div className="container nav-container">
+          <div className="nav-left">
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+            <Link href="/" className="logo">SHOP.CO</Link>
           </div>
 
-          <li className="mobile-link-item">
-            <Link href="/shop" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
-          </li>
-          <li className="mobile-link-item">
-            <Link href="/category/on-sale" onClick={() => setMobileMenuOpen(false)}>On Sale</Link>
-          </li>
-          <li className="mobile-link-item">
-            <Link href="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)}>New Arrivals</Link>
-          </li>
-          <li className="mobile-link-item">
-            <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
-          </li>
+          <ul className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+            <div className="mobile-menu-header mobile-only">
+              <Link href="/" className="logo-mobile" onClick={() => setMobileMenuOpen(false)}>SHOP.CO</Link>
+              <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
+                <X size={28} />
+              </button>
+            </div>
 
+            <li className="mobile-link-item">
+              <Link href="/shop" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
+            </li>
+            <li className="mobile-link-item">
+              <Link href="/category/on-sale" onClick={() => setMobileMenuOpen(false)}>On Sale</Link>
+            </li>
+            <li className="mobile-link-item">
+              <Link href="/category/new-arrivals" onClick={() => setMobileMenuOpen(false)}>New Arrivals</Link>
+            </li>
+            <li className="mobile-link-item">
+              <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
+            </li>
+          </ul>
 
-        </ul>
+          <div className="search-bar desktop-only">
+            <Search size={20} className="search-icon" />
+            <input type="text" placeholder="Search for products..." />
+          </div>
 
+          <div className="nav-right">
+            <div className="nav-icons">
+              <button
+                className="search-btn-mobile mobile-only"
+                onClick={() => setMobileSearchOpen(true)}
+              >
+                <Search size={24} />
+              </button>
 
-        <div className="search-bar desktop-only">
-          <Search size={20} className="search-icon" />
-          <input type="text" placeholder="Search for products..." />
-        </div>
-
-        <div className="nav-right">
-          <div className="nav-icons">
-            <button className="search-btn-mobile mobile-only">
-              <Search size={24} />
-            </button>
-            <Link href="/cart" className="cart-icon" title="View Cart">
-              <ShoppingCart size={24} />
-              {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
-            </Link>
-
-            {mounted && isAuthenticated ? (
-              <div className="user-dropdown-container">
-                <button
-                  className="user-trigger"
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                >
-                  {mounted && user?.avatar ? (
-                    <img src={`http://localhost:5000${user.avatar}`} alt="Avatar" className="nav-avatar-img" />
-                  ) : (
-                    <UserCircle size={24} />
-                  )}
-                  <span className="user-name-text">Hi, {user.name.split(' ')[0]}</span>
-                  <ChevronDown size={14} className={userDropdownOpen ? 'rotate' : ''} />
-                </button>
-
-                {userDropdownOpen && (
-                  <div className="user-dropdown-menu">
-                    <div className="dropdown-user-info">
-                      <p className="user-full-name">{user.name}</p>
-                      <p className="user-email-text">{user.email}</p>
-                      <span className="user-role-badge">{user.role}</span>
-                    </div>
-                    <div className="dropdown-divider"></div>
-                    <Link href="/profile" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
-                      <User size={16} /> My Profile
-                    </Link>
-                    <Link href="/orders" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
-                      <Package size={16} /> My Orders
-                    </Link>
-                    <Link href="/settings" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
-                      <Settings size={16} /> Settings
-                    </Link>
-                    <div className="dropdown-divider"></div>
-                    <button onClick={handleLogout} className="dropdown-item logout-item">
-                      <LogOut size={16} /> Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link href="/auth/login" className="nav-login-link" title="Login">
-                <UserCircle size={24} />
+              <Link href="/cart" className="cart-icon" title="View Cart">
+                <ShoppingCart size={24} />
+                {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
               </Link>
-            )}
+
+              {mounted && isAuthenticated ? (
+                <div className="user-dropdown-container">
+                  <button
+                    className="user-trigger"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  >
+                    {mounted && user?.avatar ? (
+                      <img src={`http://localhost:5000${user.avatar}`} alt="Avatar" className="nav-avatar-img" />
+                    ) : (
+                      <UserCircle size={24} />
+                    )}
+                    <span className="user-name-text">Hi, {user.name.split(' ')[0]}</span>
+                    <ChevronDown size={14} className={userDropdownOpen ? 'rotate' : ''} />
+                  </button>
+
+                  {userDropdownOpen && (
+                    <div className="user-dropdown-menu">
+                      <div className="dropdown-user-info">
+                        <p className="user-full-name">{user.name}</p>
+                        <p className="user-email-text">{user.email}</p>
+                        <span className="user-role-badge">{user.role}</span>
+                      </div>
+                      <div className="dropdown-divider"></div>
+                      <Link href="/profile" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
+                        <User size={16} /> My Profile
+                      </Link>
+                      <Link href="/orders" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
+                        <Package size={16} /> My Orders
+                      </Link>
+                      <Link href="/settings" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
+                        <Settings size={16} /> Settings
+                      </Link>
+                      <div className="dropdown-divider"></div>
+                      <button onClick={handleLogout} className="dropdown-item logout-item">
+                        <LogOut size={16} /> Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link href="/auth/login" className="nav-login-link" title="Login">
+                  <UserCircle size={24} />
+                </Link>
+              )}
+            </div>
+            {renderAuthLinks()}
           </div>
-          {renderAuthLinks()}
         </div>
-      </div>
+      ) : (
+        <div className="mobile-search-full-width">
+          <div className="mobile-search-container">
+            <Search size={20} className="mobile-search-icon" />
+            <input
+              type="text"
+              placeholder="Search for products..."
+              autoFocus
+              className="mobile-search-input"
+            />
+            <button
+              className="mobile-search-close"
+              onClick={() => setMobileSearchOpen(false)}
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
+

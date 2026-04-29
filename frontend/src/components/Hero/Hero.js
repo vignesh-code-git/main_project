@@ -132,9 +132,11 @@ export default function Hero() {
 
 
 
-          // Center horizontally with a small right-shift (5%), and maintain downward offset (10%)
-          offsetX = ((canvas.width - drawWidth) / 2) + (canvas.width * 0.05);
+          // Center horizontally (0% shift), and maintain downward offset (10%)
+          offsetX = ((canvas.width - drawWidth) / 2);
           offsetY = (headerHeight * dpr) + (visibleHeight - drawHeight) / 2 + (canvas.height * 0.10);
+
+
         }
 
         context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
@@ -166,10 +168,14 @@ export default function Hero() {
           <div className="hero-content" ref={heroContentRef}>
             <h1 className="hero-title">FIND CLOTHES <span className="hide-mobile"><br /></span>THAT MATCHES <span className="hide-mobile"><br /></span>YOUR STYLE</h1>
             <p className="hero-description">
-              Browse through our diverse range of meticulously crafted <br className="mobile-only" />
-              garments, designed to bring out your individuality and <br className="mobile-only" />
-              cater to your sense of style.
+              Browse through our diverse range of meticulously crafted garments, designed to bring out your <br />
+              individuality and cater to your sense of style, complemented by exceptional craftsmanship <br />
+              and a commitment to enduring elegance and quality.
             </p>
+
+
+
+
 
 
 

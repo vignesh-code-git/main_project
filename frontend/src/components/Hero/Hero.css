@@ -136,9 +136,11 @@
 
 .star-large-middle {
   font-size: 120px;
-  top: 25%;
+  top: 8%;
   left: 55%;
 }
+
+
 
 .star-9 {
   top: 34%;
@@ -224,19 +226,21 @@
     width: calc(100% - 40px);
     max-width: 320px;
     padding: 14px 0;
-    margin: 10px 20px;
+    margin: 10px auto;
     z-index: 10;
   }
+
 
   .hero-stats {
     order: 5;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 15px;
     width: 100%;
     padding: 0 20px 20px;
     z-index: 10;
   }
+
 
 
 
