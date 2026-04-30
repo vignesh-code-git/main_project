@@ -50,6 +50,8 @@ export default function CategoryPage() {
         if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice);
         if (filters.color) params.append('color', filters.color);
         if (filters.style) params.append('style', filters.style);
+        if (filters.size) params.append('size', filters.size);
+        if (filters.search) params.append('search', filters.search);
 
         const prodRes = await fetch(`${endpoint}?${params.toString()}`);
         const prodData = await prodRes.json();

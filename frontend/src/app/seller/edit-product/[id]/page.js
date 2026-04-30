@@ -159,11 +159,6 @@ export default function EditProductPage() {
     <div className="container seller-container">
       <h1>Edit Product</h1>
       <div className="form-card">
-        {status.message && (
-          <div className={`status-message ${status.type}`}>
-            {status.message}
-          </div>
-        )}
         <form onSubmit={handleSubmit} className="product-form">
           <div className="form-group">
             <label>Product Name</label>
@@ -326,6 +321,12 @@ export default function EditProductPage() {
             <button type="submit" className="submit-product-btn">Update Product</button>
             <button type="button" onClick={() => router.back()} className="cancel-btn">Cancel</button>
           </div>
+
+          {status.message && (
+            <div className={`status-message-below ${status.type}`}>
+              {status.message}
+            </div>
+          )}
         </form>
       </div>
     </div>

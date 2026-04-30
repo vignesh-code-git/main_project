@@ -20,13 +20,13 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [successMsg, setSuccessMsg] = useState('');
 
   const colorMap = {
-    'Olive': '#4F4F31',
-    'Navy': '#1A237E',
-    'Black': '#000000',
-    'White': '#FFFFFF',
-    'Gray': '#808080',
-    'Red': '#FF0000',
-    'Blue': '#0000FF'
+    'olive': '#4F4F31',
+    'navy': '#1A237E',
+    'black': '#000000',
+    'white': '#FFFFFF',
+    'gray': '#808080',
+    'red': '#FF0000',
+    'blue': '#0000FF'
   };
 
   const productColors = product.color ? product.color.split(',').map(c => c.trim()) : [];
@@ -120,7 +120,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
               <div
                 key={colorName}
                 className={`color-swatch ${selectedColor === colorName ? 'active' : ''}`}
-                style={{ backgroundColor: colorMap[colorName] || '#CCC' }}
+                style={{ backgroundColor: colorMap[colorName.toLowerCase()] || colorName }}
                 onClick={() => setSelectedColor(colorName)}
               >
                 {selectedColor === colorName && <span className="check">✓</span>}

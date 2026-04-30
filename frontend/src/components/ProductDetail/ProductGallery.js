@@ -6,7 +6,10 @@ import './ProductGallery.css';
 
 export default function ProductGallery({ images, selectedColor }) {
   // Filter images based on selected color
-  const filteredImages = images.filter(img => img.color === selectedColor || !img.color);
+  const filteredImages = images.filter(img => 
+    (img.color && selectedColor && img.color.toLowerCase() === selectedColor.toLowerCase()) || 
+    !img.color
+  );
   
   // Use a fallback if no images match the selected color
   const displayImages = filteredImages.length > 0 ? filteredImages : images.slice(0, 3);

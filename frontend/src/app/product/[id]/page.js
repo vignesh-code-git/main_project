@@ -2,7 +2,7 @@ import ProductDetailClient from './ProductDetailClient';
 
 async function getProduct(id) {
   const res = await fetch(`http://localhost:5000/api/products/${id}`, {
-    next: { revalidate: 3600 } // Revalidate every hour
+    cache: 'no-store'
   });
   
   if (!res.ok) return null;
@@ -11,7 +11,7 @@ async function getProduct(id) {
 
 async function getRelatedProducts(categoryId, currentProductId) {
   const res = await fetch(`http://localhost:5000/api/products?categoryId=${categoryId}`, {
-    next: { revalidate: 3600 }
+    cache: 'no-store'
   });
   
   if (!res.ok) return [];
