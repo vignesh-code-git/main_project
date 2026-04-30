@@ -14,22 +14,12 @@ const testimonialRoutes = require('./routes/testimonialRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const path = require('path');
 
-// Models for associations
-const User = require('./models/User');
-const Order = require('./models/Order');
-const OrderItem = require('./models/OrderItem');
-const Product = require('./models/Product');
-const Review = require('./models/Review');
-
-// Associations
-User.hasMany(Order, { foreignKey: 'userId' });
-Order.belongsTo(User, { foreignKey: 'userId' });
-Order.hasMany(OrderItem, { foreignKey: 'orderId' });
-OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
-OrderItem.belongsTo(Product, { foreignKey: 'productId' });
-Product.hasMany(OrderItem, { foreignKey: 'productId' });
-
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -41,6 +31,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/seller', require('./routes/sellerRoutes'));
 
 // Test DB Connection
 sequelize.authenticate()
@@ -65,6 +56,8 @@ sequelize.sync({ alter: true })
   .then(async () => {
     // DATA FIX: Assign orphan products to the first seller for demo/testing
     try {
+      const Product = require('./models/Product');
+      const User = require('./models/User');
       const orphanCount = await Product.count({ where: { sellerId: null } });
       if (orphanCount > 0) {
         const firstSeller = await User.findOne({ where: { role: 'seller' } });

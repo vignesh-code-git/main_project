@@ -8,21 +8,22 @@ const seed = async () => {
   try {
     await sequelize.sync({ force: true });
 
-    const casual = await Category.create({ name: 'Casual' });
-    const formal = await Category.create({ name: 'Formal' });
-    const party = await Category.create({ name: 'Party' });
-    const gym = await Category.create({ name: 'Gym' });
+    const tshirts = await Category.create({ name: 'T-shirts' });
+    const shorts = await Category.create({ name: 'Shorts' });
+    const shirts = await Category.create({ name: 'Shirts' });
+    const hoodie = await Category.create({ name: 'Hoodie' });
+    const jeans = await Category.create({ name: 'Jeans' });
 
     const products = await Product.bulkCreate([
-      { name: "T-shirt with Tape Details", price: 120, rating: 4.5, CategoryId: casual.id, brand: 'ZARA' },
-      { name: "Skinny Fit Jeans", price: 240, originalPrice: 260, rating: 3.5, CategoryId: casual.id, brand: 'PRADA' },
-      { name: "Checkered Shirt", price: 180, rating: 4.5, CategoryId: casual.id, brand: 'GUCCI' },
-      { name: "Sleeve Striped T-shirt", price: 130, originalPrice: 160, rating: 4.5, CategoryId: casual.id, brand: 'ZARA' },
+      { name: "T-shirt with Tape Details", price: 120, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
+      { name: "Skinny Fit Jeans", price: 240, originalPrice: 260, rating: 3.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual' },
+      { name: "Checkered Shirt", price: 180, rating: 4.5, CategoryId: shirts.id, brand: 'GUCCI', style: 'Formal' },
+      { name: "Sleeve Striped T-shirt", price: 130, originalPrice: 160, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
 
-      { name: "Vertical Striped Shirt", price: 212, originalPrice: 232, rating: 5.0, CategoryId: formal.id, brand: 'VERSACE' },
-      { name: "Courage Graphic T-shirt", price: 145, rating: 4.0, CategoryId: casual.id, brand: 'ZARA' },
-      { name: "Loose Fit Bermuda Shorts", price: 80, rating: 3.0, CategoryId: gym.id, brand: 'Calvin Klein' },
-      { name: "Faded Skinny Jeans", price: 210, rating: 4.5, CategoryId: casual.id, brand: 'PRADA' },
+      { name: "Vertical Striped Shirt", price: 212, originalPrice: 232, rating: 5.0, CategoryId: shirts.id, brand: 'VERSACE', style: 'Formal' },
+      { name: "Courage Graphic T-shirt", price: 145, rating: 4.0, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
+      { name: "Loose Fit Bermuda Shorts", price: 80, rating: 3.0, CategoryId: shorts.id, brand: 'Calvin Klein', style: 'Gym' },
+      { name: "Faded Skinny Jeans", price: 210, rating: 4.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual' },
     ]);
 
     const user1 = await User.create({ name: 'Sarah M.', email: 'sarah@example.com', password: 'password123', role: 'customer' });

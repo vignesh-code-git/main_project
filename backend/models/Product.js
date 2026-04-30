@@ -45,6 +45,36 @@ const Product = sequelize.define('Product', {
   color: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  size: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  details: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
+  isFreeDelivery: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  stock: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false
+  },
+  sku: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  },
+  deliveryDays: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  videoUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

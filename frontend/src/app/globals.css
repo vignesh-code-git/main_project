@@ -35,6 +35,11 @@
 
 .main-content-wrapper {
   padding-top: var(--header-total-height);
+  overflow: visible !important;
+}
+
+.panel-layout {
+  overflow: visible !important;
 }
 
 html,

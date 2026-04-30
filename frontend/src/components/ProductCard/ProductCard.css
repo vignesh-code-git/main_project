@@ -8,7 +8,8 @@
 .product-image {
   background: var(--secondary-gray);
   border-radius: 20px;
-  height: 295px;
+  aspect-ratio: 1 / 1;
+  width: 100%;
   margin-bottom: 16px;
   position: relative;
   overflow: hidden;
@@ -110,7 +111,6 @@
 
 @media (max-width: 768px) {
   .product-image {
-    height: 200px;
     border-radius: 12px;
     margin-bottom: 10px;
   }
@@ -144,8 +144,6 @@
 }
 
 @media (max-width: 480px) {
-  .product-image {
-    height: 170px;
-  }
+  /* No overrides needed for product-image here */
 }
 

@@ -54,6 +54,22 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
+exports.getSellerProducts = async (req, res) => {
+  try {
+    const products = await Product.findAll({
+      where: { sellerId: req.user.id },
+      include: [
+        { model: ProductImage, as: 'images' },
+        { model: Category }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getNewArrivals = async (req, res) => {
   try {
     const products = await Product.findAll({
@@ -82,7 +98,17 @@ exports.getTopSelling = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, originalPrice, rating, description, CategoryId, brand, style, color } = req.body;
+    let { name, price, originalPrice, rating, description, CategoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
+    
+    // Parse details if it comes as a string
+    if (details && typeof details === 'string') {
+      try {
+        details = JSON.parse(details);
+      } catch (e) {
+        console.error("Failed to parse details JSON:", e);
+      }
+    }
+
     const product = await Product.create({
       name,
       price,
@@ -93,19 +119,29 @@ exports.createProduct = async (req, res) => {
       brand,
       style,
       color,
+      size,
+      details,
+      isFreeDelivery,
+      stock,
+      sku,
+      deliveryDays,
+      videoUrl: req.files && req.files.find(f => f.fieldname === 'video') 
+        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}` 
+        : videoUrl,
       sellerId: req.user.id
     });
 
     if (req.files && Array.isArray(req.files)) {
-      const images = req.files.map(file => {
-        // Expecting fieldname like "images_Olive" or "images_Black"
-        const colorMatch = file.fieldname.match(/^images_(.+)$/);
-        return {
-          url: `http://localhost:5000/uploads/${file.filename}`,
-          ProductId: product.id,
-          color: colorMatch ? colorMatch[1] : null
-        };
-      });
+      const images = req.files
+        .filter(file => file.fieldname.startsWith('images_'))
+        .map(file => {
+          const colorMatch = file.fieldname.match(/^images_(.+)$/);
+          return {
+            url: `http://localhost:5000/uploads/${file.filename}`,
+            ProductId: product.id,
+            color: colorMatch ? colorMatch[1] : null
+          };
+        });
       await ProductImage.bulkCreate(images);
     }
 
@@ -216,7 +252,16 @@ exports.getStats = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    const { name, price, originalPrice, description, CategoryId, brand, style, color } = req.body;
+    let { name, price, originalPrice, description, CategoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
+    
+    if (details && typeof details === 'string') {
+      try {
+        details = JSON.parse(details);
+      } catch (e) {
+        console.error("Failed to parse details JSON:", e);
+      }
+    }
+
     const product = await Product.findByPk(req.params.id);
 
     if (!product) {
@@ -231,7 +276,16 @@ exports.updateProduct = async (req, res) => {
       CategoryId,
       brand,
       style,
-      color
+      color,
+      size,
+      details,
+      isFreeDelivery,
+      stock,
+      sku,
+      deliveryDays,
+      videoUrl: req.files && req.files.find(f => f.fieldname === 'video') 
+        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}` 
+        : videoUrl
     });
 
     // Handle new image uploads

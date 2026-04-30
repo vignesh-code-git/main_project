@@ -25,11 +25,11 @@
   background: #fff;
   border-color: #000;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .custom-select-trigger.placeholder span {
-  color: rgba(0, 0, 0, 0.4);
+  color: #666;
 }
 
 .chevron-icon {
@@ -55,13 +55,13 @@
   max-height: 250px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .custom-select-option {
   padding: 12px 20px;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  color: #333;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -87,6 +87,6 @@
 }
 
 .custom-select-options::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }

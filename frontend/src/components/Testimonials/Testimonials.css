@@ -34,9 +34,7 @@
   transition: transform 0.2s;
 }
 
-.review-card:hover {
-  transform: translateY(-5px);
-}
+
 
 .review-card .stars {
   color: #FFC633;

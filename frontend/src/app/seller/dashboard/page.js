@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Package, DollarSign, ShoppingBag } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './seller-dashboard.css';
 import './seller-dashboard.css';
 
@@ -14,6 +15,7 @@ export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState('inventory');
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, productId: null });
   const router = useRouter();
 
   useEffect(() => {
@@ -81,8 +83,13 @@ export default function SellerDashboard() {
     }
   };
 
-  const deleteProduct = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
+  const deleteProduct = (id) => {
+    setDeleteModal({ isOpen: true, productId: id });
+  };
+
+  const executeDelete = async () => {
+    const id = deleteModal.productId;
+    setDeleteModal({ isOpen: false, productId: null });
 
     try {
       const token = localStorage.getItem('token');
@@ -282,6 +289,16 @@ export default function SellerDashboard() {
           )}
         </div>
       </div>
+      
+      <ConfirmModal 
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, productId: null })}
+        onConfirm={executeDelete}
+        title="Delete Product?"
+        message="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Yes, Delete"
+        cancelText="No, Keep it"
+      />
     </>
   );
 }

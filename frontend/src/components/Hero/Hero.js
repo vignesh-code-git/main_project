@@ -168,10 +168,10 @@ export default function Hero() {
           <div className="hero-content" ref={heroContentRef}>
             <h1 className="hero-title">FIND CLOTHES <span className="hide-mobile"><br /></span>THAT MATCHES <span className="hide-mobile"><br /></span>YOUR STYLE</h1>
             <p className="hero-description">
-              Browse through our diverse range of meticulously crafted garments, designed to bring out your <br />
-              individuality and cater to your sense of style, complemented by exceptional craftsmanship <br />
-              and a commitment to enduring elegance and quality.
+              Browse through our diverse range of meticulously crafted garments, designed <br />
+              to bring out your individuality and cater to your sense of style.
             </p>
+
 
 
 
@@ -207,11 +207,14 @@ export default function Hero() {
             ref={canvasRef}
             className="hero-animation-canvas"
           />
+
           <span className="star star-large star-large-middle">✦</span>
-          <span className="star star-small">✦</span>
+
+
 
         </div>
       </section>
     </div>
   );
 }
+
