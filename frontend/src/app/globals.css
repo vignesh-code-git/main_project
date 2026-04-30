@@ -35,6 +35,7 @@
 
 .main-content-wrapper {
   padding-top: var(--header-total-height);
+  padding-bottom: 140px;
   overflow: visible !important;
 }
 

@@ -90,18 +90,13 @@ export default function Navbar() {
           </ul>
 
           <div className="search-bar desktop-only">
-            <Search size={20} className="search-icon" />
+            <Search size={20} className="nav-search-icon-fixed" />
             <input type="text" placeholder="Search for products..." />
           </div>
 
           <div className="nav-right">
             <div className="nav-icons">
-              <button
-                className="search-btn-mobile mobile-only"
-                onClick={() => setMobileSearchOpen(true)}
-              >
-                <Search size={24} />
-              </button>
+
 
               <Link href="/cart" className="cart-icon" title="View Cart">
                 <ShoppingCart size={24} />

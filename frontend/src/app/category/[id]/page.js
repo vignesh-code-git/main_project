@@ -31,6 +31,9 @@ export default function CategoryPage() {
         } else if (id === 'top-selling') {
           endpoint = 'http://localhost:5000/api/products/top-selling';
           setCategory({ name: 'Top Selling' });
+        } else if (id === 'on-sale') {
+          params.append('onSale', 'true');
+          setCategory({ name: 'On Sale' });
         } else if (styles.includes(id.toLowerCase())) {
           params.append('style', id.charAt(0).toUpperCase() + id.slice(1));
           setCategory({ name: id.charAt(0).toUpperCase() + id.slice(1) });
