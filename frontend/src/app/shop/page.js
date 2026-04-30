@@ -7,6 +7,7 @@ import Breadcrumbs from '@/components/Breadcrumbs/Breadcrumbs';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Pagination from '@/components/Pagination/Pagination';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import ProductCardSkeleton from '@/components/Skeleton/ProductCardSkeleton';
 import './shop-page.css';
 
 export default function ShopPage() {
@@ -66,7 +67,7 @@ function ShopPageContent() {
 
         const prodRes = await fetch(`${endpoint}?${params.toString()}`, { cache: 'no-store' });
         const prodData = await prodRes.json();
-        setProducts(Array.isArray(prodData) ? prodData : []);
+        setProducts(prodData.products || []);
       } catch (err) {
         console.error("Failed to fetch shop data:", err);
       } finally {
@@ -122,7 +123,11 @@ function ShopPageContent() {
             </header>
 
             {loading ? (
-              <div className="loading-state">LOADING PRODUCTS...</div>
+              <div className="shop-products-grid">
+                {[...Array(6)].map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
             ) : products.length > 0 ? (
               <>
                 <div className="shop-products-grid">

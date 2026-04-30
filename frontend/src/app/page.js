@@ -10,33 +10,38 @@ import Testimonials from "@/components/Testimonials/Testimonials";
 export default function Home() {
   const [newArrivals, setNewArrivals] = useState([]);
   const [topSelling, setTopSelling] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch New Arrivals
-    fetch('http://localhost:5000/api/products/new-arrivals')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setNewArrivals(data);
-        else console.error('Expected array for new arrivals:', data);
-      })
-      .catch(err => console.error('Error fetching new arrivals:', err));
+    const fetchHomeData = async () => {
+      setLoading(true);
+      try {
+        const [newRes, topRes] = await Promise.all([
+          fetch('http://localhost:5000/api/products/new-arrivals', { cache: 'no-store' }),
+          fetch('http://localhost:5000/api/products/top-selling', { cache: 'no-store' })
+        ]);
 
-    // Fetch Top Selling
-    fetch('http://localhost:5000/api/products/top-selling')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setTopSelling(data);
-        else console.error('Expected array for top selling:', data);
-      })
-      .catch(err => console.error('Error fetching top selling:', err));
+        const newData = await newRes.json();
+        const topData = await topRes.json();
+
+        setNewArrivals(newData.products || []);
+        setTopSelling(topData.products || []);
+      } catch (err) {
+        console.error('Error fetching home data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
   }, []);
 
   return (
     <>
       <Hero />
       <BrandBanner />
-      <ProductSection title="NEW ARRIVALS" products={newArrivals} viewAllHref="/category/new-arrivals" />
-      <ProductSection title="TOP SELLING" products={topSelling} viewAllHref="/category/top-selling" />
+      <ProductSection title="NEW ARRIVALS" products={newArrivals} viewAllHref="/category/new-arrivals" loading={loading} />
+      <ProductSection title="TOP SELLING" products={topSelling} viewAllHref="/category/top-selling" loading={loading} />
       <DressStyleGallery />
       <Testimonials />
     </>

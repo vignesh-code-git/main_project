@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
-import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2 } from 'lucide-react';
+import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -14,12 +14,17 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [notifications, setNotifications] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
+  const notificationRef = useRef(null);
 
   const cartItemsCount = useSelector((state) => state.cart.totalQuantity);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -31,20 +36,69 @@ export default function Navbar() {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
       }
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setNotificationOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Fetch Notifications based on role (Real Database values)
+  useEffect(() => {
+    if (mounted && isAuthenticated && user) {
+      const fetchNotifications = async () => {
+        try {
+          const res = await fetch('http://localhost:5000/api/notifications', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            cache: 'no-store'
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setNotifications(Array.isArray(data) ? data : []);
+          }
+        } catch (err) {
+          console.error('Error fetching notifications:', err);
+        }
+      };
+
+      fetchNotifications();
+      // Optional: Poll every 30 seconds for live updates
+      const interval = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [mounted, isAuthenticated, user]);
+
+  const handleMarkAsRead = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/notifications/mark-read', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.ok) {
+        // Optimistically clear the unread indicators
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      }
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
+    }
+  };
 
   // Live Search Logic
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchQuery.trim().length >= 2) {
         setIsSearching(true);
+        setSelectedIndex(-1);
         try {
-          const res = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}&limit=5`, { cache: 'no-store' });
+          const res = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}&limit=8`, { cache: 'no-store' });
           const data = await res.json();
-          setSearchResults(Array.isArray(data) ? data : []);
+          setSearchResults(data.products || []);
+          setTotalResults(data.total || 0);
           setShowResults(true);
         } catch (err) {
           console.error("Live search error:", err);
@@ -53,12 +107,36 @@ export default function Navbar() {
         }
       } else {
         setSearchResults([]);
+        setTotalResults(0);
         setShowResults(false);
       }
-    }, 300); // Debounce
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const handleKeyDown = (e) => {
+    if (!showResults || searchResults.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev < searchResults.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter') {
+      if (selectedIndex >= 0) {
+        e.preventDefault();
+        router.push(`/product/${searchResults[selectedIndex].id}`);
+        setShowResults(false);
+        setSearchQuery('');
+      } else {
+        handleSearch();
+      }
+    } else if (e.key === 'Escape') {
+      setShowResults(false);
+    }
+  };
 
   const handleSearch = (e) => {
     if (e) e.preventDefault();
@@ -146,15 +224,11 @@ export default function Navbar() {
             />
             <input 
               type="text" 
-              placeholder="Search for products..." 
+              placeholder="Search for products, brands, styles..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearch();
-                }
-              }}
+              onKeyDown={handleKeyDown}
             />
             {isSearching && (
               <div className="search-loader">
@@ -164,13 +238,21 @@ export default function Navbar() {
             
             {showResults && searchResults.length > 0 && (
               <div className="search-dropdown">
+                <div className="search-header-meta">
+                  <span>Found {totalResults} results</span>
+                  {totalResults > 8 && <span className="view-hint">Showing top 8</span>}
+                </div>
                 <div className="search-results-list">
-                  {searchResults.map(product => (
+                  {searchResults.map((product, index) => (
                     <Link 
                       href={`/product/${product.id}`} 
                       key={product.id} 
-                      className="search-result-item"
-                      onClick={() => setShowResults(false)}
+                      className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
+                      onClick={() => {
+                        setShowResults(false);
+                        setSearchQuery('');
+                      }}
+                      onMouseEnter={() => setSelectedIndex(index)}
                     >
                       <div className="result-img">
                         <img 
@@ -179,14 +261,20 @@ export default function Navbar() {
                         />
                       </div>
                       <div className="result-info">
-                        <p className="result-name">{product.name}</p>
+                        <div className="result-top">
+                          <p className="result-name">{product.name}</p>
+                          <div className="result-meta">
+                            {product.brand && <span className="result-brand">{product.brand}</span>}
+                            {product.style && <span className="result-style">{product.style}</span>}
+                          </div>
+                        </div>
                         <p className="result-price">₹{product.price}</p>
                       </div>
                     </Link>
                   ))}
                 </div>
                 <button className="view-all-results" onClick={handleSearch}>
-                  View all results for "{searchQuery}"
+                  View all {totalResults} results for "{searchQuery}"
                 </button>
               </div>
             )}
@@ -210,6 +298,57 @@ export default function Navbar() {
                 <ShoppingCart size={24} />
                 {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
               </Link>
+
+              {mounted && isAuthenticated && (
+                <div className="notification-container" ref={notificationRef}>
+                  <button 
+                    className="notification-trigger" 
+                    onClick={() => {
+                      setNotificationOpen(!notificationOpen);
+                      if (!notificationOpen) handleMarkAsRead();
+                    }}
+                    title="Notifications"
+                  >
+                    <Bell size={24} />
+                    {notifications.filter(n => !n.isRead).length > 0 && (
+                      <span className="notification-badge">
+                        {notifications.filter(n => !n.isRead).length}
+                      </span>
+                    )}
+                  </button>
+
+                  {notificationOpen && (
+                    <div className="notification-panel">
+                      <div className="notification-header">
+                        <h3>Notifications</h3>
+                        <span className="notif-count">
+                          {notifications.filter(n => !n.isRead).length} New
+                        </span>
+                      </div>
+                      <div className="notification-list">
+                        {notifications.length > 0 ? (
+                          notifications.map((notif) => (
+                            <div key={notif.id} className={`notification-item ${notif.type} ${!notif.isRead ? 'unread' : ''}`}>
+                              <div className="notif-content">
+                                <p className="notif-title">{notif.title}</p>
+                                <p className="notif-message">{notif.message}</p>
+                                <span className="notif-time">{new Date(notif.createdAt).toLocaleString()}</span>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="no-notifications">
+                            <p>No new notifications</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="notification-footer">
+                        <button onClick={handleMarkAsRead}>Clear all as read</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {mounted && isAuthenticated ? (
                 <div className="user-dropdown-container">

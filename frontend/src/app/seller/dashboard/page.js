@@ -42,7 +42,7 @@ export default function SellerDashboard() {
     try {
       const res = await fetch(`http://localhost:5000/api/products?sellerId=${sellerId}`);
       const data = await res.json();
-      setProducts(data);
+      setProducts(data.products || (Array.isArray(data) ? data : []));
     } catch (err) {
       console.error("Failed to fetch products:", err);
     }

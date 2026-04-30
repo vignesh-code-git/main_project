@@ -16,7 +16,8 @@ async function getRelatedProducts(categoryId, currentProductId) {
   
   if (!res.ok) return [];
   const data = await res.json();
-  return data.filter(p => p.id !== parseInt(currentProductId)).slice(0, 4);
+  const products = data.products || (Array.isArray(data) ? data : []);
+  return products.filter(p => p.id !== parseInt(currentProductId)).slice(0, 4);
 }
 
 export async function generateMetadata({ params }) {

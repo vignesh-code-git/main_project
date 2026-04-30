@@ -32,6 +32,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/seller', require('./routes/sellerRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Test DB Connection
 sequelize.authenticate()

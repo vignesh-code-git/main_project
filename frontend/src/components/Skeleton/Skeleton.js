@@ -1,14 +1,21 @@
-import React from 'react';
 import './Skeleton.css';
 
-const Skeleton = ({ width, height, borderRadius, className = '' }) => {
-  const style = {
+const Skeleton = ({ className, width, height, borderRadius, style }) => {
+  const styles = {
     width: width || '100%',
     height: height || '20px',
     borderRadius: borderRadius || '4px',
+    ...style
   };
 
-  return <div className={`skeleton-box ${className}`} style={style}></div>;
+  return (
+    <div 
+      className={`skeleton-base ${className || ''}`} 
+      style={styles}
+    >
+      <div className="skeleton-shimmer"></div>
+    </div>
+  );
 };
 
 export default Skeleton;

@@ -48,11 +48,11 @@ export default function MyProductsPage() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://127.0.0.1:5000/api/products/seller/my-products', {
+      const response = await axios.get('http://localhost:5000/api/products/seller/my-products', {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
-      setProducts(response.data);
+      setProducts(response.data.products || (Array.isArray(response.data) ? response.data : []));
       setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -60,15 +60,20 @@ export default function MyProductsPage() {
     }
   };
 
-  const processedProducts = products
+  const processedProducts = (products || [])
     .filter(p => {
-      // Search filter
-      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           p.category?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!p) return false;
+      
+      const searchLower = (searchTerm || '').toLowerCase();
+      const productName = (p.name || '').toLowerCase();
+      const categoryName = (p.Category?.name || '').toLowerCase();
+      
+      const matchesSearch = productName.includes(searchLower) || 
+                           categoryName.includes(searchLower);
       
       // Status filter
       const matchesStatus = filterStatus === 'all' || 
-                           (filterStatus === 'active' && p.stock > 0) ||
+                           (filterStatus === 'active' && (p.stock || 0) > 0) ||
                            (filterStatus === 'outofstock' && (p.stock === 0 || !p.stock));
       
       return matchesSearch && matchesStatus;
@@ -169,7 +174,7 @@ export default function MyProductsPage() {
               </thead>
               <tbody>
                 {processedProducts.map((product) => (
-                  <tr key={product._id}>
+                  <tr key={product.id}>
                     <td>
                       <div className="product-info-cell">
                         <img
@@ -179,12 +184,12 @@ export default function MyProductsPage() {
                         />
                         <div className="product-name-wrapper">
                           <span className="product-name">{product.name}</span>
-                          <span className="product-sku">ID: {product._id.slice(-6).toUpperCase()}</span>
+                          <span className="product-sku">ID: {product.id.toString().slice(-6).toUpperCase()}</span>
                         </div>
                       </div>
                     </td>
-                    <td>{product.category}</td>
-                    <td>${product.price}</td>
+                    <td>{product.Category?.name || 'Uncategorized'}</td>
+                    <td>₹{product.price}</td>
                     <td>{product.stock || 0} in stock</td>
                     <td>
                       <span className={`status-badge status-${product.stock > 0 ? 'active' : 'outofstock'}`}>
@@ -193,10 +198,10 @@ export default function MyProductsPage() {
                     </td>
                     <td>
                       <div className="action-btns">
-                        <Link href={`/product/${product._id}`} className="action-btn" title="View Store">
+                        <Link href={`/product/${product.id}`} className="action-btn" title="View Store">
                           <ExternalLink size={16} />
                         </Link>
-                        <Link href={`/seller/edit-product/${product._id}`} className="action-btn" title="Edit">
+                        <Link href={`/seller/edit-product/${product.id}`} className="action-btn" title="Edit">
                           <Edit size={16} />
                         </Link>
                         <button className="action-btn delete" title="Delete">

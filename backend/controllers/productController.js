@@ -17,10 +17,17 @@ exports.getAllProducts = async (req, res) => {
     if (sellerId) where.sellerId = sellerId;
 
     if (search) {
-      where[Op.or] = [
-        { name: { [Op.iLike]: `%${search}%` } },
-        { description: { [Op.iLike]: `%${search}%` } }
-      ];
+      const searchTerms = search.split(' ').filter(t => t.length > 0);
+      const searchConditions = searchTerms.map(term => ({
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${term}%` } },
+          { description: { [Op.iLike]: `%${term}%` } },
+          { brand: { [Op.iLike]: `%${term}%` } },
+          { style: { [Op.iLike]: `%${term}%` } },
+          { '$Category.name$': { [Op.iLike]: `%${term}%` } }
+        ]
+      }));
+      where[Op.and] = searchConditions;
     }
 
     if (brand) {
@@ -64,15 +71,16 @@ exports.getAllProducts = async (req, res) => {
     if (sortBy === 'rating') order = [['rating', 'DESC']];
     if (sortBy === 'popular') order = [['rating', 'DESC']];
 
-    const products = await Product.findAll({
+    const { count, rows: products } = await Product.findAndCountAll({
       where,
       order,
       include: [
         { model: ProductImage, as: 'images' },
         { model: Category }
-      ]
+      ],
+      distinct: true // To get accurate count with includes
     });
-    res.json(products);
+    res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -80,15 +88,16 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getSellerProducts = async (req, res) => {
   try {
-    const products = await Product.findAll({
+    const { count, rows: products } = await Product.findAndCountAll({
       where: { sellerId: req.user.id },
       include: [
         { model: ProductImage, as: 'images' },
         { model: Category }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      distinct: true
     });
-    res.json(products);
+    res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -126,13 +135,14 @@ exports.getNewArrivals = async (req, res) => {
       if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
     }
 
-    const products = await Product.findAll({
+    const { count, rows: products } = await Product.findAndCountAll({
       where,
       order: [['createdAt', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }]
+      include: [{ model: ProductImage, as: 'images' }],
+      distinct: true
     });
-    res.json(products);
+    res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -170,13 +180,14 @@ exports.getTopSelling = async (req, res) => {
       if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
     }
 
-    const products = await Product.findAll({
+    const { count, rows: products } = await Product.findAndCountAll({
       where,
       order: [['rating', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }]
+      include: [{ model: ProductImage, as: 'images' }],
+      distinct: true
     });
-    res.json(products);
+    res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -229,6 +240,20 @@ exports.createProduct = async (req, res) => {
           };
         });
       await ProductImage.bulkCreate(images);
+    }
+
+    // Create Notification for Seller
+    try {
+      const Notification = require('../models/Notification');
+      await Notification.create({
+        userId: req.user.id,
+        role: 'seller',
+        title: 'Product Listed Successfully',
+        message: `Your product "${product.name}" is now live on the store.`,
+        type: 'inventory'
+      });
+    } catch (notifErr) {
+      console.error('Failed to create notification:', notifErr);
     }
 
     res.status(201).json(product);

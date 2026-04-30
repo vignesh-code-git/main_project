@@ -1,0 +1,43 @@
+.product-detail-skeleton {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 40px 0;
+}
+
+.skeleton-gallery-section {
+  display: flex;
+  gap: 20px;
+}
+
+.skeleton-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-main-image {
+  flex: 1;
+}
+
+.skeleton-price-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.skeleton-circles {
+  display: flex;
+  gap: 12px;
+}
+
+.skeleton-actions {
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 992px) {
+  .product-detail-skeleton {
+    grid-template-columns: 1fr;
+  }
+}

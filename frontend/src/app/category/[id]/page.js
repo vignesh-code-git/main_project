@@ -12,6 +12,7 @@ import './category-page.css';
 export default function CategoryPage() {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({});
@@ -63,7 +64,14 @@ export default function CategoryPage() {
 
         const prodRes = await fetch(`${endpoint}?${params.toString()}`);
         const prodData = await prodRes.json();
-        setProducts(Array.isArray(prodData) ? prodData : []);
+        
+        if (prodData.products) {
+          setProducts(prodData.products);
+          setTotal(prodData.total || prodData.products.length);
+        } else {
+          setProducts(Array.isArray(prodData) ? prodData : []);
+          setTotal(Array.isArray(prodData) ? prodData.length : 0);
+        }
       } catch (err) {
         console.error("Failed to fetch category data:", err);
       } finally {
@@ -102,7 +110,7 @@ export default function CategoryPage() {
               <div className="header-left">
                 <h1>{category?.name || 'Loading...'}</h1>
                 <p className="product-count">
-                  {products.length > 0 ? `Showing 1-${products.length} of ${products.length} Products` : 'No Products Available'}
+                  {total > 0 ? `Showing 1-${products.length} of ${total} Products` : 'No Products Available'}
                 </p>
               </div>
               <div className="header-right">

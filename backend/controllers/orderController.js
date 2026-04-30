@@ -26,6 +26,39 @@ exports.createOrder = async (req, res) => {
       });
     }
 
+    // Create Notifications
+    try {
+      const Notification = require('../models/Notification');
+      
+      // Notify User
+      await Notification.create({
+        userId: userId,
+        role: 'customer',
+        title: 'Order Placed!',
+        message: `Your order #${order.id} has been placed successfully.`,
+        type: 'order'
+      });
+
+      // Notify Sellers (Get unique seller IDs from items)
+      const sellerIds = new Set();
+      for (const item of items) {
+        const product = await Product.findByPk(item.id);
+        if (product && product.sellerId) sellerIds.add(product.sellerId);
+      }
+
+      for (const sId of sellerIds) {
+        await Notification.create({
+          userId: sId,
+          role: 'seller',
+          title: 'New Order Received',
+          message: `You have a new order (#${order.id}) for your products.`,
+          type: 'order'
+        });
+      }
+    } catch (notifErr) {
+      console.error('Failed to create order notifications:', notifErr);
+    }
+
     res.status(201).json({ message: 'Order created successfully', order });
   } catch (error) {
     console.error(error);

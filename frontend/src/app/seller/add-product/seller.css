@@ -972,18 +972,18 @@ input:checked+.slider:before {
 }
 
 .tag-pill.new {
-  background: #E7F9ED;
-  color: #01AB31;
-}
-
-.tag-pill.top {
   background: #EBF2FF;
   color: #0066FF;
 }
 
-.tag-pill.free {
+.tag-pill.top {
   background: #FFF4E5;
   color: #FF8800;
+}
+
+.tag-pill.free {
+  background: #E7F9ED;
+  color: #01AB31;
 }
 
 .preview-modal-footer {
@@ -1014,7 +1014,7 @@ input:checked+.slider:before {
 .preview-thumb-box {
   position: relative;
   aspect-ratio: 1;
-  border-radius: 62px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid #eee;
 }
@@ -1045,7 +1045,7 @@ input:checked+.slider:before {
   align-items: center;
   justify-content: center;
   background: #f5f5f5;
-  border-radius: 62px;
+  border-radius: 12px;
   font-size: 12px;
   color: #999;
   border: 1px dashed #ccc;
