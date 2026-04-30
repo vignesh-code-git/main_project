@@ -18,7 +18,21 @@
 }
 
 .filter-icon {
-  opacity: 0.4;
+  opacity: 0.8;
+  color: #000;
+}
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: auto;
+  margin-right: 10px;
+  margin-top: 3px;
+}
+.clear-all-btn:hover {
   color: #000;
 }
 
@@ -26,6 +40,31 @@
   margin-bottom: 24px;
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.section-header svg {
+  color: #000;
+  transition: transform 0.2s ease;
+}
+
+.section-header:hover h3 {
+  color: #555;
 }
 
 .category-links {
@@ -60,7 +99,8 @@
 }
 
 .category-list li:hover,
-.category-list li.active-style {
+.category-list li.active-style,
+.category-list li.active-category {
   color: #000;
   font-weight: 700;
 }

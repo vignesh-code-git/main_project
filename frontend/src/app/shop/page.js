@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ProductCard/ProductCard';
 import Breadcrumbs from '@/components/Breadcrumbs/Breadcrumbs';
 import Sidebar from '@/components/Sidebar/Sidebar';
@@ -9,10 +10,35 @@ import CustomSelect from '@/components/CustomSelect/CustomSelect';
 import './shop-page.css';
 
 export default function ShopPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ShopPageContent />
+    </Suspense>
+  );
+}
+
+function ShopPageContent() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('Most Popular');
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const newFilters = {};
+    
+    if (params.get('categoryId')) newFilters.categoryId = params.get('categoryId');
+    if (params.get('color')) newFilters.color = params.get('color');
+    if (params.get('size')) newFilters.size = params.get('size');
+    if (params.get('style')) newFilters.style = params.get('style');
+    if (params.get('minPrice')) newFilters.minPrice = params.get('minPrice');
+    if (params.get('maxPrice')) newFilters.maxPrice = params.get('maxPrice');
+    if (params.get('search')) newFilters.search = params.get('search');
+    if (params.get('brand')) newFilters.brand = params.get('brand');
+    
+    setFilters(newFilters);
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchShopData = async () => {
@@ -20,6 +46,7 @@ export default function ShopPage() {
       try {
         let endpoint = 'http://localhost:5000/api/products';
         const params = new URLSearchParams();
+        if (filters.categoryId) params.append('categoryId', filters.categoryId);
 
         if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice);
         if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice);
@@ -27,8 +54,17 @@ export default function ShopPage() {
         if (filters.style) params.append('style', filters.style);
         if (filters.size) params.append('size', filters.size);
         if (filters.search) params.append('search', filters.search);
+        if (filters.brand) params.append('brand', filters.brand);
+        
+        const sortMap = {
+          'Most Popular': 'rating',
+          'Newest': 'newest',
+          'Price: Low to High': 'price-asc',
+          'Price: High to Low': 'price-desc'
+        };
+        params.append('sortBy', sortMap[sortBy] || 'newest');
 
-        const prodRes = await fetch(`${endpoint}?${params.toString()}`);
+        const prodRes = await fetch(`${endpoint}?${params.toString()}`, { cache: 'no-store' });
         const prodData = await prodRes.json();
         setProducts(Array.isArray(prodData) ? prodData : []);
       } catch (err) {
@@ -39,7 +75,7 @@ export default function ShopPage() {
     };
 
     fetchShopData();
-  }, [filters]);
+  }, [filters, sortBy]);
 
   const handleApplyFilter = (newFilters) => {
     setFilters(newFilters);
@@ -95,6 +131,7 @@ export default function ShopPage() {
                       key={product.id}
                       product={product}
                       priority={index < 4}
+                      activeColors={searchParams.get('color')}
                     />
                   ))}
                 </div>

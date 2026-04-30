@@ -20,7 +20,7 @@ export default function BrandsPage() {
 
         <div className="brands-grid">
           {brands.map((brand) => (
-            <Link href={`/category/${brand.slug}`} key={brand.slug} className="brand-card">
+            <Link href={`/shop?brand=${brand.name}`} key={brand.name} className="brand-card">
               <div className="brand-name">{brand.name}</div>
               <p className="brand-desc">{brand.description}</p>
               <span className="view-collection">View Collection →</span>

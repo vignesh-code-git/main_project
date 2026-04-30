@@ -3,6 +3,9 @@ const Product = require('./models/Product');
 const Category = require('./models/Category');
 const User = require('./models/User');
 const Review = require('./models/Review');
+const Order = require('./models/Order');
+const OrderItem = require('./models/OrderItem');
+const ProductImage = require('./models/ProductImage');
 
 const seed = async () => {
   try {
@@ -15,15 +18,15 @@ const seed = async () => {
     const jeans = await Category.create({ name: 'Jeans' });
 
     const products = await Product.bulkCreate([
-      { name: "T-shirt with Tape Details", price: 120, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
-      { name: "Skinny Fit Jeans", price: 240, originalPrice: 260, rating: 3.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual' },
-      { name: "Checkered Shirt", price: 180, rating: 4.5, CategoryId: shirts.id, brand: 'GUCCI', style: 'Formal' },
-      { name: "Sleeve Striped T-shirt", price: 130, originalPrice: 160, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
+      { name: "T-shirt with Tape Details", price: 120, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual', color: 'Red,Black,White', size: 'Medium,Large', stock: 50, deliveryDays: '2-3 Days', isFreeDelivery: true },
+      { name: "Skinny Fit Jeans", price: 240, originalPrice: 260, rating: 3.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual', color: 'Blue,Black', size: 'Large,X-Large', stock: 35, deliveryDays: '3-5 Days', isFreeDelivery: true },
+      { name: "Checkered Shirt", price: 180, rating: 4.5, CategoryId: shirts.id, brand: 'GUCCI', style: 'Formal', color: 'Red,White', size: 'Medium,Large', stock: 20, deliveryDays: '1-2 Days', isFreeDelivery: true },
+      { name: "Sleeve Striped T-shirt", price: 130, originalPrice: 160, rating: 4.5, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual', color: 'Black,White', size: 'Small,Medium', stock: 15, deliveryDays: '2-4 Days', isFreeDelivery: true },
 
-      { name: "Vertical Striped Shirt", price: 212, originalPrice: 232, rating: 5.0, CategoryId: shirts.id, brand: 'VERSACE', style: 'Formal' },
-      { name: "Courage Graphic T-shirt", price: 145, rating: 4.0, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual' },
-      { name: "Loose Fit Bermuda Shorts", price: 80, rating: 3.0, CategoryId: shorts.id, brand: 'Calvin Klein', style: 'Gym' },
-      { name: "Faded Skinny Jeans", price: 210, rating: 4.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual' },
+      { name: "Vertical Striped Shirt", price: 212, originalPrice: 232, rating: 5.0, CategoryId: shirts.id, brand: 'VERSACE', style: 'Formal', color: 'Blue,White', size: 'Large,X-Large', stock: 10, deliveryDays: '3-5 Days', isFreeDelivery: true },
+      { name: "Courage Graphic T-shirt", price: 145, rating: 4.0, CategoryId: tshirts.id, brand: 'ZARA', style: 'Casual', color: 'Black,Orange', size: 'Small,Medium,Large', stock: 42, deliveryDays: '2-3 Days', isFreeDelivery: true },
+      { name: "Loose Fit Bermuda Shorts", price: 80, rating: 3.0, CategoryId: shorts.id, brand: 'Calvin Klein', style: 'Gym', color: 'Blue,Gray', size: 'Medium,Large', stock: 25, deliveryDays: '4-6 Days', isFreeDelivery: false },
+      { name: "Faded Skinny Jeans", price: 210, rating: 4.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual', color: 'Blue,Gray', size: 'Small,Medium', stock: 3, deliveryDays: '3-5 Days', isFreeDelivery: true },
     ]);
 
     const user1 = await User.create({ name: 'Sarah M.', email: 'sarah@example.com', password: 'password123', role: 'customer' });

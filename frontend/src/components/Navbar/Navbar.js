@@ -1,25 +1,73 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
-import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings } from 'lucide-react';
+import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2 } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef(null);
 
   const cartItemsCount = useSelector((state) => state.cart.totalQuantity);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     setMounted(true);
+    
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Live Search Logic
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        setIsSearching(true);
+        try {
+          const res = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}&limit=5`, { cache: 'no-store' });
+          const data = await res.json();
+          setSearchResults(Array.isArray(data) ? data : []);
+          setShowResults(true);
+        } catch (err) {
+          console.error("Live search error:", err);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
+      }
+    }, 300); // Debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileSearchOpen(false);
+      setShowResults(false);
+    }
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -89,14 +137,74 @@ export default function Navbar() {
             </li>
           </ul>
 
-          <div className="search-bar desktop-only">
-            <Search size={20} className="nav-search-icon-fixed" />
-            <input type="text" placeholder="Search for products..." />
+          <div className="search-bar desktop-only" ref={searchRef}>
+            <Search 
+              size={20} 
+              className="nav-search-icon-fixed" 
+              onClick={handleSearch}
+              style={{ cursor: 'pointer' }}
+            />
+            <input 
+              type="text" 
+              placeholder="Search for products..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
+            />
+            {isSearching && (
+              <div className="search-loader">
+                <Loader2 className="animate-spin" size={16} />
+              </div>
+            )}
+            
+            {showResults && searchResults.length > 0 && (
+              <div className="search-dropdown">
+                <div className="search-results-list">
+                  {searchResults.map(product => (
+                    <Link 
+                      href={`/product/${product.id}`} 
+                      key={product.id} 
+                      className="search-result-item"
+                      onClick={() => setShowResults(false)}
+                    >
+                      <div className="result-img">
+                        <img 
+                          src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'} 
+                          alt={product.name} 
+                        />
+                      </div>
+                      <div className="result-info">
+                        <p className="result-name">{product.name}</p>
+                        <p className="result-price">₹{product.price}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <button className="view-all-results" onClick={handleSearch}>
+                  View all results for "{searchQuery}"
+                </button>
+              </div>
+            )}
+            {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+              <div className="search-dropdown no-results">
+                No products found for "{searchQuery}"
+              </div>
+            )}
           </div>
 
           <div className="nav-right">
             <div className="nav-icons">
-
+              <button 
+                className="mobile-search-trigger" 
+                onClick={() => setMobileSearchOpen(true)}
+              >
+                <Search size={24} />
+              </button>
 
               <Link href="/cart" className="cart-icon" title="View Cart">
                 <ShoppingCart size={24} />
@@ -153,21 +261,64 @@ export default function Navbar() {
         </div>
       ) : (
         <div className="mobile-search-full-width">
-          <div className="mobile-search-container">
-            <Search size={20} className="mobile-search-icon" />
+          <form className="mobile-search-container" onSubmit={handleSearch}>
+            <Search 
+              size={20} 
+              className="mobile-search-icon" 
+              onClick={handleSearch}
+            />
             <input
               type="text"
               placeholder="Search for products..."
               autoFocus
               className="mobile-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button
+              type="button"
               className="mobile-search-close"
               onClick={() => setMobileSearchOpen(false)}
             >
               <X size={24} />
             </button>
-          </div>
+            
+            {showResults && searchQuery.length >= 2 && (
+              <div className="mobile-search-results search-dropdown">
+                {searchResults.length > 0 ? (
+                  <div className="search-results-list">
+                    {searchResults.map(product => (
+                      <Link 
+                        href={`/product/${product.id}`} 
+                        key={product.id} 
+                        className="search-result-item"
+                        onClick={() => {
+                          setMobileSearchOpen(false);
+                          setShowResults(false);
+                        }}
+                      >
+                        <div className="result-img">
+                          <img 
+                            src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'} 
+                            alt={product.name} 
+                          />
+                        </div>
+                        <div className="result-info">
+                          <p className="result-name">{product.name}</p>
+                          <p className="result-price">₹{product.price}</p>
+                        </div>
+                      </Link>
+                    ))}
+                    <button className="view-all-results" onClick={handleSearch}>
+                      View all results
+                    </button>
+                  </div>
+                ) : !isSearching && (
+                  <div className="no-results-msg">No products found</div>
+                )}
+              </div>
+            )}
+          </form>
         </div>
       )}
     </nav>

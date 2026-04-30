@@ -20,13 +20,19 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [successMsg, setSuccessMsg] = useState('');
 
   const colorMap = {
+    'green': '#00C12B',
+    'red': '#F50606',
+    'yellow': '#F5DD06',
+    'orange': '#F57906',
+    'cyan': '#06CAF5',
+    'blue': '#063AF5',
+    'purple': '#7D06F5',
+    'pink': '#F506A4',
+    'white': '#FFFFFF',
+    'black': '#000000',
     'olive': '#4F4F31',
     'navy': '#1A237E',
-    'black': '#000000',
-    'white': '#FFFFFF',
-    'gray': '#808080',
-    'red': '#FF0000',
-    'blue': '#0000FF'
+    'gray': '#808080'
   };
 
   const productColors = product.color ? product.color.split(',').map(c => c.trim()) : [];
@@ -109,8 +115,49 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
             <span className="discount-tag">-{Math.round((1 - product.price / product.originalPrice) * 100)}%</span>
           </>
         )}
+        {product.isFreeDelivery && (
+          <span className="free-delivery-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            Free Delivery
+          </span>
+        )}
+        <span className="delivery-time-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          {product.deliveryDays || '3-5 Days'}
+        </span>
       </div>
       <p className="product-description">{product.description}</p>
+
+      <div className="product-meta-info">
+        <div className="meta-grid">
+          <div className="meta-row">
+            <span className="meta-label">Category:</span>
+            <span className="meta-value">{product.Category?.name || 'N/A'}</span>
+          </div>
+          <div className="meta-row">
+            <span className="meta-label">Brand:</span>
+            <span className="meta-value">{product.brand || 'N/A'}</span>
+          </div>
+          <div className="meta-row">
+            <span className="meta-label">Dress Style:</span>
+            <span className="meta-value">{product.style || 'N/A'}</span>
+          </div>
+          <div className="meta-row stock">
+            <span className="meta-label">Stock:</span>
+            <span className={`meta-value ${product.stock < 5 ? 'low-stock' : ''}`}>
+              {product.stock > 0 ? product.stock : 'Out of Stock'}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <div className="selection-group">
         <h4>Select Colors</h4>
@@ -147,31 +194,33 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         </div>
       </div>
 
-      <div className="actions-group-container">
+      <div className="actions-group-container sticky-actions">
         <div className="all-actions-row">
           <div className="quantity-selector">
             <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
             <span>{quantity}</span>
             <button onClick={() => setQuantity(quantity + 1)}>+</button>
           </div>
-          
-          <button 
-            className="add-to-cart-btn" 
-            onClick={handleAddToCart}
-            disabled={loading}
-          >
-            {loading && !showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Add to Cart'}
-          </button>
 
-          <button 
-            className="buy-now-btn" 
-            onClick={handleBuyNow} 
-            disabled={loading}
-          >
-            {loading && showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Buy Now'}
-          </button>
+          <div className="button-group-row">
+            <button
+              className="add-to-cart-btn"
+              onClick={handleAddToCart}
+              disabled={loading}
+            >
+              {loading && !showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Add to Cart'}
+            </button>
+
+            <button
+              className="buy-now-btn"
+              onClick={handleBuyNow}
+              disabled={loading}
+            >
+              {loading && showRazorpay ? <Loader2 className="animate-spin" size={20} /> : 'Buy Now'}
+            </button>
+          </div>
         </div>
-        
+
         {successMsg && <div className="success-message">{successMsg}</div>}
       </div>
 

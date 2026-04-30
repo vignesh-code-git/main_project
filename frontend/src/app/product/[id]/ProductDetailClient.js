@@ -10,7 +10,7 @@ import './product-detail.css';
 
 export default function ProductDetailClient({ product, relatedProducts, id }) {
   const [selectedColor, setSelectedColor] = useState('');
-  
+
   useEffect(() => {
     if (product.color) {
       const colors = product.color.split(',').map(c => c.trim());

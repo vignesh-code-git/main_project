@@ -52,6 +52,14 @@ export default function CategoryPage() {
         if (filters.style) params.append('style', filters.style);
         if (filters.size) params.append('size', filters.size);
         if (filters.search) params.append('search', filters.search);
+        
+        const sortMap = {
+          'Most Popular': 'rating',
+          'Newest': 'newest',
+          'Price: Low to High': 'price-asc',
+          'Price: High to Low': 'price-desc'
+        };
+        params.append('sortBy', sortMap[sortBy] || 'newest');
 
         const prodRes = await fetch(`${endpoint}?${params.toString()}`);
         const prodData = await prodRes.json();
@@ -64,7 +72,7 @@ export default function CategoryPage() {
     };
 
     fetchCategoryData();
-  }, [id, filters]);
+  }, [id, filters, sortBy]);
 
   const handleApplyFilter = (newFilters) => {
     setFilters(newFilters);
@@ -120,6 +128,7 @@ export default function CategoryPage() {
                       key={product.id}
                       product={product}
                       priority={index < 4}
+                      activeColors={filters.color}
                     />
                   ))}
                 </div>

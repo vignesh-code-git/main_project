@@ -26,13 +26,19 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
 
   const colorPresets = [
+    { name: 'Green', value: '#00C12B' },
+    { name: 'Red', value: '#F50606' },
+    { name: 'Yellow', value: '#F5DD06' },
+    { name: 'Orange', value: '#F57906' },
+    { name: 'Cyan', value: '#06CAF5' },
+    { name: 'Blue', value: '#063AF5' },
+    { name: 'Purple', value: '#7D06F5' },
+    { name: 'Pink', value: '#F506A4' },
+    { name: 'White', value: '#FFFFFF' },
+    { name: 'Black', value: '#000000' },
     { name: 'Olive', value: '#4F4F31' },
     { name: 'Navy', value: '#1A237E' },
-    { name: 'Black', value: '#000000' },
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Gray', value: '#808080' },
-    { name: 'Red', value: '#FF0000' },
-    { name: 'Blue', value: '#0000FF' }
+    { name: 'Gray', value: '#808080' }
   ];
 
   useEffect(() => {
@@ -157,7 +163,9 @@ export default function EditProductPage() {
 
   return (
     <div className="container seller-container">
-      <h1>Edit Product</h1>
+      <div className="page-header">
+        <h1>Edit Product</h1>
+      </div>
       <div className="form-card">
         <form onSubmit={handleSubmit} className="product-form">
           <div className="form-group">

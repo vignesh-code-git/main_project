@@ -8,7 +8,7 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size } = req.query;
+    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size, sortBy } = req.query;
     const { Op } = require('sequelize');
     let where = {};
 
@@ -18,13 +18,13 @@ exports.getAllProducts = async (req, res) => {
 
     if (search) {
       where[Op.or] = [
-        { name: { [Op.like]: `%${search}%` } },
-        { description: { [Op.like]: `%${search}%` } }
+        { name: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } }
       ];
     }
 
     if (brand) {
-      where.brand = { [Op.like]: `%${brand}%` };
+      where.brand = { [Op.iLike]: `%${brand}%` };
     }
 
     if (minPrice || maxPrice) {
@@ -34,19 +34,39 @@ exports.getAllProducts = async (req, res) => {
     }
 
     if (color) {
-      where.color = { [Op.like]: `%${color}%` };
+      const colorArray = color.split(',');
+      where.color = {
+        [Op.or]: colorArray.map(c => ({
+          [Op.iLike]: `%${c.trim()}%`
+        }))
+      };
     }
 
     if (style) {
-      where.style = { [Op.like]: `%${style}%` };
+      where.style = { [Op.iLike]: `%${style}%` };
     }
 
     if (size) {
-      where.size = { [Op.like]: `%${size}%` };
+      where.size = {
+        [Op.or]: [
+          { [Op.iLike]: `${size}` },        // Exact match
+          { [Op.iLike]: `${size},%` },      // Start of list
+          { [Op.iLike]: `%,${size}` },      // End of list
+          { [Op.iLike]: `%,${size},%` }     // Middle of list
+        ]
+      };
     }
+
+    let order = [['createdAt', 'DESC']];
+    if (sortBy === 'price-asc') order = [['price', 'ASC']];
+    if (sortBy === 'price-desc') order = [['price', 'DESC']];
+    if (sortBy === 'newest') order = [['createdAt', 'DESC']];
+    if (sortBy === 'rating') order = [['rating', 'DESC']];
+    if (sortBy === 'popular') order = [['rating', 'DESC']];
 
     const products = await Product.findAll({
       where,
+      order,
       include: [
         { model: ProductImage, as: 'images' },
         { model: Category }
@@ -76,9 +96,40 @@ exports.getSellerProducts = async (req, res) => {
 
 exports.getNewArrivals = async (req, res) => {
   try {
+    const { color, style, size, minPrice, maxPrice, categoryId } = req.query;
+    const { Op } = require('sequelize');
+    let where = {};
+
+    if (categoryId) where.CategoryId = categoryId;
+    if (color) {
+      const colorArray = color.split(',');
+      where.color = {
+        [Op.or]: colorArray.map(c => ({
+          [Op.iLike]: `%${c.trim()}%`
+        }))
+      };
+    }
+    if (style) where.style = { [Op.iLike]: `%${style}%` };
+    if (size) {
+      where.size = {
+        [Op.or]: [
+          { [Op.iLike]: `${size}` },
+          { [Op.iLike]: `${size},%` },
+          { [Op.iLike]: `%,${size}` },
+          { [Op.iLike]: `%,${size},%` }
+        ]
+      };
+    }
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
+    }
+
     const products = await Product.findAll({
+      where,
       order: [['createdAt', 'DESC']],
-      limit: 8,
+      limit: 20,
       include: [{ model: ProductImage, as: 'images' }]
     });
     res.json(products);
@@ -89,9 +140,40 @@ exports.getNewArrivals = async (req, res) => {
 
 exports.getTopSelling = async (req, res) => {
   try {
+    const { color, style, size, minPrice, maxPrice, categoryId } = req.query;
+    const { Op } = require('sequelize');
+    let where = {};
+
+    if (categoryId) where.CategoryId = categoryId;
+    if (color) {
+      const colorArray = color.split(',');
+      where.color = {
+        [Op.or]: colorArray.map(c => ({
+          [Op.iLike]: `%${c.trim()}%`
+        }))
+      };
+    }
+    if (style) where.style = { [Op.iLike]: `%${style}%` };
+    if (size) {
+      where.size = {
+        [Op.or]: [
+          { [Op.iLike]: `${size}` },
+          { [Op.iLike]: `${size},%` },
+          { [Op.iLike]: `%,${size}` },
+          { [Op.iLike]: `%,${size},%` }
+        ]
+      };
+    }
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
+    }
+
     const products = await Product.findAll({
+      where,
       order: [['rating', 'DESC']],
-      limit: 8,
+      limit: 20,
       include: [{ model: ProductImage, as: 'images' }]
     });
     res.json(products);

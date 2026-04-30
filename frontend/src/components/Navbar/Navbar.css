@@ -583,3 +583,157 @@
 .mobile-search-icon {
   color: rgba(0, 0, 0, 0.4);
 }
+
+/* Professional Search Dropdown Styles */
+.search-bar {
+  position: relative; /* Ensure relative positioning for dropdown */
+}
+
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 3000;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.search-results-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* Custom Scrollbar */
+.search-results-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-results-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.search-results-list::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 10px;
+}
+
+.search-results-list::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.search-result-item:hover {
+  background: #F8F8F8;
+  transform: translateX(4px);
+}
+
+.result-img {
+  width: 50px;
+  height: 50px;
+  background: #F0EEED;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.result-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-info {
+  flex: 1;
+}
+
+.result-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-price {
+  font-weight: 700;
+  font-size: 14px;
+  color: #000;
+}
+
+.view-all-results {
+  width: 100%;
+  padding: 14px;
+  background: #F8F8F8;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: center;
+}
+
+.view-all-results:hover {
+  background: #F0F0F0;
+  text-decoration: underline;
+}
+
+.search-loader {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.search-dropdown.no-results {
+  padding: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.mobile-search-results {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  z-index: 2200;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+.no-results-msg {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}
+
+.mobile-search-container {
+  position: relative;
+}

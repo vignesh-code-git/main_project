@@ -40,13 +40,19 @@ export default function AddProductPage() {
   const [errors, setErrors] = useState({});
 
   const colorPresets = [
+    { name: 'Green', value: '#00C12B' },
+    { name: 'Red', value: '#F50606' },
+    { name: 'Yellow', value: '#F5DD06' },
+    { name: 'Orange', value: '#F57906' },
+    { name: 'Cyan', value: '#06CAF5' },
+    { name: 'Blue', value: '#063AF5' },
+    { name: 'Purple', value: '#7D06F5' },
+    { name: 'Pink', value: '#F506A4' },
+    { name: 'White', value: '#FFFFFF' },
+    { name: 'Black', value: '#000000' },
     { name: 'Olive', value: '#4F4F31' },
     { name: 'Navy', value: '#1A237E' },
-    { name: 'Black', value: '#000000' },
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Gray', value: '#808080' },
-    { name: 'Red', value: '#FF0000' },
-    { name: 'Blue', value: '#0000FF' }
+    { name: 'Gray', value: '#808080' }
   ];
 
   useEffect(() => {
@@ -457,7 +463,7 @@ export default function AddProductPage() {
             <div className={`form-group ${errors.sizes ? 'has-error' : ''}`}>
               <label>Available Sizes</label>
               <div className="size-selector-chips">
-                {['Small', 'Medium', 'Large', 'X-Large', 'XX-Large'].map(size => (
+                {['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'].map(size => (
                   <div
                     key={size}
                     className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}

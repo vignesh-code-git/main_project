@@ -51,10 +51,32 @@
 }
 
 .product-info h3 {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.product-card-colors {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  height: 14px;
+  align-items: center;
+}
+
+.card-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.card-color-dot.selected {
+  outline: 1.5px solid #000;
+  outline-offset: 2px;
+  transform: scale(1.1);
 }
 
 .product-rating {
