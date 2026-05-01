@@ -131,7 +131,7 @@ export default function Navbar() {
   // Live Search Logic
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (searchQuery.trim().length >= 2) {
+      if (searchQuery.trim().length >= 1) {
         setIsSearching(true);
         setSelectedIndex(-1);
         try {
@@ -277,7 +277,7 @@ export default function Navbar() {
               placeholder="Search for products, brands, styles..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
+              onFocus={() => searchQuery.length >= 1 && setShowResults(true)}
               onKeyDown={handleKeyDown}
             />
             {isSearching && (
@@ -328,7 +328,7 @@ export default function Navbar() {
                 </button>
               </div>
             )}
-            {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+            {showResults && searchQuery.length >= 1 && searchResults.length === 0 && !isSearching && (
               <div className="search-dropdown no-results">
                 No products found for "{searchQuery}"
               </div>
@@ -553,7 +553,7 @@ export default function Navbar() {
               <X size={24} />
             </button>
             
-            {showResults && searchQuery.length >= 2 && (
+            {showResults && searchQuery.length >= 1 && (
               <div className="mobile-search-results search-dropdown">
                 {searchResults.length > 0 ? (
                   <div className="search-results-list">
