@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { API_BASE_URL } from '@/config/api';
 import './admin.css';
 
 export default function AdminDashboard() {
-  const [admin, setAdmin] = useState(null);
+  const { user: authUser, isAuthenticated } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
   const [sellers, setSellers] = useState([]);
   const [products, setProducts] = useState([]);
@@ -17,28 +19,24 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = localStorage.getItem('token');
-    const savedTab = localStorage.getItem('adminActiveTab');
-
-    if (!user || user.role !== 'admin') {
-      router.push('/auth/login');
-      return;
+    if (!isAuthenticated || (authUser && authUser.role !== 'admin')) {
+      // Small delay to allow auth rehydration if needed
+      const timer = setTimeout(() => {
+        if (!isAuthenticated) router.push('/auth/login');
+      }, 500);
+      return () => clearTimeout(timer);
     }
-
-    setAdmin(user);
-    if (savedTab) setActiveTab(savedTab);
 
     const fetchData = async () => {
       try {
-        const headers = { 'Authorization': `Bearer ${token}` };
+        const fetchOptions = { credentials: 'include' };
 
         const [usersRes, sellersRes, settingsRes, productsRes, ordersRes] = await Promise.all([
-          fetch('http://localhost:5000/api/admin/users', { headers }),
-          fetch('http://localhost:5000/api/admin/sellers', { headers }),
-          fetch('http://localhost:5000/api/admin/settings'),
-          fetch('http://localhost:5000/api/products'),
-          fetch('http://localhost:5000/api/orders', { headers })
+          fetch(`${API_BASE_URL}/api/admin/users`, fetchOptions),
+          fetch(`${API_BASE_URL}/api/admin/sellers`, fetchOptions),
+          fetch(`${API_BASE_URL}/api/admin/settings`, fetchOptions),
+          fetch(`${API_BASE_URL}/api/products`, fetchOptions),
+          fetch(`${API_BASE_URL}/api/orders`, fetchOptions)
         ]);
  
         const usersData = await usersRes.json();
@@ -60,11 +58,7 @@ export default function AdminDashboard() {
     };
 
     fetchData();
-  }, [router]);
-
-  useEffect(() => {
-    localStorage.setItem('adminActiveTab', activeTab);
-  }, [activeTab]);
+  }, [isAuthenticated, authUser, router]);
 
   const showToast = (message) => {
     setToast({ show: true, message });
@@ -75,31 +69,22 @@ export default function AdminDashboard() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Optimistic UI update / Preview local
-    const localPreviewUrl = URL.createObjectURL(file);
-
     const formData = new FormData();
     formData.append('image', file);
     formData.append('key', key);
 
-    const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/settings/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/settings/upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         body: formData,
+        credentials: 'include'
       });
       if (res.ok) {
         const data = await res.json();
-
-        // Broadcast the update to other tabs (Homepage, etc.)
         const channel = new BroadcastChannel('admin_settings_update');
         channel.postMessage('refresh');
         channel.close();
 
-        // Instant UI update by updating the settings state locally
         setSettings(prev => {
           const exists = prev.find(s => s.key === key);
           if (exists) {
@@ -117,19 +102,16 @@ export default function AdminDashboard() {
 
   const getSettingValue = (key) => {
     const setting = settings.find(s => s.key === key);
-    return setting ? `http://localhost:5000${setting.value}` : null;
+    return setting ? `${API_BASE_URL}${setting.value}` : null;
   };
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: newStatus })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -141,11 +123,10 @@ export default function AdminDashboard() {
     }
   };
 
-  if (!admin || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
+  if (!authUser || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
 
   return (
     <div className="admin-dashboard">
-      {/* Top Navigation */}
       <header className="admin-header-nav">
         <div className="nav-brand">
           <h2>ADMIN PANEL</h2>
@@ -172,13 +153,12 @@ export default function AdminDashboard() {
 
         <div className="nav-actions">
           <div className="user-badge">
-            <div className="badge-avatar">{admin.name.charAt(0).toUpperCase()}</div>
-            <span style={{ fontSize: '13px', fontWeight: '700' }}>{admin.name}</span>
+            <div className="badge-avatar">{authUser.name.charAt(0).toUpperCase()}</div>
+            <span style={{ fontSize: '13px', fontWeight: '700' }}>{authUser.name}</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="admin-main-full">
         {activeTab === 'dashboard' && (
           <div className="view-container-stylish">
@@ -292,10 +272,10 @@ export default function AdminDashboard() {
                   {Array.isArray(products) && products.map(product => (
                     <tr key={product.id || product._id}>
                       <td style={{ fontWeight: '800' }}>{product.name}</td>
-                      <td>{product.category || 'General'}</td>
-                      <td>${product.price}</td>
+                      <td>{product.Category?.name || 'General'}</td>
+                      <td>₹{product.price}</td>
                       <td>{product.stock} units</td>
-                      <td>{product.sellerName || 'Platform'}</td>
+                      <td>{product.User?.name || 'Platform'}</td>
                     </tr>
                   ))}
                   {(!Array.isArray(products) || products.length === 0) && (
@@ -385,7 +365,6 @@ export default function AdminDashboard() {
             </header>
             <div className="settings-list-professional">
               {[
-
                 {
                   key: 'style_casual',
                   label: 'Casual Category Banner',
@@ -443,7 +422,6 @@ export default function AdminDashboard() {
         )}
       </main>
 
-      {/* Center Toast Notification */}
       {toast.show && (
         <div className="admin-toast-container">
           {toast.message}
@@ -452,9 +430,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-
-
-
-
-

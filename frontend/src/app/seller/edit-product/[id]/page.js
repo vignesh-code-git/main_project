@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { API_BASE_URL } from '@/config/api';
 import '../../add-product/seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
@@ -45,8 +46,8 @@ export default function EditProductPage() {
     const fetchData = async () => {
       try {
         const [catRes, prodRes] = await Promise.all([
-          fetch('http://localhost:5000/api/products/categories'),
-          fetch(`http://localhost:5000/api/products/${id}`)
+          fetch(`${API_BASE_URL}/api/products/categories`),
+          fetch(`${API_BASE_URL}/api/products/${id}`)
         ]);
 
         const categoriesData = await catRes.json();
@@ -125,7 +126,7 @@ export default function EditProductPage() {
     });
 
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

@@ -15,9 +15,10 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 import axios from 'axios';
+import { API_BASE_URL } from '@/config/api';
 import './products.css';
 
-export default function MyProductsPage() {
+export default function InventoryManagementPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,7 +49,7 @@ export default function MyProductsPage() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/products/seller/my-products', {
+      const response = await axios.get(`${API_BASE_URL}/api/products/seller/my-products`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
@@ -93,7 +94,7 @@ export default function MyProductsPage() {
       <div className="container">
         <div className="page-header">
           <div>
-            <h1>My Products</h1>
+            <h1>Inventory Management</h1>
             <p>Manage and track your inventory</p>
           </div>
           <div className="header-actions">

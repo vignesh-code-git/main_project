@@ -132,8 +132,16 @@
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
+}
+
+.status-badge.active {
   background: #e8f5e9;
   color: #2e7d32;
+}
+
+.status-badge.out-of-stock {
+  background: #ffebee;
+  color: #c62828;
 }
 
 .action-btns {
@@ -275,4 +283,157 @@
 
 .stat-card.highlight p {
   color: #000;
+}
+
+/* Onboarding & Overlays */
+.blur {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.loading-dashboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 900;
+  z-index: 9999;
+}
+
+.completion-alert-banner {
+  background: #000;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.completion-alert-banner button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 12px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.onboarding-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.onboarding-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.onboarding-header h2 {
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.onboarding-header p {
+  color: rgba(0,0,0,0.6);
+  font-size: 14px;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.onboarding-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.onboarding-form input, 
+.onboarding-form textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: #F0EEED;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.onboarding-form input:focus, 
+.onboarding-form textarea:focus {
+  border-color: #000;
+  background: #fff;
+}
+
+.onboarding-form textarea {
+  height: 80px;
+  resize: none;
+}
+
+.onboarding-submit-btn {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 16px;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.3s;
+}
+
+.onboarding-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

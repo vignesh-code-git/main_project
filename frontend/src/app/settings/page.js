@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { User, Lock, Bell, Shield, CreditCard, Save, Camera } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { API_BASE_URL } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
 import { useToast } from '@/context/ToastContext';
 import axios from 'axios';
@@ -50,7 +50,7 @@ export default function SettingsPage() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('http://localhost:5000/api/auth/profile', {
+      const response = await axios.put(`${API_BASE_URL}/api/auth/profile`, {
         name: formData.name
       }, {
         headers: {
@@ -78,11 +78,11 @@ export default function SettingsPage() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/auth/avatar', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/avatar`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
-        }
+        },
       });
       
       dispatch(updateUser({ avatar: response.data.avatar }));
@@ -158,7 +158,7 @@ export default function SettingsPage() {
                 <div className="profile-upload">
                   <div className="current-avatar">
                     {mounted && user?.avatar ? (
-                      <img src={`http://localhost:5000${user.avatar}`} alt="Avatar" />
+                      <img src={`${API_BASE_URL}${user.avatar}`} alt="Avatar" />
                     ) : (
                       mounted && user?.name?.charAt(0).toUpperCase()
                     )}

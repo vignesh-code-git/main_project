@@ -1,16 +1,27 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { API_BASE_URL } from '@/config/api';
 
-const getInitialUser = () => {
-  if (typeof window !== 'undefined') {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+// Professional way: Fetch user from backend using HTTP-Only cookie on app load
+export const checkAuth = createAsyncThunk(
+  'auth/checkAuth',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+        withCredentials: true // Required for sending cookies
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
   }
-  return null;
-};
+);
 
 const initialState = {
-  user: getInitialUser(),
-  isAuthenticated: !!getInitialUser(),
+  user: null,
+  isAuthenticated: false,
+  loading: true, // Start as true while we check the cookie
+  error: null,
 };
 
 const authSlice = createSlice({
@@ -20,20 +31,37 @@ const authSlice = createSlice({
     login(state, action) {
       state.user = action.payload;
       state.isAuthenticated = true;
-      localStorage.setItem('user', JSON.stringify(action.payload));
+      state.loading = false;
     },
     logout(state) {
       state.user = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      state.loading = false;
     },
     updateUser(state, action) {
       state.user = { ...state.user, ...action.payload };
-      localStorage.setItem('user', JSON.stringify(state.user));
     },
+    setLoading(state, action) {
+      state.loading = action.payload;
+    }
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.loading = false;
+      });
+  }
 });
 
-export const { login, logout, updateUser } = authSlice.actions;
+export const { login, logout, updateUser, setLoading } = authSlice.actions;
 export default authSlice.reducer;

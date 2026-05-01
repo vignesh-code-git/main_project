@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckCircle2, Settings2, Star, X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './ReviewSection.css';
 
 export default function ReviewSection({ productId }) {
@@ -42,7 +43,7 @@ export default function ReviewSection({ productId }) {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/reviews/product/${productId}`);
+        const res = await fetch(`${API_BASE_URL}/api/reviews/product/${productId}`);
         if (res.ok) {
           const data = await res.json();
           setReviews(data);
@@ -72,12 +73,12 @@ export default function ReviewSection({ productId }) {
 
     setSubmitting(true);
     try {
-      const res = await fetch('http://localhost:5000/api/reviews', {
+      const res = await fetch(`${API_BASE_URL}/api/reviews`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           rating,
           content,

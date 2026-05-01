@@ -8,5 +8,6 @@ router.get('/user/:userId', orderController.getUserOrders);
 router.get('/seller/:sellerId', orderController.getSellerOrders);
 router.get('/:id', orderController.getOrderById);
 router.put('/:id/status', orderController.updateOrderStatus);
+router.get('/:id/invoice', orderController.generateInvoice);
 
 module.exports = router;

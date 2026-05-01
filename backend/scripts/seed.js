@@ -1,15 +1,24 @@
-const sequelize = require('./config/database');
-const Product = require('./models/Product');
-const Category = require('./models/Category');
-const User = require('./models/User');
-const Review = require('./models/Review');
-const Order = require('./models/Order');
-const OrderItem = require('./models/OrderItem');
-const ProductImage = require('./models/ProductImage');
+require('dotenv').config();
+const sequelize = require('../config/database');
+const Product = require('../models/Product');
+const Category = require('../models/Category');
+const User = require('../models/User');
+const Review = require('../models/Review');
+const Order = require('../models/Order');
+const OrderItem = require('../models/OrderItem');
+const ProductImage = require('../models/ProductImage');
 
 const seed = async () => {
   try {
-    await sequelize.sync({ force: true });
+    // Sync without forcing (keeps tables)
+    await sequelize.sync();
+
+    // Clear only specific tables to keep Users/Admin safe
+    await Product.destroy({ where: {}, truncate: { cascade: true } });
+    await Category.destroy({ where: {}, truncate: { cascade: true } });
+    await Review.destroy({ where: {}, truncate: { cascade: true } });
+    await Order.destroy({ where: {}, truncate: { cascade: true } });
+    console.log('Product-related tables cleared. Admin/Users preserved.');
 
     const tshirts = await Category.create({ name: 'T-shirts' });
     const shorts = await Category.create({ name: 'Shorts' });
@@ -29,9 +38,13 @@ const seed = async () => {
       { name: "Faded Skinny Jeans", price: 210, rating: 4.5, CategoryId: jeans.id, brand: 'PRADA', style: 'Casual', color: 'Blue,Gray', size: 'Small,Medium', stock: 3, deliveryDays: '3-5 Days', isFreeDelivery: true },
     ]);
 
-    const user1 = await User.create({ name: 'Sarah M.', email: 'sarah@example.com', password: 'password123', role: 'customer' });
-    const user2 = await User.create({ name: 'Alex K.', email: 'alex@example.com', password: 'password123', role: 'customer' });
-    const user3 = await User.create({ name: 'James L.', email: 'james@example.com', password: 'password123', role: 'customer' });
+    const bcrypt = require('bcryptjs');
+    const salt = await bcrypt.genSalt(10);
+    const hashedCustomerPass = await bcrypt.hash('password123', salt);
+
+    const user1 = await User.create({ name: 'Sarah M.', email: 'sarah@example.com', password: hashedCustomerPass, role: 'customer' });
+    const user2 = await User.create({ name: 'Alex K.', email: 'alex@example.com', password: hashedCustomerPass, role: 'customer' });
+    const user3 = await User.create({ name: 'James L.', email: 'james@example.com', password: hashedCustomerPass, role: 'customer' });
 
     // Site-wide Testimonials (no ProductId)
     await Review.bulkCreate([

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { API_BASE_URL } from '@/config/api';
 import './DressStyleGallery.css';
 
 export default function DressStyleGallery() {
@@ -10,7 +11,7 @@ export default function DressStyleGallery() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/admin/settings');
+        const res = await fetch(`${API_BASE_URL}/api/admin/settings`);
         const data = await res.json();
         setSettings(data);
       } catch (err) {
@@ -29,7 +30,7 @@ export default function DressStyleGallery() {
 
   const getStyleImage = (slug) => {
     const setting = settings.find(s => s.key === `style_${slug}`);
-    return setting ? `http://localhost:5000${setting.value}` : null;
+    return setting ? `${API_BASE_URL}${setting.value}` : null;
   };
 
   const styles = [

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 import './seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
@@ -56,7 +57,7 @@ export default function AddProductPage() {
   ];
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products/categories')
+    fetch(`${API_BASE_URL}/api/products/categories`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -134,7 +135,7 @@ export default function AddProductPage() {
     data.append('file', bulkFile);
 
     try {
-      const response = await fetch('http://localhost:5000/api/products/bulk', {
+      const response = await fetch(`${API_BASE_URL}/api/products/bulk`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -197,7 +198,7 @@ export default function AddProductPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

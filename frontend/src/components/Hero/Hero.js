@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '@/config/api';
 import Skeleton from '../Skeleton/Skeleton';
 import './Hero.css';
 
@@ -29,7 +30,7 @@ export default function Hero() {
 
     const fetchHeroData = async () => {
       try {
-        const statsRes = await fetch('http://localhost:5000/api/products/stats');
+        const statsRes = await fetch(`${API_BASE_URL}/api/products/stats`);
         if (statsRes.ok) {
           const statsData = await statsRes.json();
           if (statsData && typeof statsData.products !== 'undefined') {

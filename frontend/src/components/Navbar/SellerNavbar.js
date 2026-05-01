@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   PlusCircle,
-  Package,
   BarChart3,
   Bell,
   UserCircle,
@@ -37,7 +36,6 @@ export default function SellerNavbar() {
 
   const navLinks = [
     { name: 'Overview', href: '/seller/dashboard', icon: LayoutDashboard, title: 'SELLER DASHBOARD' },
-    { name: 'My Products', href: '/seller/products', icon: Package, title: 'MY PRODUCTS' },
     { name: 'Add Product', href: '/seller/add-product', icon: PlusCircle, title: 'ADD NEW PRODUCT' },
     { name: 'Performance', href: '/seller/stats', icon: BarChart3, title: 'PERFORMANCE STATS' },
   ];

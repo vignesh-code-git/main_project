@@ -8,6 +8,7 @@ import Sidebar from '@/components/Sidebar/Sidebar';
 import Pagination from '@/components/Pagination/Pagination';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 import ProductCardSkeleton from '@/components/Skeleton/ProductCardSkeleton';
+import { API_BASE_URL } from '@/config/api';
 import './shop-page.css';
 
 export default function ShopPage() {
@@ -45,7 +46,7 @@ function ShopPageContent() {
     const fetchShopData = async () => {
       setLoading(true);
       try {
-        let endpoint = 'http://localhost:5000/api/products';
+        let endpoint = `${API_BASE_URL}/api/products`;
         const params = new URLSearchParams();
         if (filters.categoryId) params.append('categoryId', filters.categoryId);
 

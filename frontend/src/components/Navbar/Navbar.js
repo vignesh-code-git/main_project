@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -25,6 +26,7 @@ export default function Navbar() {
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
   const notificationRef = useRef(null);
+  const userDropdownRef = useRef(null);
 
   const cartItemsCount = useSelector((state) => state.cart.totalQuantity);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -39,6 +41,9 @@ export default function Navbar() {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setNotificationOpen(false);
       }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setUserDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -49,10 +54,8 @@ export default function Navbar() {
     if (mounted && isAuthenticated && user) {
       const fetchNotifications = async () => {
         try {
-          const res = await fetch('http://localhost:5000/api/notifications', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
+          const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+            credentials: 'include', // Use cookies
             cache: 'no-store'
           });
           if (res.ok) {
@@ -73,11 +76,9 @@ export default function Navbar() {
 
   const handleMarkAsRead = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/notifications/mark-read', {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/mark-read`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+        credentials: 'include'
       });
       if (res.ok) {
         // Optimistically clear the unread indicators
@@ -95,7 +96,7 @@ export default function Navbar() {
         setIsSearching(true);
         setSelectedIndex(-1);
         try {
-          const res = await fetch(`http://localhost:5000/api/products?search=${encodeURIComponent(searchQuery)}&limit=8`, { cache: 'no-store' });
+          const res = await fetch(`${API_BASE_URL}/api/products?search=${encodeURIComponent(searchQuery)}&limit=8`, { cache: 'no-store' });
           const data = await res.json();
           setSearchResults(data.products || []);
           setTotalResults(data.total || 0);
@@ -147,9 +148,19 @@ export default function Navbar() {
     }
   };
 
-  const handleLogout = () => {
-    dispatch(logout());
-    window.location.href = '/'; // Refresh to clear states
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { 
+        method: 'POST',
+        credentials: 'include' 
+      });
+      dispatch(logout());
+      window.location.href = '/'; 
+    } catch (err) {
+      console.error('Logout failed:', err);
+      dispatch(logout());
+      window.location.href = '/';
+    }
   };
 
   // Prevent hydration mismatch by returning null for auth-dependent parts during SSR
@@ -351,13 +362,13 @@ export default function Navbar() {
               )}
 
               {mounted && isAuthenticated ? (
-                <div className="user-dropdown-container">
+                <div className="user-dropdown-container" ref={userDropdownRef}>
                   <button
                     className="user-trigger"
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   >
                     {mounted && user?.avatar ? (
-                      <img src={`http://localhost:5000${user.avatar}`} alt="Avatar" className="nav-avatar-img" />
+                      <img src={`${API_BASE_URL}${user.avatar}`} alt="Avatar" className="nav-avatar-img" />
                     ) : (
                       <UserCircle size={24} />
                     )}

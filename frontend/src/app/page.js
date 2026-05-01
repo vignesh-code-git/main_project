@@ -6,6 +6,7 @@ import BrandBanner from "@/components/BrandBanner/BrandBanner";
 import ProductSection from "@/components/ProductSection/ProductSection";
 import DressStyleGallery from "@/components/DressStyleGallery/DressStyleGallery";
 import Testimonials from "@/components/Testimonials/Testimonials";
+import { API_BASE_URL } from '@/config/api';
 
 export default function Home() {
   const [newArrivals, setNewArrivals] = useState([]);
@@ -17,8 +18,8 @@ export default function Home() {
       setLoading(true);
       try {
         const [newRes, topRes] = await Promise.all([
-          fetch('http://localhost:5000/api/products/new-arrivals', { cache: 'no-store' }),
-          fetch('http://localhost:5000/api/products/top-selling', { cache: 'no-store' })
+          fetch(`${API_BASE_URL}/api/products/new-arrivals`, { cache: 'no-store' }),
+          fetch(`${API_BASE_URL}/api/products/top-selling`, { cache: 'no-store' })
         ]);
 
         const newData = await newRes.json();

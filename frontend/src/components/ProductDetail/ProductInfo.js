@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { addItem } from '@/lib/redux/slices/cartSlice';
 import { Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import RazorpayDemo from '../Payment/RazorpayDemo';
 import './ProductInfo.css';
 
@@ -82,7 +83,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         }]
       };
 
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

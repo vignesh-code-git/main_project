@@ -7,6 +7,7 @@ import Breadcrumbs from '@/components/Breadcrumbs/Breadcrumbs';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Pagination from '@/components/Pagination/Pagination';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import { API_BASE_URL } from '@/config/api';
 import './category-page.css';
 
 export default function CategoryPage() {
@@ -22,15 +23,15 @@ export default function CategoryPage() {
     const fetchCategoryData = async () => {
       setLoading(true);
       try {
-        let endpoint = 'http://localhost:5000/api/products';
+        let endpoint = `${API_BASE_URL}/api/products`;
         const params = new URLSearchParams();
         const styles = ['casual', 'formal', 'party', 'gym'];
 
         if (id === 'new-arrivals') {
-          endpoint = 'http://localhost:5000/api/products/new-arrivals';
+          endpoint = `${API_BASE_URL}/api/products/new-arrivals`;
           setCategory({ name: 'New Arrivals' });
         } else if (id === 'top-selling') {
-          endpoint = 'http://localhost:5000/api/products/top-selling';
+          endpoint = `${API_BASE_URL}/api/products/top-selling`;
           setCategory({ name: 'Top Selling' });
         } else if (id === 'on-sale') {
           params.append('onSale', 'true');
@@ -41,7 +42,7 @@ export default function CategoryPage() {
         } else {
           params.append('categoryId', id);
           // Fetch category details
-          const catRes = await fetch(`http://localhost:5000/api/products/categories`);
+          const catRes = await fetch(`${API_BASE_URL}/api/products/categories`);
           const catData = await catRes.json();
           const currentCat = catData.find(c => c.id === parseInt(id));
           setCategory(currentCat);

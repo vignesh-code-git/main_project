@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { SlidersHorizontal, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './Sidebar.css';
 
 export default function Sidebar({ onApplyFilter }) {
@@ -19,7 +20,7 @@ export default function Sidebar({ onApplyFilter }) {
   const [isStyleOpen, setIsStyleOpen] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products/categories', { cache: 'no-store' })
+    fetch(`${API_BASE_URL}/api/products/categories`, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error('Error fetching categories:', err));

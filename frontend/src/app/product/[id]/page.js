@@ -1,7 +1,8 @@
 import ProductDetailClient from './ProductDetailClient';
+import { API_BASE_URL } from '@/config/api';
 
 async function getProduct(id) {
-  const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
     cache: 'no-store'
   });
   
@@ -10,7 +11,7 @@ async function getProduct(id) {
 }
 
 async function getRelatedProducts(categoryId, currentProductId) {
-  const res = await fetch(`http://localhost:5000/api/products?categoryId=${categoryId}`, {
+  const res = await fetch(`${API_BASE_URL}/api/products?categoryId=${categoryId}`, {
     cache: 'no-store'
   });
   

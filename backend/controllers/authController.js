@@ -26,8 +26,16 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
+      const token = generateToken(user.id, user.role);
+      
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+
       res.status(201).json({
-        token: generateToken(user.id, user.role),
         user: {
           id: user.id,
           name: user.name,
@@ -53,8 +61,25 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      // Check if account is active
+      if (!user.isActive) {
+        return res.status(403).json({ message: 'Account is deactivated. Please contact support.' });
+      }
+
+      // Update last login timestamp
+      user.lastLoginAt = new Date();
+      await user.save();
+
+      const token = generateToken(user.id, user.role);
+      
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+
       res.json({
-        token: generateToken(user.id, user.role),
         user: {
           id: user.id,
           name: user.name,
@@ -71,6 +96,35 @@ const loginUser = async (req, res) => {
   }
 };
 
+// @desc    Get current user profile
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: { exclude: ['password'] }
+    });
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Logout user / clear cookie
+// @route   POST /api/auth/logout
+// @access  Public
+const logoutUser = (req, res) => {
+  res.cookie('token', '', {
+    httpOnly: true,
+    expires: new Date(0)
+  });
+  res.status(200).json({ message: 'Logged out successfully' });
+};
+
 // @desc    Update user profile
 // @route   PUT /api/auth/profile
 // @access  Private
@@ -80,7 +134,13 @@ const updateProfile = async (req, res) => {
 
     if (user) {
       user.name = req.body.name || user.name;
-      // Email change is usually restricted or requires verification
+      user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+      user.address = req.body.address || user.address;
+      user.city = req.body.city || user.city;
+      user.state = req.body.state || user.state;
+      user.zipCode = req.body.zipCode || user.zipCode;
+      user.country = req.body.country || user.country;
+      user.storeName = req.body.storeName || user.storeName;
       
       const updatedUser = await user.save();
 
@@ -90,7 +150,14 @@ const updateProfile = async (req, res) => {
           name: updatedUser.name,
           email: updatedUser.email,
           role: updatedUser.role,
-          avatar: updatedUser.avatar
+          avatar: updatedUser.avatar,
+          phoneNumber: updatedUser.phoneNumber,
+          address: updatedUser.address,
+          city: updatedUser.city,
+          state: updatedUser.state,
+          zipCode: updatedUser.zipCode,
+          country: updatedUser.country,
+          storeName: updatedUser.storeName
         }
       });
     } else {
@@ -133,5 +200,7 @@ module.exports = {
   registerUser,
   loginUser,
   updateProfile,
-  updateAvatar
+  updateAvatar,
+  getMe,
+  logoutUser
 };

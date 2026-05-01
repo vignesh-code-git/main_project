@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const passport = require('./config/passport');
 const sequelize = require('./config/database');
 require('dotenv').config();
 
@@ -12,15 +15,25 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const addressRoutes = require('./routes/addressRoutes');
 const path = require('path');
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
@@ -31,6 +44,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/addresses', addressRoutes);
 app.use('/api/seller', require('./routes/sellerRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 

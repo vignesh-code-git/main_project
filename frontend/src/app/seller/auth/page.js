@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { login } from '@/lib/redux/slices/authSlice';
-import './seller-auth.css';
+import { API_BASE_URL } from '@/config/api';
 import './seller-auth.css';
 
 export default function SellerAuth() {
@@ -29,18 +29,18 @@ export default function SellerAuth() {
       : { ...formData, role: 'seller' };
 
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        credentials: 'include'
       });
       
       const data = await res.json();
       
       if (!res.ok) throw new Error(data.message || 'Something went wrong');
 
-      // Save token and user info
-      localStorage.setItem('token', data.token);
+      // Dispatch login with user data (cookie is handled by browser)
       dispatch(login(data.user));
 
       if (data.user.role === 'seller') {

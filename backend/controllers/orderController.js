@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const OrderItem = require('../models/OrderItem');
 const Product = require('../models/Product');
+const ProductImage = require('../models/ProductImage');
 const User = require('../models/User');
 
 exports.createOrder = async (req, res) => {
@@ -73,7 +74,12 @@ exports.getUserOrders = async (req, res) => {
       include: [
         {
           model: OrderItem,
-          include: [Product]
+          include: [
+            {
+              model: Product,
+              include: [{ model: ProductImage, as: 'images' }]
+            }
+          ]
         }
       ],
       order: [['createdAt', 'DESC']]
@@ -91,7 +97,12 @@ exports.getAllOrders = async (req, res) => {
       include: [
         {
           model: OrderItem,
-          include: [Product]
+          include: [
+            {
+              model: Product,
+              include: [{ model: ProductImage, as: 'images' }]
+            }
+          ]
         },
         User
       ],
@@ -110,7 +121,12 @@ exports.getOrderById = async (req, res) => {
       include: [
         {
           model: OrderItem,
-          include: [Product]
+          include: [
+            {
+              model: Product,
+              include: [{ model: ProductImage, as: 'images' }]
+            }
+          ]
         },
         User
       ]
@@ -135,7 +151,8 @@ exports.getSellerOrders = async (req, res) => {
           include: [
             {
               model: Product,
-              where: { sellerId: sellerId }
+              where: { sellerId: sellerId },
+              include: [{ model: ProductImage, as: 'images' }]
             }
           ]
         },
@@ -169,5 +186,135 @@ exports.updateOrderStatus = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error updating order status' });
+  }
+};
+
+exports.generateInvoice = async (req, res) => {
+  try {
+    const order = await Order.findByPk(req.params.id, {
+      include: [
+        {
+          model: OrderItem,
+          include: [Product]
+        },
+        User
+      ]
+    });
+
+    if (!order) return res.status(404).send('Order not found');
+
+    const invoiceHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Invoice - SHOP.CO</title>
+        <style>
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 0; padding: 40px; }
+          .invoice-box { max-width: 800px; margin: auto; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+          .logo { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: -1px; }
+          .invoice-details { text-align: right; }
+          .invoice-details h2 { margin: 0; color: #000; font-size: 32px; }
+          .invoice-details p { margin: 4px 0; color: #666; font-size: 14px; }
+          
+          .billing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+          .billing-info h3 { font-size: 12px; text-transform: uppercase; color: #999; margin-bottom: 12px; }
+          .billing-info p { margin: 4px 0; font-size: 15px; line-height: 1.4; }
+
+          table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; margin-bottom: 40px; }
+          table th { background: #000; color: #fff; padding: 12px; font-size: 13px; text-transform: uppercase; }
+          table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 15px; }
+          
+          .totals { margin-left: auto; width: 300px; }
+          .total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+          .total-row.grand-total { border-bottom: none; font-weight: 900; font-size: 20px; color: #000; padding-top: 16px; }
+          
+          .footer { margin-top: 60px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px; }
+          @media print { .print-btn { display: none; } }
+          .print-btn { background: #000; color: #fff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 700; margin-bottom: 20px; }
+        </style>
+      </head>
+      <body>
+        <button class="print-btn" onclick="window.print()">Print Invoice</button>
+        
+        <div class="header">
+          <div class="logo">SHOP.CO</div>
+          <div class="invoice-details">
+            <h2>INVOICE</h2>
+            <p>Order ID: #${order.id.toString().slice(-8).toUpperCase()}</p>
+            <p>Date: ${new Date(order.createdAt).toLocaleDateString()}</p>
+          </div>
+        </div>
+
+        <div class="billing-grid">
+          <div class="billing-info">
+            <h3>Billed From</h3>
+            <p><strong>SHOP.CO Marketplace</strong></p>
+            <p>123 Commerce Way</p>
+            <p>Tech Hub, Bangalore - 560001</p>
+            <p>GSTIN: 29ABCDE1234F1Z5</p>
+          </div>
+          <div class="billing-info">
+            <h3>Billed To</h3>
+            <p><strong>${order.User?.name}</strong></p>
+            <p>${order.shippingAddress}</p>
+            <p>Zip Code: ${order.zipcode}</p>
+            <p>${order.User?.email}</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.OrderItems.map(item => `
+              <tr>
+                <td><strong>${item.Product?.name}</strong><br><small>Size: ${item.size}, Color: ${item.color}</small></td>
+                <td>${item.quantity}</td>
+                <td>₹${item.price}</td>
+                <td>₹${(item.quantity * item.price).toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span>₹${order.totalAmount}</span>
+          </div>
+          <div class="total-row">
+            <span>Shipping</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="total-row">
+            <span>Tax (Included)</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Total</span>
+            <span>₹${order.totalAmount}</span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>Thank you for shopping with SHOP.CO!</p>
+          <p>If you have any questions about this invoice, please contact support@shop.co</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    res.send(invoiceHtml);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error generating invoice');
   }
 };

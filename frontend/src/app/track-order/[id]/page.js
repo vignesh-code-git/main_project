@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronLeft, Phone, ShieldCheck, Box } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './track-order.css';
 
 export default function TrackOrder() {
@@ -14,7 +15,9 @@ export default function TrackOrder() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/orders/${id}`);
+        const res = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+          credentials: 'include'
+        });
         const data = await res.json();
         setOrder(data);
       } catch (err) {
@@ -27,8 +30,8 @@ export default function TrackOrder() {
     if (id) fetchOrder();
   }, [id]);
 
-  if (loading) return <div className="track-loading">Locating your package...</div>;
-  if (!order) return <div className="track-error">Order not found</div>;
+  if (loading) return <div className="track-loading-overlay">Locating your package...</div>;
+  if (!order) return <div className="track-error-container">Order not found</div>;
 
   const steps = [
     { label: 'Order Placed', status: 'Pending', icon: <Box size={20} />, date: new Date(order.createdAt).toLocaleString() },
@@ -38,28 +41,29 @@ export default function TrackOrder() {
   ];
 
   // Logic to determine current step index
-  const currentStatusIndex = steps.findIndex(s => s.status === order.status);
+  const statusOrder = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+  const currentStatusIndex = statusOrder.indexOf(order.status);
   const finalIndex = currentStatusIndex === -1 ? 0 : currentStatusIndex;
 
   return (
     <div className="track-page-wrapper">
       <div className="container track-container">
-        <button className="back-to-profile" onClick={() => router.push('/profile')}>
-          <ChevronLeft size={18} /> Back to Profile
+        <button className="back-to-profile" onClick={() => router.push('/orders')}>
+          <ChevronLeft size={18} /> Back to My Orders
         </button>
 
         <div className="track-header-premium">
           <div className="header-main">
             <h1>Track Your Order</h1>
             <div className="order-badges">
-              <span className="badge-id">#{order.id.split('-')[0].toUpperCase()}</span>
+              <span className="badge-id">#{order.id.toString().slice(-8).toUpperCase()}</span>
               <span className={`badge-status ${order.status.toLowerCase()}`}>{order.status}</span>
             </div>
           </div>
           <div className="tracking-meta">
             <div className="meta-item">
               <label>Tracking Number</label>
-              <strong>{order.trackingNumber || 'TCK-829371HS'}</strong>
+              <strong>{order.trackingNumber || 'TCK-' + order.id.toString().slice(-6).toUpperCase()}</strong>
             </div>
             <div className="meta-item">
               <label>Courier Partner</label>
@@ -109,21 +113,28 @@ export default function TrackOrder() {
                 <strong>{order.User?.name || 'Customer'}</strong>
                 <p>{order.shippingAddress}</p>
                 <p>Zipcode: {order.zipcode}</p>
-                <div className="phone-verified">
-                  <Phone size={14} /> +91 99887 76655 <span className="verified-tag">VERIFIED</span>
-                </div>
+                {order.User?.phoneNumber && (
+                  <div className="phone-verified">
+                    <Phone size={14} /> {order.User.phoneNumber} <span className="verified-tag">VERIFIED</span>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="order-summary-mini">
               <div className="sidebar-section-title">
-                <ShieldCheck size={18} /> Order Items
+                <Package size={18} /> Order Items
               </div>
               <div className="mini-item-list">
                 {order.OrderItems?.map((item, idx) => (
                   <div key={idx} className="mini-item">
-                    <div className="item-img-placeholder">
-                      <Package size={20} color="#94A3B8" />
+                    <div className="item-img-small">
+                      <img 
+                        src={item.Product?.images?.[0]?.url?.startsWith('http') 
+                          ? item.Product.images[0].url 
+                          : `${API_BASE_URL}${item.Product?.images?.[0]?.url || '/placeholder.png'}`} 
+                        alt={item.Product?.name} 
+                      />
                     </div>
                     <div className="item-txt">
                       <div className="item-name">{item.Product?.name}</div>

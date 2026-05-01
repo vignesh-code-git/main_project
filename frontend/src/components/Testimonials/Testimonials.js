@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 import './Testimonials.css';
 
 export default function Testimonials() {
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/testimonials')
+    fetch(`${API_BASE_URL}/api/testimonials`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {

@@ -4,6 +4,7 @@ import { clearCart } from '@/lib/redux/slices/cartSlice';
 import { Tag, ArrowRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import RazorpayDemo from '../Payment/RazorpayDemo';
+import { API_BASE_URL } from '@/config/api';
 import './OrderSummary.css';
 
 export default function OrderSummary() {
@@ -51,7 +52,7 @@ export default function OrderSummary() {
         }))
       };
 
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)

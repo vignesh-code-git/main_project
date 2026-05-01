@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { login } from '@/lib/redux/slices/authSlice';
 import Link from 'next/link';
+import { Mail, Lock, ArrowRight, Loader2, CheckCircle, AlertCircle, ShoppingBag, ShieldCheck } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './login.css';
 
 export default function CustomerAuth() {
@@ -28,18 +30,18 @@ export default function CustomerAuth() {
       : { ...formData, role: 'customer' };
 
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        credentials: 'include' // This is the professional way to handle cookies
       });
       
       const data = await res.json();
       
       if (!res.ok) throw new Error(data.message || 'Something went wrong');
 
-      // Save token and user info
-      localStorage.setItem('token', data.token);
+      // Dispatch login with user data (cookie is handled by browser)
       dispatch(login(data.user));
 
       // Redirect based on role
