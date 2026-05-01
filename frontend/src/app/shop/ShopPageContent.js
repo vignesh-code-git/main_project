@@ -33,7 +33,7 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
       if (value !== undefined && value !== null && value !== '') {
         // For price, only append if it deviates from the 0-500 range
         if (key === 'minPrice' && parseInt(value) === 0) return;
-        if (key === 'maxPrice' && parseInt(value) === 500) return;
+        if (key === 'maxPrice' && parseInt(value) === 10000) return;
         
         params.append(key, value);
         hasFilters = true;

@@ -10,7 +10,7 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
   const [selectedSize, setSelectedSize] = useState(initialFilters.size || '');
   const [priceRange, setPriceRange] = useState({ 
     min: parseInt(initialFilters.minPrice) || 0, 
-    max: parseInt(initialFilters.maxPrice) || 500 
+    max: parseInt(initialFilters.maxPrice) || 10000 
   });
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialFilters.categoryId || '');
   const [selectedStyle, setSelectedStyle] = useState(initialFilters.style || '');
@@ -52,7 +52,7 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
   const clearFilters = () => {
     setSelectedColor('');
     setSelectedSize('');
-    setPriceRange({ min: 50, max: 200 });
+    setPriceRange({ min: 0, max: 10000 });
     setSelectedStyle('');
     setSelectedCategoryId('');
     onApplyFilter({});
@@ -117,17 +117,17 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
             <div
               className="range-input-container"
               style={{
-                background: `linear-gradient(to right, #F0F0F0 ${(priceRange.min / 500) * 100}%, #000 ${(priceRange.min / 500) * 100}%, #000 ${(priceRange.max / 500) * 100}%, #F0F0F0 ${(priceRange.max / 500) * 100}%)`
+                background: `linear-gradient(to right, #F0F0F0 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.max / 10000) * 100}%, #F0F0F0 ${(priceRange.max / 10000) * 100}%)`
               }}
             >
               <input
                 type="range"
                 min="0"
-                max="500"
-                step="10"
+                max="10000"
+                step="100"
                 value={priceRange.min}
                 onChange={(e) => {
-                  const val = Math.min(parseInt(e.target.value), priceRange.max - 10);
+                  const val = Math.min(parseInt(e.target.value), priceRange.max - 100);
                   setPriceRange(prev => ({ ...prev, min: val }));
                 }}
                 className="range-min"
@@ -135,11 +135,11 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
               <input
                 type="range"
                 min="0"
-                max="500"
-                step="10"
+                max="10000"
+                step="100"
                 value={priceRange.max}
                 onChange={(e) => {
-                  const val = Math.max(parseInt(e.target.value), priceRange.min + 10);
+                  const val = Math.max(parseInt(e.target.value), priceRange.min + 100);
                   setPriceRange(prev => ({ ...prev, max: val }));
                 }}
                 className="range-max"
