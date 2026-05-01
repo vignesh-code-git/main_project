@@ -18,6 +18,7 @@ export default function EditProductPage() {
     style: '',
     brand: '',
     colors: ['Black'],
+    sizes: [],
   });
 
   const [colorFiles, setColorFiles] = useState({}); // { 'Olive': [file1, file2, file3], ... }
@@ -66,6 +67,7 @@ export default function EditProductPage() {
           style: productData.style || '',
           brand: productData.brand || '',
           colors: productData.color ? productData.color.split(',') : ['Black'],
+          sizes: productData.size ? productData.size.split(',').map(s => s.trim()) : [],
         });
         
         if (productData.images) {
@@ -113,6 +115,8 @@ export default function EditProductPage() {
     Object.keys(formData).forEach(key => {
       if (key === 'colors') {
         submitData.append('color', formData.colors.join(','));
+      } else if (key === 'sizes') {
+        submitData.append('size', formData.sizes.join(','));
       } else {
         submitData.append(key, formData[key]);
       }
@@ -251,6 +255,29 @@ export default function EditProductPage() {
                 >
                   <div className="color-swatch-circle" style={{ backgroundColor: color.value }}></div>
                   <span>{color.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Available Sizes</label>
+            <div className="size-selector-chips">
+              {['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'].map(size => (
+                <div
+                  key={size}
+                  className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}
+                  onClick={() => {
+                    setFormData(prev => {
+                      const isSelected = prev.sizes.includes(size);
+                      const newSizes = isSelected
+                        ? prev.sizes.filter(s => s !== size)
+                        : [...prev.sizes, size];
+                      return { ...prev, sizes: newSizes };
+                    });
+                  }}
+                >
+                  {size}
                 </div>
               ))}
             </div>

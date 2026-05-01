@@ -16,7 +16,8 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [showRazorpay, setShowRazorpay] = useState(false);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-  const [selectedSize, setSelectedSize] = useState('Large');
+  const sizes = product.size ? product.size.split(',').map(s => s.trim()) : [];
+  const [selectedSize, setSelectedSize] = useState(sizes[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -38,7 +39,6 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
 
   const productColors = product.color ? product.color.split(',').map(c => c.trim()) : [];
 
-  const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
@@ -195,15 +195,19 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       <div className="selection-group">
         <h4>Choose Size</h4>
         <div className="size-buttons">
-          {sizes.map(size => (
-            <button
-              key={size}
-              className={`size-btn ${selectedSize === size ? 'active' : ''}`}
-              onClick={() => setSelectedSize(size)}
-            >
-              {size}
-            </button>
-          ))}
+          {sizes.length > 0 ? (
+            sizes.map(size => (
+              <button
+                key={size}
+                className={`size-btn ${selectedSize === size ? 'active' : ''}`}
+                onClick={() => setSelectedSize(size)}
+              >
+                {size}
+              </button>
+            ))
+          ) : (
+            <p className="no-data">No sizes specified for this product.</p>
+          )}
         </div>
       </div>
 

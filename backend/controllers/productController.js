@@ -51,12 +51,7 @@ exports.getAllProducts = async (req, res) => {
 
     if (size) {
       where.size = {
-        [Op.or]: [
-          { [Op.iLike]: `${size}` },        // Exact match
-          { [Op.iLike]: `${size},%` },      // Start of list
-          { [Op.iLike]: `%,${size}` },      // End of list
-          { [Op.iLike]: `%,${size},%` }     // Middle of list
-        ]
+        [Op.regexp]: `(^|,)\\s*${size}\\s*(,|$)`
       };
     }
 
@@ -117,12 +112,7 @@ exports.getNewArrivals = async (req, res) => {
     if (style) where.style = { [Op.iLike]: `%${style}%` };
     if (size) {
       where.size = {
-        [Op.or]: [
-          { [Op.iLike]: `${size}` },
-          { [Op.iLike]: `${size},%` },
-          { [Op.iLike]: `%,${size}` },
-          { [Op.iLike]: `%,${size},%` }
-        ]
+        [Op.regexp]: `(^|,)\\s*${size}\\s*(,|$)`
       };
     }
     if (minPrice || maxPrice) {
@@ -164,12 +154,7 @@ exports.getTopSelling = async (req, res) => {
     if (style) where.style = { [Op.iLike]: `%${style}%` };
     if (size) {
       where.size = {
-        [Op.or]: [
-          { [Op.iLike]: `${size}` },
-          { [Op.iLike]: `${size},%` },
-          { [Op.iLike]: `%,${size}` },
-          { [Op.iLike]: `%,${size},%` }
-        ]
+        [Op.regexp]: `(^|,)\\s*${size}\\s*(,|$)`
       };
     }
     if (minPrice || maxPrice) {
