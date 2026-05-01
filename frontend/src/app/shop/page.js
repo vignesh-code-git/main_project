@@ -1,164 +1,54 @@
-'use client';
-
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import ProductCard from '@/components/ProductCard/ProductCard';
-import Breadcrumbs from '@/components/Breadcrumbs/Breadcrumbs';
-import Sidebar from '@/components/Sidebar/Sidebar';
-import Pagination from '@/components/Pagination/Pagination';
-import CustomSelect from '@/components/CustomSelect/CustomSelect';
-import ProductCardSkeleton from '@/components/Skeleton/ProductCardSkeleton';
+import { Suspense } from 'react';
+import ShopPageContent from './ShopPageContent';
 import { API_BASE_URL } from '@/config/api';
-import './shop-page.css';
 
-export default function ShopPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ShopPageContent />
-    </Suspense>
-  );
+async function getShopData(searchParams) {
+  try {
+    const params = new URLSearchParams();
+    if (searchParams.categoryId) params.append('categoryId', searchParams.categoryId);
+    if (searchParams.minPrice) params.append('minPrice', searchParams.minPrice);
+    if (searchParams.maxPrice) params.append('maxPrice', searchParams.maxPrice);
+    if (searchParams.color) params.append('color', searchParams.color);
+    if (searchParams.style) params.append('style', searchParams.style);
+    if (searchParams.size) params.append('size', searchParams.size);
+    if (searchParams.search) params.append('search', searchParams.search);
+    if (searchParams.brand) params.append('brand', searchParams.brand);
+    
+    const sortMap = {
+      'Most Popular': 'rating',
+      'Newest': 'newest',
+      'Price: Low to High': 'price-asc',
+      'Price: High to Low': 'price-desc'
+    };
+    const sortBy = searchParams.sortBy || 'Most Popular';
+    params.append('sortBy', sortMap[sortBy] || 'newest');
+
+    const prodRes = await fetch(`${API_BASE_URL}/api/products?${params.toString()}`, { 
+      cache: 'no-store' 
+    });
+    const prodData = await prodRes.json();
+    
+    return {
+      products: prodData.products || [],
+      total: prodData.total || 0
+    };
+  } catch (err) {
+    console.error("Failed to fetch shop data:", err);
+    return { products: [], total: 0 };
+  }
 }
 
-function ShopPageContent() {
-  const searchParams = useSearchParams();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({});
-  const [sortBy, setSortBy] = useState('Most Popular');
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const newFilters = {};
-    
-    if (params.get('categoryId')) newFilters.categoryId = params.get('categoryId');
-    if (params.get('color')) newFilters.color = params.get('color');
-    if (params.get('size')) newFilters.size = params.get('size');
-    if (params.get('style')) newFilters.style = params.get('style');
-    if (params.get('minPrice')) newFilters.minPrice = params.get('minPrice');
-    if (params.get('maxPrice')) newFilters.maxPrice = params.get('maxPrice');
-    if (params.get('search')) newFilters.search = params.get('search');
-    if (params.get('brand')) newFilters.brand = params.get('brand');
-    
-    setFilters(newFilters);
-  }, [searchParams]);
-
-  useEffect(() => {
-    const fetchShopData = async () => {
-      setLoading(true);
-      try {
-        let endpoint = `${API_BASE_URL}/api/products`;
-        const params = new URLSearchParams();
-        if (filters.categoryId) params.append('categoryId', filters.categoryId);
-
-        if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice);
-        if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice);
-        if (filters.color) params.append('color', filters.color);
-        if (filters.style) params.append('style', filters.style);
-        if (filters.size) params.append('size', filters.size);
-        if (filters.search) params.append('search', filters.search);
-        if (filters.brand) params.append('brand', filters.brand);
-        
-        const sortMap = {
-          'Most Popular': 'rating',
-          'Newest': 'newest',
-          'Price: Low to High': 'price-asc',
-          'Price: High to Low': 'price-desc'
-        };
-        params.append('sortBy', sortMap[sortBy] || 'newest');
-
-        const prodRes = await fetch(`${endpoint}?${params.toString()}`, { cache: 'no-store' });
-        const prodData = await prodRes.json();
-        setProducts(prodData.products || []);
-      } catch (err) {
-        console.error("Failed to fetch shop data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShopData();
-  }, [filters, sortBy]);
-
-  const handleApplyFilter = (newFilters) => {
-    setFilters(newFilters);
-  };
-
-  const resetFilters = () => {
-    setFilters({});
-  };
-
-  const breadcrumbPaths = [
-    { name: 'Home', url: '/' },
-    { name: 'Shop', url: '#' },
-  ];
+export default async function ShopPage({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const { products, total } = await getShopData(resolvedSearchParams);
 
   return (
-    <div className="shop-page">
-      <div className="container">
-        <Breadcrumbs paths={breadcrumbPaths} />
-
-        <div className="shop-layout">
-          <aside className="shop-sidebar">
-            <Sidebar onApplyFilter={handleApplyFilter} />
-          </aside>
-
-          <main className="shop-content">
-            <header className="shop-header">
-              <div className="header-left">
-                <h1>ALL PRODUCTS</h1>
-                <p className="product-count">
-                  {products.length > 0 ? `Showing 1-${products.length} of ${products.length} Products` : 'No Products Available'}
-                </p>
-              </div>
-              <div className="header-right">
-                <span className="sort-label">Sort by:</span>
-                <div className="shop-sort-wrapper">
-                  <CustomSelect
-                    options={['Most Popular', 'Newest', 'Price: Low to High', 'Price: High to Low']}
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    placeholder="Most Popular"
-                  />
-                </div>
-              </div>
-            </header>
-
-            {loading ? (
-              <div className="shop-products-grid">
-                {[...Array(6)].map((_, i) => (
-                  <ProductCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : products.length > 0 ? (
-              <>
-                <div className="shop-products-grid">
-                  {products.map((product, index) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      priority={index < 4}
-                      activeColors={searchParams.get('color')}
-                    />
-                  ))}
-                </div>
-                <div className="pagination-wrapper">
-                  <Pagination />
-                </div>
-              </>
-            ) : (
-              <div className="no-results">
-                <div className="no-results-content">
-                  <h3>No products found matching your search criteria.</h3>
-                  <p>Try adjusting your search or filters to find what you're looking for.</p>
-                  <button onClick={resetFilters} className="clear-filters-btn">
-                    Clear All Filters
-                  </button>
-                </div>
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<div className="container" style={{padding: '100px 0', textAlign: 'center'}}>Loading products...</div>}>
+      <ShopPageContent 
+        initialProducts={products} 
+        initialTotal={total} 
+        searchParams={resolvedSearchParams} 
+      />
+    </Suspense>
   );
 }

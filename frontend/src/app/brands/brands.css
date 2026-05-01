@@ -34,37 +34,67 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   text-decoration: none;
-  color: inherit;
+  color: #000000;
   box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  height: 100%;
 }
 
 .brand-card:hover {
-  border-color: var(--primary-black);
+  border-color: #000000;
   box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  transform: translateY(-5px);
+}
+
+.brand-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .brand-name {
-  font-size: 32px;
-  font-weight: 900;
+  font-size: 32px !important;
+  font-weight: 900 !important;
   margin-bottom: 12px;
   letter-spacing: 2px;
+  color: #000000 !important;
+  text-transform: uppercase;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .brand-desc {
-  color: var(--text-gray);
+  color: #666666;
   font-size: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
   line-height: 1.6;
+  flex-grow: 1;
+}
+
+.brand-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
 }
 
 .view-collection {
-  font-weight: 700;
-  color: var(--primary-black);
-  font-size: 14px;
+  font-weight: 800;
+  color: #000000;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  position: relative;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+  font-weight: bold;
+}
+
+.brand-card:hover .arrow {
+  transform: translateX(5px);
 }
 
 @media (max-width: 768px) {
