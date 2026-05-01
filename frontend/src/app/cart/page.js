@@ -7,18 +7,27 @@ import OrderSummary from "@/components/Cart/OrderSummary";
 import './cart-page.css';
 
 export default function CartPage() {
-  const cartItems = useSelector((state) => state.cart.items);
+  const { items: cartItems, loading } = useSelector((state) => state.cart);
 
   const breadcrumbPaths = [
     { name: 'Home', url: '/' },
     { name: 'Cart', url: '/cart' },
   ];
 
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>
+        <div className="loading-spinner"></div>
+        <p>Loading your cart...</p>
+      </div>
+    );
+  }
+
   return (
     <main className="cart-page-main">
       <div className="container">
         <Breadcrumbs paths={breadcrumbPaths} />
-        <h1 className="cart-page-title">YOUR CART</h1>
+        <h1 className="cart-page-title">Your Cart</h1>
         
         <div className="cart-content-layout">
           <div className="cart-items-container">

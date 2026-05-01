@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const { User, Notification } = require('../models/associations');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -26,6 +26,16 @@ const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Notify User
+      await Notification.create({
+        userId: user.id,
+        role: user.role,
+        title: 'Welcome to SHOP.CO!',
+        message: `Hi ${user.name}, your account has been created successfully. Happy shopping!`,
+        type: 'system',
+        actorId: user.id
+      });
+
       const token = generateToken(user.id, user.role);
       
       res.cookie('token', token, {
@@ -69,6 +79,16 @@ const loginUser = async (req, res) => {
       // Update last login timestamp
       user.lastLoginAt = new Date();
       await user.save();
+
+      // Create Login Notification
+      await Notification.create({
+        userId: user.id,
+        role: user.role,
+        title: 'Successful Login',
+        message: `You logged in successfully at ${new Date().toLocaleTimeString()}.`,
+        type: 'system',
+        actorId: user.id
+      });
 
       const token = generateToken(user.id, user.role);
       
@@ -144,6 +164,16 @@ const updateProfile = async (req, res) => {
       
       const updatedUser = await user.save();
 
+      // Create Notification
+      await Notification.create({
+        userId: user.id,
+        role: user.role,
+        title: 'Profile Updated',
+        message: 'Your profile information has been successfully updated.',
+        type: 'system',
+        actorId: user.id
+      });
+
       res.json({
         user: {
           id: updatedUser.id,
@@ -179,6 +209,17 @@ const updateAvatar = async (req, res) => {
       const avatarUrl = `/uploads/${req.files[0].filename}`;
       user.avatar = avatarUrl;
       await user.save();
+
+      // Create Notification
+      await Notification.create({
+        userId: user.id,
+        role: user.role,
+        title: 'Avatar Updated',
+        message: 'Your profile picture has been successfully updated.',
+        type: 'system',
+        actorId: user.id,
+        metadata: { imageUrl: avatarUrl }
+      });
 
       res.json({ avatar: avatarUrl });
     } else {

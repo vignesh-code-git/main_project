@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
+import { fetchCart } from '@/lib/redux/slices/cartSlice';
 import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import './Navbar.css';
@@ -22,6 +23,11 @@ export default function Navbar() {
   const [totalResults, setTotalResults] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [notifications, setNotifications] = useState([]);
+  const [totalNotifs, setTotalNotifs] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const pollingRef = useRef(null);
+
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef(null);
@@ -49,28 +55,61 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fetch Notifications based on role (Real Database values)
+  // Fetch Cart when logged in
+  useEffect(() => {
+    if (mounted && isAuthenticated) {
+      dispatch(fetchCart());
+    }
+  }, [mounted, isAuthenticated, dispatch]);
+
+  const fetchNotifications = async (pageNum = 1, append = false) => {
+    try {
+      if (append) setLoadingMore(true);
+      
+      const res = await fetch(`${API_BASE_URL}/api/notifications?page=${pageNum}&limit=10`, {
+        credentials: 'include',
+        cache: 'no-store'
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        const newNotifs = Array.isArray(data.notifications) ? data.notifications : [];
+        
+        if (append) {
+          setNotifications(prev => [...prev, ...newNotifs]);
+        } else {
+          setNotifications(newNotifs);
+        }
+        
+        setTotalNotifs(data.total || 0);
+        setPage(pageNum);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    } finally {
+      if (append) setLoadingMore(false);
+    }
+  };
+
   useEffect(() => {
     if (mounted && isAuthenticated && user) {
-      const fetchNotifications = async () => {
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/notifications`, {
-            credentials: 'include', // Use cookies
-            cache: 'no-store'
-          });
-          if (res.ok) {
-            const data = await res.json();
-            setNotifications(Array.isArray(data) ? data : []);
-          }
-        } catch (err) {
-          console.error('Error fetching notifications:', err);
-        }
-      };
+      // Initial fetch
+      fetchNotifications(1, false);
 
-      fetchNotifications();
-      // Optional: Poll every 30 seconds for live updates
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
+      // Listen for custom "newOrder" event for instant update
+      const handleNewOrder = () => fetchNotifications(1, false);
+      window.addEventListener('newOrder', handleNewOrder);
+
+      // Poll for new notifications every 30 seconds
+      pollingRef.current = setInterval(() => {
+        // Only poll for the first page to keep it light
+        fetchNotifications(1, false);
+      }, 30000);
+
+      return () => {
+        window.removeEventListener('newOrder', handleNewOrder);
+        if (pollingRef.current) clearInterval(pollingRef.current);
+      };
     }
   }, [mounted, isAuthenticated, user]);
 
@@ -329,33 +368,114 @@ export default function Navbar() {
                   </button>
 
                   {notificationOpen && (
-                    <div className="notification-panel">
+                    <div className="notification-panel professional-panel">
                       <div className="notification-header">
-                        <h3>Notifications</h3>
-                        <span className="notif-count">
-                          {notifications.filter(n => !n.isRead).length} New
+                        <div className="header-info">
+                          <h3>Notifications</h3>
+                          <span className="unread-count">
+                            {notifications.filter(n => !n.isRead).length} New
+                          </span>
+                        </div>
+                        <span className="mark-all-read-link" onClick={handleMarkAsRead}>
+                          Mark all as read
                         </span>
                       </div>
+                      
                       <div className="notification-list">
-                        {notifications.length > 0 ? (
-                          notifications.map((notif) => (
-                            <div key={notif.id} className={`notification-item ${notif.type} ${!notif.isRead ? 'unread' : ''}`}>
-                              <div className="notif-content">
-                                <p className="notif-title">{notif.title}</p>
-                                <p className="notif-message">{notif.message}</p>
-                                <span className="notif-time">{new Date(notif.createdAt).toLocaleString()}</span>
-                              </div>
+                        {notifications.length === 0 ? (
+                          <div className="no-notifications">
+                            <div className="empty-notif-icon">
+                              <Bell size={32} />
+                            </div>
+                            <p>No new notifications</p>
+                            <span>We'll notify you when something happens</span>
+                          </div>
+                        ) : (
+                          Object.entries(
+                            notifications.reduce((groups, notif) => {
+                              const date = new Date(notif.createdAt);
+                              const today = new Date();
+                              const yesterday = new Date();
+                              yesterday.setDate(today.getDate() - 1);
+                              
+                              let dateLabel = "";
+                              if (date.toDateString() === today.toDateString()) {
+                                dateLabel = "Today";
+                              } else if (date.toDateString() === yesterday.toDateString()) {
+                                dateLabel = "Yesterday";
+                              } else {
+                                dateLabel = date.toLocaleDateString(undefined, { 
+                                  month: 'long', 
+                                  day: 'numeric', 
+                                  year: 'numeric' 
+                                });
+                              }
+                              
+                              if (!groups[dateLabel]) groups[dateLabel] = [];
+                              groups[dateLabel].push(notif);
+                              return groups;
+                            }, {})
+                          ).map(([dateLabel, groupNotifs]) => (
+                            <div key={dateLabel} className="notif-date-group">
+                              <div className="notif-date-header">{dateLabel}</div>
+                              {groupNotifs.map((notif) => (
+                                <div 
+                                  key={notif.id} 
+                                  className={`notification-item ${!notif.isRead ? 'unread' : ''}`}
+                                  onClick={() => handleNotifClick(notif)}
+                                >
+                                  <div className="notif-avatar-wrapper">
+                                    {notif.metadata?.imageUrl ? (
+                                      <img 
+                                        src={notif.metadata.imageUrl.startsWith('http') ? notif.metadata.imageUrl : `${API_BASE_URL}${notif.metadata.imageUrl}`} 
+                                        alt="Notification" 
+                                        className="notif-image"
+                                      />
+                                    ) : (
+                                      <div className={`notif-icon-circle ${notif.type}`}>
+                                        <Bell size={16} />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="notif-content">
+                                    <div className="notif-top">
+                                      <h4 className="notif-title">{notif.title}</h4>
+                                      {!notif.isRead && <div className="unread-indicator"></div>}
+                                    </div>
+                                    <p className="notif-message">{notif.message}</p>
+                                    <div className="notif-bottom">
+                                      <span className="notif-time">
+                                        {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           ))
-                        ) : (
-                          <div className="no-notifications">
-                            <p>No new notifications</p>
-                          </div>
                         )}
                       </div>
-                      <div className="notification-footer">
-                        <button onClick={handleMarkAsRead}>Clear all as read</button>
-                      </div>
+                      
+                      {notifications.length > 0 && (
+                        <div className="notification-footer professional-footer">
+                          <span className="total-notif-text">
+                            Showing {notifications.length} results of {totalNotifs} notifications
+                          </span>
+                          {notifications.length < totalNotifs ? (
+                            <button 
+                              className="view-more-link"
+                              onClick={() => fetchNotifications(page + 1, true)}
+                              disabled={loadingMore}
+                            >
+                              {loadingMore ? 'Loading...' : 'View more'}
+                            </button>
+                          ) : (
+                            <span className="all-caught-up-text">
+                              All caught up
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

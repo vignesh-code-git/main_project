@@ -48,9 +48,7 @@ export default function InventoryManagementPage() {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.get(`${API_BASE_URL}/api/products/seller/my-products`, {
-        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true
       });
       setProducts(response.data.products || (Array.isArray(response.data) ? response.data : []));

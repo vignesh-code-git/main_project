@@ -14,6 +14,7 @@ import {
   Download,
   Check
 } from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 import './stats.css';
 
 export default function PerformancePage() {
@@ -47,9 +48,7 @@ export default function PerformancePage() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://127.0.0.1:5000/api/seller/stats', {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.get(`${API_BASE_URL}/api/seller/stats`, {
         withCredentials: true
       });
       setStatsData(response.data.stats);

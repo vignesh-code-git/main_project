@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./config/passport');
 const sequelize = require('./config/database');
+require('./models/associations'); // LOAD ASSOCIATIONS FIRST
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +17,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const addressRoutes = require('./routes/addressRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 const path = require('path');
 
 app.use(cors({
@@ -47,6 +49,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/seller', require('./routes/sellerRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/cart', cartRoutes);
 
 // Test DB Connection
 sequelize.authenticate()
@@ -71,8 +74,7 @@ sequelize.sync({ alter: true })
   .then(async () => {
     // DATA FIX: Assign orphan products to the first seller for demo/testing
     try {
-      const Product = require('./models/Product');
-      const User = require('./models/User');
+      const { Product, User } = require('./models/associations');
       const orphanCount = await Product.count({ where: { sellerId: null } });
       if (orphanCount > 0) {
         const firstSeller = await User.findOne({ where: { role: 'seller' } });

@@ -1,21 +1,36 @@
-const Notification = require('../models/Notification');
+const { Notification } = require('../models/associations');
+const { Op } = require('sequelize');
 
 exports.getNotifications = async (req, res) => {
   try {
-    const { role, id } = req.user; // From auth middleware
+    const { role, id } = req.user;
 
-    const notifications = await Notification.findAll({
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await Notification.findAndCountAll({
       where: {
-        [Notification.sequelize.Op.or]: [
-          { userId: id },
-          { role: role, userId: null } // Global notifications for that role
+        [Op.or]: [
+          { userId: id }, // Direct notifications to this user
+          {
+            userId: null,
+            role: role,
+            actorId: { [Op.ne]: id } // Role-based global notifications (exclude self-triggered)
+          }
         ]
       },
       order: [['createdAt', 'DESC']],
-      limit: 20
+      limit: limit,
+      offset: offset
     });
 
-    res.json(notifications);
+    res.json({
+      notifications: rows,
+      total: count,
+      currentPage: page,
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

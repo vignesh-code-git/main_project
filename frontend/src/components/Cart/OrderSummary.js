@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { clearCart } from '@/lib/redux/slices/cartSlice';
+import { clearUserCart } from '@/lib/redux/slices/cartSlice';
 import { Tag, ArrowRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import RazorpayDemo from '../Payment/RazorpayDemo';
@@ -55,11 +55,14 @@ export default function OrderSummary() {
       const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
+        credentials: 'include'
       });
 
       if (res.ok) {
-        dispatch(clearCart());
+        dispatch(clearUserCart());
+        // Trigger a custom event to notify Navbar to refresh notifications
+        window.dispatchEvent(new Event('newOrder'));
         router.push('/profile');
       } else {
         throw new Error('Failed to save order after payment');

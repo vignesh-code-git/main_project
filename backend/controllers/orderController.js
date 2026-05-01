@@ -1,15 +1,11 @@
-const Order = require('../models/Order');
-const OrderItem = require('../models/OrderItem');
-const Product = require('../models/Product');
-const ProductImage = require('../models/ProductImage');
-const User = require('../models/User');
+const { Order, OrderItem, Product, ProductImage, User, Notification } = require('../models/associations');
 
 exports.createOrder = async (req, res) => {
   try {
     const { userId, totalAmount, shippingAddress, zipcode, items } = req.body;
 
     const order = await Order.create({
-      userId,
+      userId: req.user.id,
       totalAmount,
       shippingAddress,
       zipcode,
@@ -27,24 +23,65 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Create Notifications
+    // Create Notifications & Manage Stock
     try {
-      const Notification = require('../models/Notification');
+      // Get image for the first item
+      const firstItem = items[0];
+      const productForImage = await Product.findByPk(firstItem.id, {
+        include: [{ model: ProductImage, as: 'images', limit: 1 }]
+      });
+      
+      let imageUrl = null;
+      if (productForImage && productForImage.images && productForImage.images.length > 0) {
+        imageUrl = productForImage.images[0].url;
+      }
       
       // Notify User
       await Notification.create({
-        userId: userId,
+        userId: req.user.id,
         role: 'customer',
         title: 'Order Placed!',
-        message: `Your order #${order.id} has been placed successfully.`,
-        type: 'order'
+        message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been placed successfully.`,
+        type: 'order',
+        actorId: req.user.id,
+        metadata: {
+          imageUrl: imageUrl || '/placeholder.png', // Fallback to placeholder
+          orderId: order.id,
+          productCount: items.length
+        }
       });
 
-      // Notify Sellers (Get unique seller IDs from items)
+      // Notify Sellers & Check Stock
       const sellerIds = new Set();
       for (const item of items) {
-        const product = await Product.findByPk(item.id);
-        if (product && product.sellerId) sellerIds.add(product.sellerId);
+        const product = await Product.findByPk(item.id, {
+          include: [{ model: ProductImage, as: 'images', limit: 1 }]
+        });
+        
+        if (product) {
+          // 1. Decrement Stock
+          const newStock = Math.max(0, product.stock - item.quantity);
+          await product.update({ stock: newStock });
+
+          // 2. Check for Low Stock Notification
+          if (newStock <= 5 && product.sellerId) {
+            await Notification.create({
+              userId: product.sellerId,
+              role: 'seller',
+              title: newStock === 0 ? 'Out of Stock Alert' : 'Low Stock Alert',
+              message: newStock === 0 ? `"${product.name}" is now out of stock.` : `Only ${newStock} units left for "${product.name}".`,
+              type: 'inventory',
+              actorId: req.user.id,
+              metadata: {
+                imageUrl: product.images?.[0]?.url,
+                productId: product.id,
+                currentStock: newStock
+              }
+            });
+          }
+
+          if (product.sellerId) sellerIds.add(product.sellerId);
+        }
       }
 
       for (const sId of sellerIds) {
@@ -52,8 +89,13 @@ exports.createOrder = async (req, res) => {
           userId: sId,
           role: 'seller',
           title: 'New Order Received',
-          message: `You have a new order (#${order.id}) for your products.`,
-          type: 'order'
+          message: `You have a new order for ${items.length} item(s).`,
+          type: 'order',
+          actorId: req.user.id,
+          metadata: {
+            imageUrl: imageUrl || '/placeholder.png', 
+            orderId: order.id
+          }
         });
       }
     } catch (notifErr) {
@@ -181,6 +223,32 @@ exports.updateOrderStatus = async (req, res) => {
 
     order.status = status;
     await order.save();
+
+    // Create Notification for User
+    try {
+      const firstItem = await OrderItem.findOne({
+        where: { orderId: order.id },
+        include: [{ model: Product, include: [{ model: ProductImage, as: 'images', limit: 1 }] }]
+      });
+
+      const imageUrl = firstItem?.Product?.images?.[0]?.url;
+
+      await Notification.create({
+        userId: order.userId,
+        role: 'customer',
+        title: `Order ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+        message: `Your order #${order.id.toString().slice(-8).toUpperCase()} status has been updated to ${status}.`,
+        type: 'order',
+        actorId: req.user.id,
+        metadata: {
+          imageUrl,
+          orderId: order.id,
+          status: status
+        }
+      });
+    } catch (notifErr) {
+      console.error('Failed to create status notification:', notifErr);
+    }
 
     res.json({ message: 'Order status updated successfully', order });
   } catch (error) {

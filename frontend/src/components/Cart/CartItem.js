@@ -1,7 +1,7 @@
 'use client';
 
 import { useDispatch } from 'react-redux';
-import { addItem, removeItem, deleteItem } from '@/lib/redux/slices/cartSlice';
+import { updateCartItem, removeCartItem } from '@/lib/redux/slices/cartSlice';
 import { Trash2, Minus, Plus } from 'lucide-react';
 import './CartItem.css';
 
@@ -28,7 +28,7 @@ export default function CartItem({ item }) {
           <h3 className="item-name">{item.name}</h3>
           <button 
             className="item-delete-btn" 
-            onClick={() => dispatch(deleteItem(item.id))}
+            onClick={() => dispatch(removeCartItem(item.cartItemId))}
             aria-label="Remove item"
           >
             <Trash2 size={20} color="#FF3333" />
@@ -43,14 +43,20 @@ export default function CartItem({ item }) {
           <div className="quantity-control">
             <button 
               className="qty-btn" 
-              onClick={() => dispatch(removeItem(item.id))}
+              onClick={() => {
+                if (item.quantity > 1) {
+                  dispatch(updateCartItem({ id: item.cartItemId, quantity: item.quantity - 1 }));
+                } else {
+                  dispatch(removeCartItem(item.cartItemId));
+                }
+              }}
             >
               <Minus size={18} />
             </button>
             <span className="qty-value">{item.quantity}</span>
             <button 
               className="qty-btn" 
-              onClick={() => dispatch(addItem(item))}
+              onClick={() => dispatch(updateCartItem({ id: item.cartItemId, quantity: item.quantity + 1 }))}
             >
               <Plus size={18} />
             </button>

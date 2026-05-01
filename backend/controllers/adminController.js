@@ -1,6 +1,4 @@
-const User = require('../models/User');
-const Product = require('../models/Product');
-const WebsiteSettings = require('../models/WebsiteSettings');
+const { User, Product, WebsiteSettings } = require('../models/associations');
 
 // @desc    Get all users (customers)
 // @route   GET /api/admin/users
@@ -68,6 +66,25 @@ const updateSettings = async (req, res) => {
         value,
         type: 'image'
       });
+    }
+
+    // Notify all admins about the change
+    try {
+      const { Notification } = require('../models/associations');
+      await Notification.create({
+        role: 'admin',
+        userId: null, // Global for all admins
+        title: 'System Settings Updated',
+        message: `Admin setting "${key}" has been updated.`,
+        type: 'system',
+        actorId: req.user.id,
+        metadata: {
+          key,
+          imageUrl: value
+        }
+      });
+    } catch (notifErr) {
+      console.error('Failed to create admin notification:', notifErr);
     }
 
     res.json({ 

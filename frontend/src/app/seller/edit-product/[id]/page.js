@@ -128,9 +128,7 @@ export default function EditProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+        credentials: 'include',
         body: submitData,
       });
 

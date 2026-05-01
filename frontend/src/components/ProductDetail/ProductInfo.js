@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { addItem } from '@/lib/redux/slices/cartSlice';
+import { addItemToCart, fetchCart } from '@/lib/redux/slices/cartSlice';
 import { Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import RazorpayDemo from '../Payment/RazorpayDemo';
@@ -40,20 +40,31 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
 
   const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      for (let i = 0; i < quantity; i++) {
-        dispatch(addItem({
-          ...product,
-          size: selectedSize,
-          color: selectedColor
-        }));
-      }
-      setLoading(false);
+    try {
+      await dispatch(addItemToCart({
+        productId: product.id,
+        quantity,
+        size: selectedSize,
+        color: selectedColor
+      })).unwrap();
+      
+      // Refresh cart to get the latest state
+      dispatch(fetchCart());
+      
       setSuccessMsg('Added to cart successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
-    }, 500);
+    } catch (err) {
+      console.error('Failed to add item to cart:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBuyNow = () => {
@@ -86,7 +97,8 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
+        credentials: 'include'
       });
 
       if (res.ok) {

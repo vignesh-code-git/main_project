@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
-import { addItem } from '@/lib/redux/slices/cartSlice';
+import { addItemToCart, fetchCart } from '@/lib/redux/slices/cartSlice';
+import { useSelector } from 'react-redux';
 import './ProductCard.css';
 
 export default function ProductCard({ product, priority = false, activeColors = null }) {
@@ -22,10 +23,28 @@ export default function ProductCard({ product, priority = false, activeColors = 
     return (matchingImage?.url) || fallback;
   };
 
-  const handleAddToCart = (e) => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(addItem(product));
+
+    if (!isAuthenticated) {
+      window.location.href = '/auth/login';
+      return;
+    }
+
+    try {
+      await dispatch(addItemToCart({
+        productId: product.id,
+        quantity: 1,
+        size: product.size ? product.size.split(',')[0].trim() : 'Medium',
+        color: product.color ? product.color.split(',')[0].trim() : 'White'
+      })).unwrap();
+      dispatch(fetchCart());
+    } catch (err) {
+      console.error('Quick add failed:', err);
+    }
   };
 
   return (

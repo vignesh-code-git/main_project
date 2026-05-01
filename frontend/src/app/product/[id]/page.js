@@ -50,7 +50,7 @@ export default async function ProductDetailPage({ params }) {
     return <div className="error container" style={{padding: '100px 0', textAlign: 'center'}}>Product not found.</div>;
   }
 
-  const relatedProducts = await getRelatedProducts(product.CategoryId, id);
+  const relatedProducts = await getRelatedProducts(product.categoryId, id);
 
   return <ProductDetailClient product={product} relatedProducts={relatedProducts} id={id} />;
 }

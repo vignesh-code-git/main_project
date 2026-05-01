@@ -19,11 +19,4 @@ const Review = sequelize.define('Review', {
     }
 });
 
-Review.belongsTo(User);
-User.hasMany(Review);
-
-const Product = require('./Product');
-Review.belongsTo(Product);
-Product.hasMany(Review);
-
 module.exports = Review;

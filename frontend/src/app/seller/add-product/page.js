@@ -137,9 +137,7 @@ export default function AddProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/bulk`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+        credentials: 'include',
         body: data,
       });
 
@@ -200,9 +198,7 @@ export default function AddProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
+        credentials: 'include',
         body: submitData,
       });
 

@@ -27,9 +27,4 @@ const OrderItem = sequelize.define('OrderItem', {
   }
 });
 
-OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
-Order.hasMany(OrderItem, { foreignKey: 'orderId' });
-OrderItem.belongsTo(Product, { foreignKey: 'productId' });
-Product.hasMany(OrderItem, { foreignKey: 'productId' });
-
 module.exports = OrderItem;

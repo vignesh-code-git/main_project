@@ -49,13 +49,10 @@ export default function SettingsPage() {
     setLoading(true);
     
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.put(`${API_BASE_URL}/api/auth/profile`, {
         name: formData.name
       }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        withCredentials: true
       });
       
       dispatch(updateUser(response.data.user));
@@ -77,12 +74,11 @@ export default function SettingsPage() {
     formData.append('avatar', file);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.post(`${API_BASE_URL}/api/auth/avatar`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'multipart/form-data'
         },
+        withCredentials: true
       });
       
       dispatch(updateUser({ avatar: response.data.avatar }));

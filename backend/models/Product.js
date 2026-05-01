@@ -78,11 +78,4 @@ const Product = sequelize.define('Product', {
   }
 });
 
-Product.belongsTo(Category);
-Category.hasMany(Product);
-Product.hasMany(ProductImage, { as: 'images' });
-ProductImage.belongsTo(Product);
-Product.belongsTo(User, { as: 'seller', foreignKey: 'sellerId' });
-User.hasMany(Product, { foreignKey: 'sellerId' });
-
 module.exports = Product;

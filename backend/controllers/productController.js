@@ -1,8 +1,4 @@
-const Product = require('../models/Product');
-const ProductImage = require('../models/ProductImage');
-const Category = require('../models/Category');
-const User = require('../models/User');
-const Review = require('../models/Review');
+const { Product, ProductImage, Category, User, Review } = require('../models/associations');
 const fs = require('fs');
 const csv = require('csv-parser');
 
@@ -12,7 +8,7 @@ exports.getAllProducts = async (req, res) => {
     const { Op } = require('sequelize');
     let where = {};
 
-    if (categoryId) where.CategoryId = categoryId;
+    if (categoryId) where.categoryId = categoryId;
     if (onSale) where.originalPrice = { [Op.ne]: null };
     if (sellerId) where.sellerId = sellerId;
 
@@ -109,7 +105,7 @@ exports.getNewArrivals = async (req, res) => {
     const { Op } = require('sequelize');
     let where = {};
 
-    if (categoryId) where.CategoryId = categoryId;
+    if (categoryId) where.categoryId = categoryId;
     if (color) {
       const colorArray = color.split(',');
       where.color = {
@@ -154,7 +150,7 @@ exports.getTopSelling = async (req, res) => {
     const { Op } = require('sequelize');
     let where = {};
 
-    if (categoryId) where.CategoryId = categoryId;
+    if (categoryId) where.categoryId = categoryId;
     if (color) {
       const colorArray = color.split(',');
       where.color = {
@@ -195,7 +191,7 @@ exports.getTopSelling = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    let { name, price, originalPrice, rating, description, CategoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
+    let { name, price, originalPrice, rating, description, categoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
     
     // Parse details if it comes as a string
     if (details && typeof details === 'string') {
@@ -212,7 +208,7 @@ exports.createProduct = async (req, res) => {
       originalPrice,
       rating,
       description,
-      CategoryId,
+      categoryId,
       brand,
       style,
       color,
@@ -235,7 +231,7 @@ exports.createProduct = async (req, res) => {
           const colorMatch = file.fieldname.match(/^images_(.+)$/);
           return {
             url: `http://localhost:5000/uploads/${file.filename}`,
-            ProductId: product.id,
+            productId: product.id,
             color: colorMatch ? colorMatch[1] : null
           };
         });
@@ -244,13 +240,22 @@ exports.createProduct = async (req, res) => {
 
     // Create Notification for Seller
     try {
-      const Notification = require('../models/Notification');
+      // Get the image url for notification (first uploaded image)
+      const firstImageUrl = req.files && req.files.find(f => f.fieldname.startsWith('images_')) 
+        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname.startsWith('images_')).filename}`
+        : null;
+
       await Notification.create({
         userId: req.user.id,
         role: 'seller',
         title: 'Product Listed Successfully',
         message: `Your product "${product.name}" is now live on the store.`,
-        type: 'inventory'
+        type: 'inventory',
+        actorId: req.user.id,
+        metadata: {
+          imageUrl: firstImageUrl,
+          productId: product.id
+        }
       });
     } catch (notifErr) {
       console.error('Failed to create notification:', notifErr);
@@ -279,7 +284,7 @@ exports.bulkUploadProducts = async (req, res) => {
             originalPrice: p.originalPrice || null,
             rating: p.rating || 5,
             description: p.description,
-            CategoryId: p.CategoryId,
+            categoryId: p.categoryId,
             brand: p.brand,
             sellerId: req.user.id
           });
@@ -288,13 +293,30 @@ exports.bulkUploadProducts = async (req, res) => {
             const imageLinks = p.images.split(',');
             const imageRecords = Array.isArray(imageLinks) ? imageLinks.map(url => ({
               url: url.trim(),
-              ProductId: product.id
+              productId: product.id
             })) : [];
             await ProductImage.bulkCreate(imageRecords);
           }
           createdProducts.push(product);
         }
         fs.unlinkSync(req.file.path);
+
+        // Create Notification
+        try {
+          const { Notification } = require('../models/associations');
+          await Notification.create({
+            userId: req.user.id,
+            role: 'seller',
+            title: 'Bulk Upload Successful',
+            message: `${createdProducts.length} products have been uploaded and are now live.`,
+            type: 'inventory',
+            actorId: req.user.id,
+            metadata: { count: createdProducts.length }
+          });
+        } catch (notifErr) {
+          console.error('Failed to create bulk notification:', notifErr);
+        }
+
         res.status(201).json({ message: `${createdProducts.length} products uploaded successfully.` });
       } catch (err) {
         if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
@@ -363,7 +385,7 @@ exports.getStats = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
-    let { name, price, originalPrice, description, CategoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
+    let { name, price, originalPrice, description, categoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
     
     if (details && typeof details === 'string') {
       try {
@@ -384,7 +406,7 @@ exports.updateProduct = async (req, res) => {
       price,
       originalPrice,
       description,
-      CategoryId,
+      categoryId,
       brand,
       style,
       color,
@@ -399,18 +421,25 @@ exports.updateProduct = async (req, res) => {
         : videoUrl
     });
 
-    // Handle new image uploads
-    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-      const ProductImage = require('../models/ProductImage');
-      const images = req.files.map(file => {
-        const colorMatch = file.fieldname.match(/^images_(.+)$/);
-        return {
-          url: `http://localhost:5000/uploads/${file.filename}`,
-          ProductId: product.id,
-          color: colorMatch ? colorMatch[1] : null
-        };
+    // Create Notification
+    try {
+      const { Notification } = require('../models/associations');
+      const firstImage = await ProductImage.findOne({ where: { productId: product.id } });
+      
+      await Notification.create({
+        userId: req.user.id,
+        role: 'seller',
+        title: 'Product Updated',
+        message: `Your product "${product.name}" has been updated successfully.`,
+        type: 'inventory',
+        actorId: req.user.id,
+        metadata: {
+          imageUrl: firstImage?.url,
+          productId: product.id
+        }
       });
-      await ProductImage.bulkCreate(images);
+    } catch (notifErr) {
+      console.error('Failed to update notification:', notifErr);
     }
 
     res.json(product);
@@ -426,7 +455,24 @@ exports.deleteProduct = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    const productName = product.name;
     await product.destroy();
+
+    // Create Notification
+    try {
+      const { Notification } = require('../models/associations');
+      await Notification.create({
+        userId: req.user.id,
+        role: 'seller',
+        title: 'Product Deleted',
+        message: `"${productName}" has been removed from your store.`,
+        type: 'inventory',
+        actorId: req.user.id
+      });
+    } catch (notifErr) {
+      console.error('Failed to delete notification:', notifErr);
+    }
+
     res.json({ message: 'Product deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });

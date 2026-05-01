@@ -34,6 +34,19 @@ const Notification = sequelize.define('Notification', {
   isRead: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  actorId: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // The user who triggered the action
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
+  },
+  metadata: {
+    type: DataTypes.JSON,
+    allowNull: true, // Stores images, product IDs, etc.
+    defaultValue: {}
   }
 }, {
   timestamps: true

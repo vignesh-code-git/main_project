@@ -6,7 +6,7 @@ import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
 import { useDispatch } from 'react-redux';
-import { addItem } from '@/lib/redux/slices/cartSlice';
+import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import './orders-page.css';
 
 export default function OrdersPage() {
@@ -47,18 +47,18 @@ export default function OrdersPage() {
     }
   };
 
-  const handleBuyAgain = (item) => {
-    const productToAdd = {
-      id: item.Product.id,
-      name: item.Product.name,
-      price: item.price,
-      quantity: 1,
-      images: item.Product.images,
-      size: item.size || 'M',
-      color: item.color || 'Black'
-    };
-    dispatch(addItem(productToAdd));
-    alert(`${item.Product.name} added to cart!`);
+  const handleBuyAgain = async (item) => {
+    try {
+      await dispatch(addItemToCart({
+        productId: item.Product.id,
+        quantity: 1,
+        size: item.size || 'M',
+        color: item.color || 'Black'
+      })).unwrap();
+      alert(`${item.Product.name} added to cart!`);
+    } catch (err) {
+      console.error('Failed to add item to cart:', err);
+    }
   };
 
   const handleInvoice = (order) => {

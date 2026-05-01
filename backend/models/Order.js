@@ -34,7 +34,4 @@ const Order = sequelize.define('Order', {
   }
 });
 
-Order.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Order, { foreignKey: 'userId' });
-
 module.exports = Order;

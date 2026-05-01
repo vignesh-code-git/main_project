@@ -23,7 +23,7 @@ export default function ProductDetailClient({ product, relatedProducts, id }) {
   const breadcrumbPaths = [
     { name: 'Home', url: '/' },
     { name: 'Shop', url: '/shop' },
-    { name: product.Category?.name || 'Category', url: `/category/${product.CategoryId}` },
+    { name: product.Category?.name || 'Category', url: `/category/${product.categoryId}` },
     { name: product.name, url: '#' },
   ];
 

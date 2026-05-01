@@ -1,7 +1,4 @@
-const Product = require('../models/Product');
-const Order = require('../models/Order');
-const OrderItem = require('../models/OrderItem');
-const User = require('../models/User');
+const { Product, Order, OrderItem, User } = require('../models/associations');
 const { Op } = require('sequelize');
 
 exports.getSellerStats = async (req, res) => {
@@ -36,7 +33,7 @@ exports.getSellerStats = async (req, res) => {
     const outOfStockProducts = products.filter(p => p.stock === 0);
 
     // 5. Recent Activity Feed
-    const recentOrders = [...new Map(orderItems.map(item => [item.OrderId, item.Order])).values()]
+    const recentOrders = [...new Map(orderItems.map(item => [item.orderId, item.Order])).values()]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 5)
       .map(order => ({
