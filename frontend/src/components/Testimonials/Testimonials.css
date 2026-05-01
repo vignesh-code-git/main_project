@@ -69,6 +69,30 @@
   line-height: 1.4;
 }
 
+.view-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.view-more-reviews-btn {
+  background: var(--primary-black);
+  color: white;
+  padding: 16px 54px;
+  border-radius: 62px;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--primary-black);
+}
+
+.view-more-reviews-btn:hover {
+  background: white;
+  color: var(--primary-black);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 @media (max-width: 1024px) {
   .reviews-grid {
     grid-template-columns: repeat(2, 1fr);

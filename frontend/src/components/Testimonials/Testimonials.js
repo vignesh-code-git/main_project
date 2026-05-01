@@ -6,6 +6,7 @@ import './Testimonials.css';
 
 export default function Testimonials() {
   const [reviews, setReviews] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/testimonials`)
@@ -24,6 +25,10 @@ export default function Testimonials() {
       });
   }, []);
 
+  const handleShowMore = () => {
+    setVisibleCount(reviews.length);
+  };
+
   return (
     <section className="testimonials container">
       <div className="testimonials-header">
@@ -33,7 +38,7 @@ export default function Testimonials() {
         </div>
       </div>
       <div className="reviews-grid">
-        {reviews.map((review) => (
+        {reviews.slice(0, visibleCount).map((review) => (
           <div key={review.id} className="review-card">
             <div className="stars">{"★".repeat(Math.floor(review.rating))}</div>
             <div className="reviewer-name">
@@ -43,6 +48,13 @@ export default function Testimonials() {
           </div>
         ))}
       </div>
+      {visibleCount < reviews.length && (
+        <div className="view-more-container">
+          <button className="view-more-reviews-btn" onClick={handleShowMore}>
+            VIEW MORE
+          </button>
+        </div>
+      )}
     </section>
   );
 }
