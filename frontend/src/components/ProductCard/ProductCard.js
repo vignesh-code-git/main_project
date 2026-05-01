@@ -10,20 +10,31 @@ import './ProductCard.css';
 export default function ProductCard({ product, priority = false, activeColors = null }) {
   const dispatch = useDispatch();
 
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { API_BASE_URL } = require('@/config/api');
+
   // Find the first image that matches the filtered colors
   const getDisplayImage = () => {
-    if (!activeColors || !product.images) return product.images?.[0]?.url;
+    let rawUrl = '';
+    if (!activeColors || !product.images) {
+      rawUrl = product.images?.[0]?.url || product.imageUrl;
+    } else {
+      const selectedColors = activeColors.split(',').map(c => c.trim().toLowerCase());
+      const matchingImage = product.images.find(img => 
+        img.color && typeof img.color === 'string' && selectedColors.includes(img.color.toLowerCase())
+      );
+      rawUrl = (matchingImage?.url) || product.imageUrl || (product.images?.[0]?.url);
+    }
 
-    const selectedColors = activeColors.split(',').map(c => c.trim().toLowerCase());
-    const matchingImage = product.images.find(img => 
-      img.color && typeof img.color === 'string' && selectedColors.includes(img.color.toLowerCase())
-    );
+    const fallback = '/images/placeholder.png';
+    if (!rawUrl) return fallback;
 
-    const fallback = product.imageUrl || (product.images?.[0]?.url) || '/images/placeholder.png';
-    return (matchingImage?.url) || fallback;
+    // Handle relative URLs from bulk upload
+    if (rawUrl.startsWith('/uploads')) {
+      return `${API_BASE_URL}${rawUrl}`;
+    }
+    return rawUrl;
   };
-
-  const { isAuthenticated } = useSelector((state) => state.auth);
 
   const handleAddToCart = async (e) => {
     e.preventDefault();

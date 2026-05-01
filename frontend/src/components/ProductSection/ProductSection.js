@@ -9,12 +9,16 @@ export default function ProductSection({ title, products, viewAllHref, loading }
       <div className="container">
         <h2>{title}</h2>
         <div className="product-grid">
-          {loading || !products || products.length === 0 ? (
+          {loading ? (
             [...Array(4)].map((_, i) => <ProductCardSkeleton key={i} />)
-          ) : (
-            products.map((product) => (
+          ) : products && products.length > 0 ? (
+            products.slice(0, 4).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))
+          ) : (
+            <div className="no-products-message">
+              No products found in this category.
+            </div>
           )}
         </div>
         <div className="view-all-container">

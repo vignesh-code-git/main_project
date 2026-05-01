@@ -16,7 +16,7 @@ router.post('/logout', logoutUser);
 // Google Auth Routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/google/callback', 
+router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
     // Successful authentication, generate JWT and set cookie
@@ -27,7 +27,7 @@ router.get('/google/callback',
     };
 
     const token = generateToken(req.user.id, req.user.role);
-    
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

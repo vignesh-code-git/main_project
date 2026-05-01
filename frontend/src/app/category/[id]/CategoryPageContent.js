@@ -23,15 +23,47 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
   }, [initialProducts]);
 
   const handleApplyFilter = (newFilters) => {
-    setLoading(true);
     const params = new URLSearchParams();
+    
+    // Determine the base path
+    let basePath = `/category/${id}`;
+    
+    // If it's a real category ID being changed, navigate to the new path
+    if (!['on-sale', 'new-arrivals', 'top-selling'].includes(id) && 
+        newFilters.categoryId && newFilters.categoryId.toString() !== id.toString()) {
+      basePath = `/category/${newFilters.categoryId}`;
+    }
+
+    let hasFilters = false;
     Object.entries(newFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
+      // Don't append categoryId if it's already in the path or we are on a special page where it will be handled as a query param
+      if (key === 'categoryId') {
+        if (['on-sale', 'new-arrivals', 'top-selling'].includes(id)) {
+           if (value) {
+             params.append(key, value);
+             hasFilters = true;
+           }
+        }
+      } else if (value !== undefined && value !== null && value !== '') {
+        // For price, only append if it deviates from the 0-500 range
+        if (key === 'minPrice' && parseInt(value) === 0) return;
+        if (key === 'maxPrice' && parseInt(value) === 500) return;
+
         params.append(key, value);
+        hasFilters = true;
       }
     });
-    params.append('sortBy', sortBy);
-    router.push(`/category/${id}?${params.toString()}`);
+
+    if (sortBy !== 'Most Popular') {
+      params.append('sortBy', sortBy);
+      hasFilters = true;
+    }
+
+    const currentQuery = window.location.search;
+    if (hasFilters || currentQuery) {
+      setLoading(true);
+      router.push(`${basePath}${hasFilters ? '?' + params.toString() : ''}`);
+    }
   };
 
   const handleSortChange = (newSort) => {
@@ -59,7 +91,10 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
 
         <div className="category-layout">
           <aside className="category-sidebar">
-            <Sidebar onApplyFilter={handleApplyFilter} initialFilters={searchParams} />
+            <Sidebar 
+              onApplyFilter={handleApplyFilter} 
+              initialFilters={{ ...searchParams, categoryId: !['on-sale', 'new-arrivals', 'top-selling'].includes(id) ? id : searchParams.categoryId }} 
+            />
           </aside>
 
           <main className="category-content">

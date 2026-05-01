@@ -18,9 +18,10 @@ export default function CustomSelect({ options, value, onChange, placeholder = "
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedOption = Array.isArray(options) ? options.find(opt => 
-    (typeof opt === 'object' ? opt[valueKey] : opt).toString() === value.toString()
-  ) : null;
+  const selectedOption = Array.isArray(options) ? options.find(opt => {
+    const optVal = typeof opt === 'object' ? opt[valueKey] : opt;
+    return optVal?.toString() === value?.toString();
+  }) : null;
 
   return (
     <div className="custom-select-wrapper" ref={dropdownRef}>
@@ -45,7 +46,7 @@ export default function CustomSelect({ options, value, onChange, placeholder = "
             return (
               <li 
                 key={idx}
-                className={`custom-select-option ${optValue.toString() === value.toString() ? 'selected' : ''}`}
+                className={`custom-select-option ${optValue?.toString() === value?.toString() ? 'selected' : ''}`}
                 onClick={() => {
                   onChange({ target: { value: optValue } });
                   setIsOpen(false);

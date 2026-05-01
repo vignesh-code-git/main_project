@@ -23,15 +23,35 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
   }, [initialProducts]);
 
   const handleApplyFilter = (newFilters) => {
-    setLoading(true);
     const params = new URLSearchParams();
+    
+    // Determine the base path
+    let basePath = `/shop`;
+    
+    let hasFilters = false;
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
+        // For price, only append if it deviates from the 0-500 range
+        if (key === 'minPrice' && parseInt(value) === 0) return;
+        if (key === 'maxPrice' && parseInt(value) === 500) return;
+        
         params.append(key, value);
+        hasFilters = true;
       }
     });
-    params.append('sortBy', sortBy);
-    router.push(`/shop?${params.toString()}`);
+
+    // Only append sortBy if it's not the default or if we already have other filters
+    if (sortBy !== 'Most Popular') {
+      params.append('sortBy', sortBy);
+      hasFilters = true;
+    }
+
+    // Only navigate if we actually have filters OR if the current URL has filters we need to clear
+    const currentQuery = window.location.search;
+    if (hasFilters || currentQuery) {
+      setLoading(true);
+      router.push(`${basePath}${hasFilters ? '?' + params.toString() : ''}`);
+    }
   };
 
   const handleSortChange = (newSort) => {

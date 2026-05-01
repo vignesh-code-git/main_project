@@ -14,7 +14,7 @@ export default function EditProductPage() {
     price: '',
     originalPrice: '',
     description: '',
-    CategoryId: '',
+    categoryId: '',
     style: '',
     brand: '',
     colors: ['Black'],
@@ -62,7 +62,7 @@ export default function EditProductPage() {
           price: productData.price,
           originalPrice: productData.originalPrice || '',
           description: productData.description,
-          CategoryId: productData.CategoryId,
+          categoryId: productData.categoryId,
           style: productData.style || '',
           brand: productData.brand || '',
           colors: productData.color ? productData.color.split(',') : ['Black'],
@@ -204,8 +204,8 @@ export default function EditProductPage() {
             <label>Category</label>
             <CustomSelect 
               options={categories}
-              value={formData.CategoryId}
-              onChange={(e) => setFormData(prev => ({ ...prev, CategoryId: e.target.value }))}
+              value={formData.categoryId}
+              onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
               placeholder="Select Category"
             />
           </div>

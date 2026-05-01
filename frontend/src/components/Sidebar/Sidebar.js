@@ -1,17 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SlidersHorizontal, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import './Sidebar.css';
 
-export default function Sidebar({ onApplyFilter }) {
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: 50, max: 200 });
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [selectedStyle, setSelectedStyle] = useState('');
+export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
+  const [selectedColor, setSelectedColor] = useState(initialFilters.color || '');
+  const [selectedSize, setSelectedSize] = useState(initialFilters.size || '');
+  const [priceRange, setPriceRange] = useState({ 
+    min: parseInt(initialFilters.minPrice) || 0, 
+    max: parseInt(initialFilters.maxPrice) || 500 
+  });
+  const [selectedCategoryId, setSelectedCategoryId] = useState(initialFilters.categoryId || '');
+  const [selectedStyle, setSelectedStyle] = useState(initialFilters.style || '');
   const [categories, setCategories] = useState([]);
+  const isFirstRender = useRef(true);
   
   // Accordion states
   const [isPriceOpen, setIsPriceOpen] = useState(true);
@@ -26,8 +30,13 @@ export default function Sidebar({ onApplyFilter }) {
       .catch(err => console.error('Error fetching categories:', err));
   }, []);
 
-  // Instant update: trigger filter when any state changes
+  // Instant update: trigger filter when any state changes (skipping first render)
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     if (onApplyFilter) {
       onApplyFilter({
         categoryId: selectedCategoryId,

@@ -11,7 +11,7 @@ export default function AddProductPage() {
     price: '',
     originalPrice: '',
     description: '',
-    CategoryId: '',
+    categoryId: '',
     style: '',
     brand: '',
     colors: ['Black'],
@@ -100,7 +100,7 @@ export default function AddProductPage() {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
-    if (!formData.CategoryId) newErrors.CategoryId = 'Category is required';
+    if (!formData.categoryId) newErrors.categoryId = 'Category is required';
     if (!formData.style) newErrors.style = 'Dress style is required';
     if (!formData.brand) newErrors.brand = 'Brand is required';
     if (formData.sizes.length === 0) newErrors.sizes = 'Select at least one size';
@@ -209,7 +209,7 @@ export default function AddProductPage() {
           price: '',
           originalPrice: '',
           description: '',
-          CategoryId: '',
+          categoryId: '',
           style: '',
           brand: '',
           colors: ['Black'],
@@ -392,10 +392,10 @@ export default function AddProductPage() {
               <label>Category</label>
               <CustomSelect
                 options={categories}
-                value={formData.CategoryId}
+                value={formData.categoryId}
                 onChange={(e) => {
-                  setFormData(prev => ({ ...prev, CategoryId: e.target.value }));
-                  if (errors.CategoryId) setErrors(prev => ({ ...prev, CategoryId: null }));
+                  setFormData(prev => ({ ...prev, categoryId: e.target.value }));
+                  if (errors.categoryId) setErrors(prev => ({ ...prev, categoryId: null }));
                 }}
                 placeholder="Select Category"
               />
@@ -724,7 +724,7 @@ export default function AddProductPage() {
                     <div className="meta-item">
                       <span className="label">Category</span>
                       <span className="value">
-                        {categories.find(c => c.id.toString() === formData.CategoryId.toString())?.name || 'N/A'}
+                        {categories.find(c => c.id.toString() === formData.categoryId.toString())?.name || 'N/A'}
                       </span>
                     </div>
                     <div className="meta-item">

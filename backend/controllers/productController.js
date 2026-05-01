@@ -131,6 +131,7 @@ exports.getNewArrivals = async (req, res) => {
       if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
     }
 
+    console.log('Fetching new arrivals with where:', where);
     const { count, rows: products } = await Product.findAndCountAll({
       where,
       order: [['createdAt', 'DESC']],
@@ -138,6 +139,7 @@ exports.getNewArrivals = async (req, res) => {
       include: [{ model: ProductImage, as: 'images' }],
       distinct: true
     });
+    console.log(`Found ${products.length} new arrivals.`);
     res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -176,6 +178,7 @@ exports.getTopSelling = async (req, res) => {
       if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
     }
 
+    console.log('Fetching top selling with where:', where);
     const { count, rows: products } = await Product.findAndCountAll({
       where,
       order: [['rating', 'DESC']],
@@ -183,6 +186,7 @@ exports.getTopSelling = async (req, res) => {
       include: [{ model: ProductImage, as: 'images' }],
       distinct: true
     });
+    console.log(`Found ${products.length} top selling products.`);
     res.json({ products, total: count });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -277,7 +281,20 @@ exports.bulkUploadProducts = async (req, res) => {
     .on('end', async () => {
       try {
         const createdProducts = [];
-        for (const p of products) {
+        const errors = [];
+
+      for (const p of products) {
+        try {
+          // Parse complex fields
+          let details = null;
+          if (p.details) {
+            try {
+              details = typeof p.details === 'string' ? JSON.parse(p.details) : p.details;
+            } catch (e) {
+              console.warn(`Failed to parse details for product ${p.name}:`, e.message);
+            }
+          }
+
           const product = await Product.create({
             name: p.name,
             price: p.price,
@@ -286,22 +303,52 @@ exports.bulkUploadProducts = async (req, res) => {
             description: p.description,
             categoryId: p.categoryId,
             brand: p.brand,
+            style: p.style || 'Casual',
+            color: p.color || 'Black',
+            size: p.size || 'Medium',
+            stock: p.stock || 0,
+            sku: p.sku || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            deliveryDays: p.deliveryDays || '3-5 Business Days',
+            isFreeDelivery: String(p.isFreeDelivery).toLowerCase() === 'true',
+            isNewArrival: String(p.isNewArrival).toLowerCase() === 'true',
+            isTopSelling: String(p.isTopSelling).toLowerCase() === 'true',
+            details: details,
             sellerId: req.user.id
           });
 
           if (p.images) {
             const imageLinks = p.images.split(',');
-            const imageRecords = Array.isArray(imageLinks) ? imageLinks.map(url => ({
+            const imageRecords = imageLinks.map(url => ({
               url: url.trim(),
               productId: product.id
-            })) : [];
+            }));
             await ProductImage.bulkCreate(imageRecords);
           }
+          
+          console.log(`Successfully uploaded: ${product.name}`);
           createdProducts.push(product);
+        } catch (itemErr) {
+          console.error(`Error uploading product "${p.name}":`, itemErr.message);
+          errors.push({ name: p.name, error: itemErr.message });
         }
-        fs.unlinkSync(req.file.path);
+      }
 
-        // Create Notification
+      try {
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      } catch (fsErr) {
+        console.error('Failed to delete temp CSV:', fsErr);
+      }
+
+      if (createdProducts.length === 0 && products.length > 0) {
+        return res.status(400).json({ 
+          message: 'Failed to upload any products. Check server logs for details.',
+          errors 
+        });
+      }
+
+      // Create Notification
         try {
           const { Notification } = require('../models/associations');
           await Notification.create({

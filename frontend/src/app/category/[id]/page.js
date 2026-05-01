@@ -30,12 +30,14 @@ async function getCategoryData(id, searchParams) {
       if (currentCat) categoryName = currentCat.name;
     }
 
+    if (searchParams.categoryId) params.append('categoryId', searchParams.categoryId);
     if (searchParams.minPrice) params.append('minPrice', searchParams.minPrice);
     if (searchParams.maxPrice) params.append('maxPrice', searchParams.maxPrice);
     if (searchParams.color) params.append('color', searchParams.color);
     if (searchParams.style) params.append('style', searchParams.style);
     if (searchParams.size) params.append('size', searchParams.size);
     if (searchParams.search) params.append('search', searchParams.search);
+    if (searchParams.brand) params.append('brand', searchParams.brand);
     
     const sortMap = {
       'Most Popular': 'rating',

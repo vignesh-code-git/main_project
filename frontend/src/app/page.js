@@ -8,12 +8,12 @@ import { API_BASE_URL } from '@/config/api';
 async function getHomeData() {
   try {
     const [newRes, topRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/products/new-arrivals`, { next: { revalidate: 3600 } }),
-      fetch(`${API_BASE_URL}/api/products/top-selling`, { next: { revalidate: 3600 } })
+      fetch(`${API_BASE_URL}/api/products/new-arrivals`, { cache: 'no-store' }),
+      fetch(`${API_BASE_URL}/api/products/top-selling`, { cache: 'no-store' })
     ]);
 
-    const newData = await newRes.json();
-    const topData = await topRes.json();
+    const newData = newRes.ok ? await newRes.json() : { products: [] };
+    const topData = topRes.ok ? await topRes.json() : { products: [] };
 
     return {
       newArrivals: newData.products || [],

@@ -124,7 +124,7 @@
 
 .product-cell-link:hover .product-img-small {
   border-color: #000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .status-badge {
@@ -332,76 +332,83 @@
 .onboarding-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: 9999;
+  padding: 40px 20px;
+  overflow-y: auto;
 }
 
 .onboarding-modal {
   background: #fff;
   width: 100%;
-  max-width: 500px;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  animation: slideUp 0.4s ease-out;
+  max-width: 560px;
+  border-radius: 24px;
+  padding: 44px 32px 32px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
+  from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
 .onboarding-header {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 .onboarding-header h2 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 
 .onboarding-header p {
-  color: rgba(0,0,0,0.6);
-  font-size: 14px;
+  color: rgba(0,0,0,0.5);
+  font-size: 13px;
+  max-width: 90%;
+  margin: 0 auto;
 }
 
 .onboarding-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
 }
 
 .onboarding-form label {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #000;
 }
 
 .onboarding-form input, 
 .onboarding-form textarea {
   width: 100%;
-  padding: 12px 16px;
-  background: #F0EEED;
+  padding: 10px 16px;
+  background: #F0F0F0;
   border: 1px solid transparent;
   border-radius: 12px;
   font-size: 14px;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  color: #000;
 }
 
 .onboarding-form input:focus, 
@@ -411,21 +418,22 @@
 }
 
 .onboarding-form textarea {
-  height: 80px;
+  height: 60px;
   resize: none;
+  line-height: 1.4;
 }
 
 .onboarding-submit-btn {
   background: #000;
   color: #fff;
   border: none;
-  padding: 16px;
+  padding: 14px;
   border-radius: 62px;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-  transition: opacity 0.3s;
+  transition: all 0.3s ease;
 }
 
 .onboarding-submit-btn:disabled {
