@@ -181,7 +181,7 @@ exports.getTopSelling = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     let { name, price, originalPrice, rating, description, categoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
-    
+
     // Parse details if it comes as a string
     if (details && typeof details === 'string') {
       try {
@@ -207,8 +207,8 @@ exports.createProduct = async (req, res) => {
       stock,
       sku,
       deliveryDays,
-      videoUrl: req.files && req.files.find(f => f.fieldname === 'video') 
-        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}` 
+      videoUrl: req.files && req.files.find(f => f.fieldname === 'video')
+        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
         : videoUrl,
       sellerId: req.user.id
     });
@@ -230,7 +230,7 @@ exports.createProduct = async (req, res) => {
     // Create Notification for Seller
     try {
       // Get the image url for notification (first uploaded image)
-      const firstImageUrl = req.files && req.files.find(f => f.fieldname.startsWith('images_')) 
+      const firstImageUrl = req.files && req.files.find(f => f.fieldname.startsWith('images_'))
         ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname.startsWith('images_')).filename}`
         : null;
 
@@ -268,72 +268,72 @@ exports.bulkUploadProducts = async (req, res) => {
         const createdProducts = [];
         const errors = [];
 
-      for (const p of products) {
-        try {
-          // Parse complex fields
-          let details = null;
-          if (p.details) {
-            try {
-              details = typeof p.details === 'string' ? JSON.parse(p.details) : p.details;
-            } catch (e) {
-              console.warn(`Failed to parse details for product ${p.name}:`, e.message);
+        for (const p of products) {
+          try {
+            // Parse complex fields
+            let details = null;
+            if (p.details) {
+              try {
+                details = typeof p.details === 'string' ? JSON.parse(p.details) : p.details;
+              } catch (e) {
+                console.warn(`Failed to parse details for product ${p.name}:`, e.message);
+              }
             }
-          }
 
-          const product = await Product.create({
-            name: p.name,
-            price: p.price,
-            originalPrice: p.originalPrice || null,
-            rating: p.rating || 5,
-            description: p.description,
-            categoryId: p.categoryId,
-            brand: p.brand,
-            style: p.style || 'Casual',
-            color: p.color || 'Black',
-            size: p.size || 'Medium',
-            stock: p.stock || 0,
-            sku: p.sku || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            deliveryDays: p.deliveryDays || '3-5 Business Days',
-            isFreeDelivery: String(p.isFreeDelivery).toLowerCase() === 'true',
-            isNewArrival: String(p.isNewArrival).toLowerCase() === 'true',
-            isTopSelling: String(p.isTopSelling).toLowerCase() === 'true',
-            details: details,
-            sellerId: req.user.id
+            const product = await Product.create({
+              name: p.name,
+              price: p.price,
+              originalPrice: p.originalPrice || null,
+              rating: p.rating || 5,
+              description: p.description,
+              categoryId: p.categoryId,
+              brand: p.brand,
+              style: p.style || 'Casual',
+              color: p.color || 'Black',
+              size: p.size || 'Medium',
+              stock: p.stock || 0,
+              sku: p.sku || `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+              deliveryDays: p.deliveryDays || '3-5 Business Days',
+              isFreeDelivery: String(p.isFreeDelivery).toLowerCase() === 'true',
+              isNewArrival: String(p.isNewArrival).toLowerCase() === 'true',
+              isTopSelling: String(p.isTopSelling).toLowerCase() === 'true',
+              details: details,
+              sellerId: req.user.id
+            });
+
+            if (p.images) {
+              const imageLinks = p.images.split(',');
+              const imageRecords = imageLinks.map(url => ({
+                url: url.trim(),
+                productId: product.id
+              }));
+              await ProductImage.bulkCreate(imageRecords);
+            }
+
+            console.log(`Successfully uploaded: ${product.name}`);
+            createdProducts.push(product);
+          } catch (itemErr) {
+            console.error(`Error uploading product "${p.name}":`, itemErr.message);
+            errors.push({ name: p.name, error: itemErr.message });
+          }
+        }
+
+        try {
+          if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+          }
+        } catch (fsErr) {
+          console.error('Failed to delete temp CSV:', fsErr);
+        }
+
+        if (createdProducts.length === 0 && products.length > 0) {
+          return res.status(400).json({
+            message: 'Failed to upload any products. Check server logs for details.',
+            errors
           });
-
-          if (p.images) {
-            const imageLinks = p.images.split(',');
-            const imageRecords = imageLinks.map(url => ({
-              url: url.trim(),
-              productId: product.id
-            }));
-            await ProductImage.bulkCreate(imageRecords);
-          }
-          
-          console.log(`Successfully uploaded: ${product.name}`);
-          createdProducts.push(product);
-        } catch (itemErr) {
-          console.error(`Error uploading product "${p.name}":`, itemErr.message);
-          errors.push({ name: p.name, error: itemErr.message });
         }
-      }
 
-      try {
-        if (req.file && fs.existsSync(req.file.path)) {
-          fs.unlinkSync(req.file.path);
-        }
-      } catch (fsErr) {
-        console.error('Failed to delete temp CSV:', fsErr);
-      }
-
-      if (createdProducts.length === 0 && products.length > 0) {
-        return res.status(400).json({ 
-          message: 'Failed to upload any products. Check server logs for details.',
-          errors 
-        });
-      }
-
-      // Create Notification
+        // Create Notification
         try {
           const { Notification } = require('../models/associations');
           await Notification.create({
@@ -418,7 +418,7 @@ exports.getStats = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     let { name, price, originalPrice, description, categoryId, brand, style, color, size, details, isFreeDelivery, stock, sku, deliveryDays, videoUrl } = req.body;
-    
+
     if (details && typeof details === 'string') {
       try {
         details = JSON.parse(details);
@@ -448,8 +448,8 @@ exports.updateProduct = async (req, res) => {
       stock,
       sku,
       deliveryDays,
-      videoUrl: req.files && req.files.find(f => f.fieldname === 'video') 
-        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}` 
+      videoUrl: req.files && req.files.find(f => f.fieldname === 'video')
+        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
         : videoUrl
     });
 
@@ -457,7 +457,7 @@ exports.updateProduct = async (req, res) => {
     try {
       const { Notification } = require('../models/associations');
       const firstImage = await ProductImage.findOne({ where: { productId: product.id } });
-      
+
       await Notification.create({
         userId: req.user.id,
         role: 'seller',

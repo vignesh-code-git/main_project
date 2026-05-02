@@ -71,6 +71,21 @@
   color: rgba(0,0,0,0.6);
 }
 
+.color-prop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #FFF;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  display: inline-block;
+}
+
 .details-footer {
   display: flex;
   justify-content: space-between;

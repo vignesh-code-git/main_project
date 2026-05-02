@@ -21,7 +21,7 @@
 }
 
 .orders-header p {
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   font-size: 16px;
 }
 
@@ -36,14 +36,14 @@
 
 .order-card-premium {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   overflow: hidden;
   transition: box-shadow 0.3s;
 }
 
 .order-card-premium:hover {
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 /* Header section of the card */
@@ -53,7 +53,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .header-left {
@@ -69,7 +69,7 @@
 
 .info-group .label {
   font-size: 12px;
-  color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.5);
   font-weight: 600;
   text-transform: uppercase;
 }
@@ -112,7 +112,7 @@
 }
 
 .divider {
-  color: rgba(0,0,0,0.2);
+  color: rgba(0, 0, 0, 0.2);
   font-size: 12px;
 }
 
@@ -135,13 +135,88 @@
   text-transform: capitalize;
 }
 
-.status-text.delivered { color: #01AB31; }
-.status-text.shipped { color: #000; }
-.status-text.processing { color: #FFB800; }
+.status-text.delivered {
+  color: #01AB31;
+}
+
+.status-text.shipped {
+  color: #000;
+}
+
+.status-text.processing {
+  color: #FFB800;
+}
 
 .status-subtext {
   font-size: 14px;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.order-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.horizontal-images-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.order-item-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #F0EEED;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.order-item-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.items-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 15px;
+}
+
+.item-detail-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.buy-again-btn-lite {
+  background: transparent;
+  color: #000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.buy-again-btn-lite:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
 }
 
 .items-list {
@@ -183,9 +258,50 @@
   margin-bottom: 4px;
 }
 
+.item-variant-info {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.variant-tag {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  background: #F0F0F0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-prop-history {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.color-label-mini {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.color-swatch-mini {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #FFF;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.variant-tag strong {
+  color: #000;
+  font-weight: 700;
+}
+
 .item-meta {
   font-size: 14px;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   margin-bottom: 16px;
 }
 
@@ -212,9 +328,10 @@
   gap: 12px;
 }
 
-.primary-action-btn, .secondary-action-btn {
+.primary-action-btn,
+.secondary-action-btn {
   background: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 12px;
   font-size: 14px;
@@ -226,24 +343,39 @@
   text-align: center;
 }
 
-.primary-action-btn:hover, .secondary-action-btn:hover {
+.primary-action-btn:hover,
+.secondary-action-btn:hover {
   background: #000;
   color: #fff;
   border-color: #000;
 }
+
+.secondary-action-btn.cancel-btn-red {
+  background: #FFF0F0;
+  color: #FF3333;
+  border: 1px solid #FFCCCC;
+}
+
+.secondary-action-btn.cancel-btn-red:hover {
+  background: #FF3333;
+  color: #fff;
+  border-color: #FF3333;
+}
+
 
 .no-orders {
   text-align: center;
   padding: 100px;
   background: #fff;
   border-radius: 20px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 992px) {
   .order-card-body {
     grid-template-columns: 1fr;
   }
+
   .header-left {
     gap: 30px;
   }
@@ -255,9 +387,11 @@
     align-items: flex-start;
     gap: 20px;
   }
+
   .header-right {
     width: 100%;
   }
+
   .header-right .info-group {
     align-items: flex-start;
   }
@@ -289,7 +423,15 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

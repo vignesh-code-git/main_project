@@ -9,7 +9,7 @@ exports.getCart = async (req, res) => {
       where: { userId: req.user.id },
       include: [{
         model: Product,
-        include: [{ model: ProductImage, as: 'images', limit: 1 }]
+        include: [{ model: ProductImage, as: 'images' }]
       }]
     });
     res.json(items);

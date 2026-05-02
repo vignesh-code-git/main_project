@@ -22,9 +22,11 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
         <p className="modal-message">{message}</p>
         
         <div className="modal-actions">
-          <button className="btn-cancel" onClick={onClose}>
-            {cancelText}
-          </button>
+          {cancelText && (
+            <button className="btn-cancel" onClick={onClose}>
+              {cancelText}
+            </button>
+          )}
           <button className="btn-confirm" onClick={onConfirm}>
             {confirmText}
           </button>

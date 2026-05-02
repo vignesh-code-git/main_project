@@ -5,14 +5,11 @@ import Image from 'next/image';
 import './ProductGallery.css';
 
 export default function ProductGallery({ images, selectedColor }) {
-  // Filter images based on selected color
-  const filteredImages = images.filter(img => 
-    (img.color && selectedColor && img.color.toLowerCase() === selectedColor.toLowerCase()) || 
-    !img.color
-  );
+  // Filter and sort images: exact color matches FIRST, then generic images
+  const colorMatches = images.filter(img => img.color && selectedColor && img.color.toLowerCase() === selectedColor.toLowerCase());
+  const genericImages = images.filter(img => !img.color);
   
-  // Use a fallback if no images match the selected color
-  const displayImages = filteredImages.length > 0 ? filteredImages : images.slice(0, 3);
+  const displayImages = colorMatches.length > 0 ? [...colorMatches, ...genericImages] : images.slice(0, 5);
   
   const [activeImage, setActiveImage] = useState(null);
 

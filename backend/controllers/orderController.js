@@ -1,4 +1,5 @@
 const { Order, OrderItem, Product, ProductImage, User, Notification, Payment } = require('../models/associations');
+const puppeteer = require('puppeteer');
 
 exports.createOrder = async (req, res) => {
   try {
@@ -44,19 +45,19 @@ exports.createOrder = async (req, res) => {
         color: item.color
       });
     }
-    
+
     // ... (rest of the notification logic remains same)
     try {
       const firstItem = items[0];
       const productForImage = await Product.findByPk(firstItem.id, {
         include: [{ model: ProductImage, as: 'images', limit: 1 }]
       });
-      
+
       let imageUrl = null;
       if (productForImage && productForImage.images && productForImage.images.length > 0) {
         imageUrl = productForImage.images[0].url;
       }
-      
+
       await Notification.create({
         userId: req.user.id,
         role: 'customer',
@@ -74,7 +75,7 @@ exports.createOrder = async (req, res) => {
       const sellerIds = new Set();
       for (const item of items) {
         const product = await Product.findByPk(item.id);
-        
+
         if (product) {
           // 1. Decrement Stock
           const newStock = Math.max(0, product.stock - item.quantity);
@@ -85,7 +86,7 @@ exports.createOrder = async (req, res) => {
             const productWithImages = await Product.findByPk(product.id, {
               include: [{ model: ProductImage, as: 'images', limit: 1 }]
             });
-            
+
             await Notification.create({
               userId: product.sellerId,
               role: 'seller',
@@ -114,13 +115,20 @@ exports.createOrder = async (req, res) => {
           type: 'order',
           actorId: req.user.id,
           metadata: {
-            imageUrl: imageUrl || '/placeholder.png', 
+            imageUrl: imageUrl || '/placeholder.png',
             orderId: order.id
           }
         });
       }
     } catch (notifErr) {
       console.error('Failed to create order notifications:', notifErr);
+    }
+
+    // Clear the cart
+    try {
+      await CartItem.destroy({ where: { userId: req.user.id } });
+    } catch (cartErr) {
+      console.error('Failed to clear cart:', cartErr);
     }
 
     res.status(201).json({ message: 'Order created successfully', order });
@@ -214,7 +222,7 @@ exports.getSellerOrders = async (req, res) => {
   try {
     const { sellerId } = req.params;
     console.log('Fetching orders for sellerId:', sellerId);
-    
+
     const orders = await Order.findAll({
       include: [
         {
@@ -314,50 +322,43 @@ exports.generateInvoice = async (req, res) => {
           .invoice-details { text-align: right; }
           .invoice-details h2 { margin: 0; color: #000; font-size: 32px; }
           .invoice-details p { margin: 4px 0; color: #666; font-size: 14px; }
-          
-          .billing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-          .billing-info h3 { font-size: 12px; text-transform: uppercase; color: #999; margin-bottom: 12px; }
-          .billing-info p { margin: 4px 0; font-size: 15px; line-height: 1.4; }
-
-          table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; margin-bottom: 40px; }
-          table th { background: #000; color: #fff; padding: 12px; font-size: 13px; text-transform: uppercase; }
-          table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 15px; }
-          
-          .totals { margin-left: auto; width: 300px; }
-          .total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-          .total-row.grand-total { border-bottom: none; font-weight: 900; font-size: 20px; color: #000; padding-top: 16px; }
-          
-          .footer { margin-top: 60px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px; }
-          @media print { .print-btn { display: none; } }
-          .print-btn { background: #000; color: #fff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 700; margin-bottom: 20px; }
+          body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a1a; }
+          .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+          .logo { font-size: 24px; font-weight: 900; }
+          .invoice-info { text-align: right; }
+          .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+          .details-grid h3 { font-size: 14px; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+          th { background: #f9f9f9; text-align: left; padding: 12px; border-bottom: 2px solid #eee; }
+          td { padding: 12px; border-bottom: 1px solid #eee; }
+          .totals { margin-left: auto; width: 250px; }
+          .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
+          .grand-total { border-top: 2px solid #000; margin-top: 10px; padding-top: 10px; font-weight: 900; font-size: 18px; }
+          .footer { margin-top: 60px; font-size: 12px; color: #888; text-align: center; }
         </style>
       </head>
       <body>
-        <button class="print-btn" onclick="window.print()">Print Invoice</button>
-        
         <div class="header">
           <div class="logo">SHOP.CO</div>
-          <div class="invoice-details">
-            <h2>INVOICE</h2>
+          <div class="invoice-info">
+            <h2 style="margin: 0; font-size: 28px;">INVOICE</h2>
             <p>Order ID: #${order.id.toString().slice(-8).toUpperCase()}</p>
             <p>Date: ${new Date(order.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
 
-        <div class="billing-grid">
-          <div class="billing-info">
-            <h3>Billed From</h3>
+        <div class="details-grid">
+          <div>
+            <h3>From</h3>
             <p><strong>SHOP.CO Marketplace</strong></p>
-            <p>123 Commerce Way</p>
-            <p>Tech Hub, Bangalore - 560001</p>
-            <p>GSTIN: 29ABCDE1234F1Z5</p>
+            <p>123 Commerce Way, Tech Hub</p>
+            <p>Bangalore, 560001</p>
           </div>
-          <div class="billing-info">
+          <div>
             <h3>Billed To</h3>
             <p><strong>${order.User?.name}</strong></p>
             <p>${order.shippingAddress}</p>
-            <p>Zip Code: ${order.zipcode}</p>
-            <p>${order.User?.email}</p>
+            <p>Zip: ${order.zipcode}</p>
           </div>
         </div>
 
@@ -365,15 +366,15 @@ exports.generateInvoice = async (req, res) => {
           <thead>
             <tr>
               <th>Description</th>
-              <th>Quantity</th>
-              <th>Unit Price</th>
-              <th>Amount</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
             ${order.OrderItems.map(item => `
               <tr>
-                <td><strong>${item.Product?.name}</strong><br><small>Size: ${item.size}, Color: ${item.color}</small></td>
+                <td><strong>${item.Product?.name}</strong><br><small>${item.size} / ${item.color}</small></td>
                 <td>${item.quantity}</td>
                 <td>₹${item.price}</td>
                 <td>₹${(item.quantity * item.price).toFixed(2)}</td>
@@ -383,35 +384,119 @@ exports.generateInvoice = async (req, res) => {
         </table>
 
         <div class="totals">
-          <div class="total-row">
-            <span>Subtotal</span>
-            <span>₹${order.totalAmount}</span>
-          </div>
-          <div class="total-row">
-            <span>Shipping</span>
-            <span>₹0.00</span>
-          </div>
-          <div class="total-row">
-            <span>Tax (Included)</span>
-            <span>₹0.00</span>
-          </div>
-          <div class="total-row grand-total">
-            <span>Total</span>
-            <span>₹${order.totalAmount}</span>
-          </div>
+          <div class="total-row"><span>Subtotal</span><span>₹${order.totalAmount}</span></div>
+          <div class="total-row"><span>Shipping</span><span>₹0.00</span></div>
+          <div class="total-row grand-total"><span>Total</span><span>₹${order.totalAmount}</span></div>
         </div>
 
         <div class="footer">
-          <p>Thank you for shopping with SHOP.CO!</p>
-          <p>If you have any questions about this invoice, please contact support@shop.co</p>
+          <p>Thank you for your purchase! This is a computer generated invoice.</p>
         </div>
       </body>
       </html>
     `;
 
-    res.send(invoiceHtml);
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    try {
+      const page = await browser.newPage();
+      await page.setContent(invoiceHtml, { waitUntil: 'networkidle0' });
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+      });
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.id.toString().slice(-8)}.pdf`);
+      res.send(pdfBuffer);
+    } finally {
+      await browser.close();
+    }
   } catch (error) {
-    console.error(error);
+    console.error('Error generating invoice for ID:', req.params.id, error);
     res.status(500).send('Error generating invoice');
+  }
+};
+
+exports.cancelOrder = async (req, res) => {
+  try {
+    console.log('Attempting to cancel order ID:', req.params.id);
+    const order = await Order.findByPk(req.params.id, {
+      include: [{ model: OrderItem }]
+    });
+
+    if (!order) {
+      console.log('Order not found for ID:', req.params.id);
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    console.log('Order found, current status:', order.status);
+
+    // Check if order belongs to user or if user is admin
+    if (order.userId !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized to cancel this order' });
+    }
+
+    // Only allow cancellation if order is not Shipped, Delivered or already Cancelled
+    if (['Shipped', 'Delivered', 'Cancelled'].includes(order.status)) {
+      return res.status(400).json({ message: `Cannot cancel order with status: ${order.status}` });
+    }
+
+    // 1. Update Order Status
+    await order.update({ status: 'Cancelled' });
+    console.log('Order status updated to Cancelled');
+
+    // 2. Restore Stock
+    if (order.OrderItems) {
+      for (const item of order.OrderItems) {
+        const product = await Product.findByPk(item.productId);
+        if (product) {
+          await product.update({
+            stock: product.stock + item.quantity
+          });
+        }
+      }
+    }
+
+    // 3. Create Notification for Customer
+    await Notification.create({
+      userId: order.userId,
+      role: 'customer',
+      title: 'Order Cancelled',
+      message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been cancelled and stock has been restored.`,
+      type: 'order',
+      actorId: req.user.id,
+      metadata: { orderId: order.id }
+    });
+
+    // 4. Create Notification for Seller(s)
+    const sellerIds = new Set();
+    if (order.OrderItems) {
+      for (const item of order.OrderItems) {
+        const product = await Product.findByPk(item.productId);
+        if (product && product.sellerId) sellerIds.add(product.sellerId);
+      }
+    }
+
+    for (const sId of sellerIds) {
+      await Notification.create({
+        userId: sId,
+        role: 'seller',
+        title: 'Order Cancelled by Customer',
+        message: `An order containing your products (#${order.id.toString().slice(-8).toUpperCase()}) has been cancelled.`,
+        type: 'order',
+        actorId: req.user.id,
+        metadata: { orderId: order.id }
+      });
+    }
+
+    res.json({ message: 'Order cancelled successfully', order });
+  } catch (error) {
+    console.error('CRITICAL ERROR IN cancelOrder for ID:', req.params.id, error);
+    res.status(500).json({ message: 'Error cancelling order' });
   }
 };

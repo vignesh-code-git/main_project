@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronLeft, Phone, ShieldCheck, Box } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './track-order.css';
 
 export default function TrackOrder() {
@@ -11,6 +12,10 @@ export default function TrackOrder() {
   const router = useRouter();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSuccessModal, setIsSuccessModal] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -29,6 +34,34 @@ export default function TrackOrder() {
 
     if (id) fetchOrder();
   }, [id]);
+
+  const handleCancelOrder = () => {
+    setIsSuccessModal(false);
+    setIsModalOpen(true);
+  };
+
+  const executeCancel = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/orders/${order.id}/cancel`, {
+        method: 'PUT',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        setIsSuccessModal(true);
+        // We will reload on success modal close
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to cancel order');
+        setIsModalOpen(false);
+      }
+    } catch (err) {
+      console.error('Error cancelling order:', err);
+      alert('An error occurred while cancelling the order');
+      setIsModalOpen(false);
+    }
+  };
+
 
   if (loading) return <div className="track-loading-overlay">Locating your package...</div>;
   if (!order) return <div className="track-error-container">Order not found</div>;
@@ -84,7 +117,7 @@ export default function TrackOrder() {
               {steps.map((step, index) => {
                 const isCompleted = index <= finalIndex;
                 const isCurrent = index === finalIndex;
-                
+
                 return (
                   <div key={index} className={`timeline-step-v2 ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
                     <div className="step-marker-v2">
@@ -100,6 +133,13 @@ export default function TrackOrder() {
                   </div>
                 );
               })}
+            </div>
+
+            <div className="shipment-footer-desc">
+              <div className="desc-content-v3">
+                <CheckCircle2 size={20} className="desc-icon" />
+                <p>Our courier partner is currently processing your shipment. You will receive a notification once the status changes to "Shipped". For any queries, please contact our support team.</p>
+              </div>
             </div>
           </div>
 
@@ -129,18 +169,32 @@ export default function TrackOrder() {
                 {order.OrderItems?.map((item, idx) => (
                   <div key={idx} className="mini-item">
                     <div className="item-img-small">
-                      <img 
-                        src={item.Product?.images?.[0]?.url?.startsWith('http') 
-                          ? item.Product.images[0].url 
-                          : `${API_BASE_URL}${item.Product?.images?.[0]?.url || '/placeholder.png'}`} 
-                        alt={item.Product?.name} 
-                      />
+                      {(() => {
+                        const allImages = [...(item.Product?.images || [])].sort((a, b) => a.id - b.id);
+                        const colorImage = allImages.find(img =>
+                          img.color && item.color &&
+                          img.color.trim().toLowerCase() === item.color.trim().toLowerCase()
+                        ) || allImages.find(img => !img.color);
+                        const imgUrl = colorImage ? colorImage.url : (allImages[0]?.url || '/placeholder.png');
+                        return (
+                          <img
+                            src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
+                            alt={item.Product?.name}
+                          />
+                        );
+                      })()}
                     </div>
                     <div className="item-txt">
                       <div className="item-name">{item.Product?.name}</div>
                       <div className="item-meta">Qty: {item.quantity} | Size: {item.size}</div>
+                      {item.color && (
+                        <div className="item-color-preview">
+                          <span className="color-label-mini">Color:</span>
+                          <span className="color-swatch-mini" style={{ backgroundColor: item.color.toLowerCase() }}></span>
+                          <span className="color-value-mini">{item.color}</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="item-price">₹{item.price}</div>
                   </div>
                 ))}
               </div>
@@ -163,10 +217,28 @@ export default function TrackOrder() {
                   <strong>₹{order.totalAmount}</strong>
                 </div>
               </div>
+
+              {['Pending', 'Processing', 'Placed'].includes(order.status) && (
+                <button className="track-cancel-btn" onClick={handleCancelOrder}>
+                  Cancel Order
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={isSuccessModal ? () => window.location.reload() : executeCancel}
+        title={isSuccessModal ? "Order Cancelled" : "Cancel Order?"}
+        message={isSuccessModal
+          ? "Your order has been successfully cancelled. The stock has been restored."
+          : "Are you sure you want to cancel this order? This action will restore stock and cannot be undone."}
+        confirmText={isSuccessModal ? "Close" : "Yes, Cancel Order"}
+        cancelText={isSuccessModal ? "" : "No, Keep Order"}
+      />
     </div>
   );
 }

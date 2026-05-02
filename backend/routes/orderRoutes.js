@@ -9,6 +9,7 @@ router.get('/user/:userId', protect, orderController.getUserOrders);
 router.get('/seller/:sellerId', protect, orderController.getSellerOrders);
 router.get('/:id', protect, orderController.getOrderById);
 router.put('/:id/status', protect, orderController.updateOrderStatus);
+router.put('/:id/cancel', protect, orderController.cancelOrder);
 router.get('/:id/invoice', protect, orderController.generateInvoice);
 
 module.exports = router;

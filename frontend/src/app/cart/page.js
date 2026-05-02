@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import CartItem from "@/components/Cart/CartItem";
@@ -7,12 +8,19 @@ import OrderSummary from "@/components/Cart/OrderSummary";
 import './cart-page.css';
 
 export default function CartPage() {
+  const [mounted, setMounted] = useState(false);
   const { items: cartItems, loading } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const breadcrumbPaths = [
     { name: 'Home', url: '/' },
     { name: 'Cart', url: '/cart' },
   ];
+
+  if (!mounted) return null;
 
   if (loading) {
     return (
@@ -33,7 +41,7 @@ export default function CartPage() {
           <div className="cart-items-container">
             {cartItems.length > 0 ? (
               cartItems.map((item) => (
-                <CartItem key={item.id} item={item} />
+                <CartItem key={item.cartItemId} item={item} />
               ))
             ) : (
               <div className="empty-cart-message">

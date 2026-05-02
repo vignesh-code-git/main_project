@@ -8,10 +8,8 @@ import './CartItem.css';
 export default function CartItem({ item }) {
   const dispatch = useDispatch();
 
-  // Get first image from images array or use placeholder
-  const imageUrl = item.images && item.images.length > 0 
-    ? item.images[0].url 
-    : (item.imageUrl || '');
+  // Prioritize the color-specific image from the cart slice
+  const imageUrl = item.image || (item.imageUrl || '');
 
   return (
     <div className="cart-item">
@@ -36,7 +34,11 @@ export default function CartItem({ item }) {
         </div>
         
         <p className="item-property">Size: <span>{item.size || 'Large'}</span></p>
-        <p className="item-property">Color: <span>{item.color || 'White'}</span></p>
+        <p className="item-property color-prop">
+          Color: 
+          <span className="cart-color-swatch" style={{ backgroundColor: (item.color || 'white').toLowerCase() }}></span>
+          <span>{item.color || 'White'}</span>
+        </p>
         
         <div className="details-footer">
           <span className="item-price">₹{item.price}</span>

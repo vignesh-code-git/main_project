@@ -48,8 +48,8 @@ export default function OrderSummary() {
           id: item.id,
           quantity: item.quantity,
           price: item.price,
-          size: item.selectedSize || 'Standard',
-          color: item.selectedColor || 'Default'
+          size: item.size || '',
+          color: item.color || ''
         }))
       };
 
@@ -64,7 +64,7 @@ export default function OrderSummary() {
         dispatch(clearUserCart());
         // Trigger a custom event to notify Navbar to refresh notifications
         window.dispatchEvent(new Event('newOrder'));
-        router.push('/profile');
+        router.push('/orders');
       } else {
         throw new Error('Failed to save order after payment');
       }

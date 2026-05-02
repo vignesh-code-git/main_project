@@ -90,8 +90,8 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
           id: product.id,
           quantity: quantity,
           price: product.price,
-          size: selectedSize,
-          color: selectedColor
+          size: selectedSize || '',
+          color: selectedColor || ''
         }]
       };
 
@@ -103,7 +103,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       });
 
       if (res.ok) {
-        router.push('/profile');
+        router.push('/orders');
       } else {
         throw new Error('Failed to complete purchase after payment');
       }

@@ -3,23 +3,30 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { Package, MapPin, User, Settings, ShoppingBag, Truck, ChevronRight, X, Plus, Trash2, Edit3, Loader2 } from 'lucide-react';
+import { Package, MapPin, User, Settings, ShoppingBag, Truck, ChevronRight, X, Plus, Trash2, Edit3, Loader2, FileText } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './profile.css';
 
 export default function UserProfile() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState('orders');
+  const [activeTab, setActiveTab] = useState('address');
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   // Address State
   const [addresses, setAddresses] = useState([]);
   const [loadingAddresses, setLoadingAddresses] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentAddressId, setCurrentAddressId] = useState(null);
+
+  // Modal State
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [isSuccessModal, setIsSuccessModal] = useState(false);
+
   const [addressForm, setAddressForm] = useState({
     title: 'Home',
     addressLine: '',
@@ -93,7 +100,7 @@ export default function UserProfile() {
 
       if (res.ok) {
         fetchAddresses();
-        setIsModalOpen(false);
+        setIsAddressModalOpen(false);
         resetAddressForm();
       }
     } catch (err) {
@@ -126,7 +133,7 @@ export default function UserProfile() {
     });
     setCurrentAddressId(addr.id);
     setIsEditing(true);
-    setIsModalOpen(true);
+    setIsAddressModalOpen(true);
   };
 
   const resetAddressForm = () => {
@@ -141,6 +148,34 @@ export default function UserProfile() {
     });
     setIsEditing(false);
     setCurrentAddressId(null);
+  };
+
+  const handleCancelOrder = (orderId) => {
+    setSelectedOrderId(orderId);
+    setIsSuccessModal(false);
+    setIsCancelModalOpen(true);
+  };
+
+  const executeCancel = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/orders/${selectedOrderId}/cancel`, {
+        method: 'PUT',
+        credentials: 'include'
+      });
+
+      if (res.ok) {
+        setIsSuccessModal(true);
+        fetchOrders(); // Refresh order list
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to cancel order');
+        setIsCancelModalOpen(false);
+      }
+    } catch (err) {
+      console.error('Error cancelling order:', err);
+      alert('An error occurred while cancelling the order');
+      setIsCancelModalOpen(false);
+    }
   };
 
   const handleTrackOrder = (order) => {
@@ -163,12 +198,6 @@ export default function UserProfile() {
 
           <nav className="profile-nav">
             <button
-              className={activeTab === 'orders' ? 'active' : ''}
-              onClick={() => setActiveTab('orders')}
-            >
-              <ShoppingBag size={20} /> My Orders
-            </button>
-            <button
               className={activeTab === 'address' ? 'active' : ''}
               onClick={() => setActiveTab('address')}
             >
@@ -186,74 +215,6 @@ export default function UserProfile() {
         {/* Main Content Area */}
         <main className="profile-main-content">
 
-          {activeTab === 'orders' && (
-            <div className="orders-view">
-              <header className="view-header">
-                <h2>Order History</h2>
-                <p>Track and manage your recent purchases.</p>
-              </header>
-
-              <div className="orders-list">
-                {loadingOrders ? (
-                  <div className="loading-small">Fetching orders...</div>
-                ) : orders.length > 0 ? (
-                  orders.map((order) => (
-                    <div key={order.id} className="order-card-premium">
-                      <div className="order-header-lite">
-                        <div className="header-meta">
-                          <span className="order-id">#{order.id.toString().slice(-8).toUpperCase()}</span>
-                          <span className="order-date">{new Date(order.createdAt).toLocaleDateString()}</span>
-                        </div>
-                        <div className="header-status">
-                          <span className={`status-pill ${order.status.toLowerCase()}`}>
-                            {order.status}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="order-body-lite">
-                        <div className="items-preview-mini">
-                          {order.OrderItems?.slice(0, 3).map((item, idx) => (
-                            <div key={idx} className="mini-thumb">
-                              <img
-                                src={item.Product?.images?.[0]?.url?.startsWith('http')
-                                  ? item.Product.images[0].url
-                                  : `${API_BASE_URL}${item.Product?.images?.[0]?.url || '/placeholder.png'}`}
-                                alt=""
-                              />
-                            </div>
-                          ))}
-                          {order.OrderItems?.length > 3 && (
-                            <div className="more-count">+{order.OrderItems.length - 3}</div>
-                          )}
-                        </div>
-
-                        <div className="order-summary-lite">
-                          <div className="summary-item">
-                            <label>METHOD</label>
-                            <span className="payment-method-text">
-                              {order.Payments?.[0]?.method === 'cod' ? 'Cash on Delivery' : (order.Payments?.[0]?.method || 'Card')}
-                            </span>
-                          </div>
-                          <div className="summary-item">
-                            <label>TOTAL</label>
-                            <strong>₹{order.totalAmount}</strong>
-                          </div>
-                          <button className="track-btn-lite" onClick={() => handleTrackOrder(order)}>
-                            Track <ChevronRight size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-orders">
-                    <p>You haven't placed any orders yet.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {activeTab === 'address' && (
             <div className="address-view">
@@ -279,7 +240,7 @@ export default function UserProfile() {
                   </div>
                 ))}
 
-                <button className="add-address-card" onClick={() => { resetAddressForm(); setIsModalOpen(true); }}>
+                <button className="add-address-card" onClick={() => { resetAddressForm(); setIsAddressModalOpen(true); }}>
                   <div className="add-circle">+</div>
                   <span>Add New Address</span>
                 </button>
@@ -321,14 +282,14 @@ export default function UserProfile() {
       </div>
 
       {/* Address Modal */}
-      {isModalOpen && (
+      {isAddressModalOpen && (
         <div className="modal-overlay" onClick={(e) => {
-          if (e.target.className === 'modal-overlay') setIsModalOpen(false);
+          if (e.target.className === 'modal-overlay') setIsAddressModalOpen(false);
         }}>
           <div className="address-modal">
             <div className="modal-header">
               <h2>{isEditing ? 'Edit Address' : 'Add New Address'}</h2>
-              <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}><X size={24} strokeWidth={2} /></button>
+              <button className="modal-close-btn" onClick={() => setIsAddressModalOpen(false)}><X size={24} strokeWidth={2} /></button>
             </div>
             <form onSubmit={handleAddressSubmit}>
               <div className="form-row">
@@ -407,6 +368,19 @@ export default function UserProfile() {
           </div>
         </div>
       )}
+
+      {/* Professional Cancellation Modal */}
+      <ConfirmModal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={isSuccessModal ? () => setIsCancelModalOpen(false) : executeCancel}
+        title={isSuccessModal ? "Order Cancelled" : "Cancel Order?"}
+        message={isSuccessModal
+          ? "Your order has been successfully cancelled. The stock has been restored to the inventory."
+          : "Are you sure you want to cancel this order? This action will restore the product stock and cannot be undone."}
+        confirmText={isSuccessModal ? "Close" : "Yes, Cancel Order"}
+        cancelText={isSuccessModal ? "" : "No, Keep Order"}
+      />
     </div>
   );
 }

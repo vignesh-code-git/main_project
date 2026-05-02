@@ -39,7 +39,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
@@ -65,22 +65,22 @@ export default function Navbar() {
   const fetchNotifications = async (pageNum = 1, append = false) => {
     try {
       if (append) setLoadingMore(true);
-      
+
       const res = await fetch(`${API_BASE_URL}/api/notifications?page=${pageNum}&limit=10`, {
         credentials: 'include',
         cache: 'no-store'
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         const newNotifs = Array.isArray(data.notifications) ? data.notifications : [];
-        
+
         if (append) {
           setNotifications(prev => [...prev, ...newNotifs]);
         } else {
           setNotifications(newNotifs);
         }
-        
+
         setTotalNotifs(data.total || 0);
         setPage(pageNum);
       }
@@ -189,12 +189,12 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/auth/logout`, { 
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
-        credentials: 'include' 
+        credentials: 'include'
       });
       dispatch(logout());
-      window.location.href = '/'; 
+      window.location.href = '/';
     } catch (err) {
       console.error('Logout failed:', err);
       dispatch(logout());
@@ -269,15 +269,15 @@ export default function Navbar() {
           </ul>
 
           <div className="search-bar desktop-only" ref={searchRef}>
-            <Search 
-              size={20} 
-              className="nav-search-icon-fixed" 
+            <Search
+              size={20}
+              className="nav-search-icon-fixed"
               onClick={handleSearch}
               style={{ cursor: 'pointer' }}
             />
-            <input 
-              type="text" 
-              placeholder="Search for products, brands, styles..." 
+            <input
+              type="text"
+              placeholder="Search for products, brands, styles..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery.length >= 1 && setShowResults(true)}
@@ -288,7 +288,7 @@ export default function Navbar() {
                 <Loader2 className="animate-spin" size={16} />
               </div>
             )}
-            
+
             {showResults && searchResults.length > 0 && (
               <div className="search-dropdown">
                 <div className="search-header-meta">
@@ -297,9 +297,9 @@ export default function Navbar() {
                 </div>
                 <div className="search-results-list">
                   {searchResults.map((product, index) => (
-                    <Link 
-                      href={`/product/${product.id}`} 
-                      key={product.id} 
+                    <Link
+                      href={`/product/${product.id}`}
+                      key={product.id}
                       className={`search-result-item ${index === selectedIndex ? 'selected' : ''}`}
                       onClick={() => {
                         setShowResults(false);
@@ -308,9 +308,9 @@ export default function Navbar() {
                       onMouseEnter={() => setSelectedIndex(index)}
                     >
                       <div className="result-img">
-                        <img 
-                          src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'} 
-                          alt={product.name} 
+                        <img
+                          src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'}
+                          alt={product.name}
                         />
                       </div>
                       <div className="result-info">
@@ -340,8 +340,8 @@ export default function Navbar() {
 
           <div className="nav-right">
             <div className="nav-icons">
-              <button 
-                className="mobile-search-trigger" 
+              <button
+                className="mobile-search-trigger"
                 onClick={() => setMobileSearchOpen(true)}
               >
                 <Search size={24} />
@@ -354,8 +354,8 @@ export default function Navbar() {
 
               {mounted && isAuthenticated && (
                 <div className="notification-container" ref={notificationRef}>
-                  <button 
-                    className="notification-trigger" 
+                  <button
+                    className="notification-trigger"
                     onClick={() => {
                       setNotificationOpen(!notificationOpen);
                       if (!notificationOpen) handleMarkAsRead();
@@ -383,7 +383,7 @@ export default function Navbar() {
                           Mark all as read
                         </span>
                       </div>
-                      
+
                       <div className="notification-list">
                         {notifications.length === 0 ? (
                           <div className="no-notifications">
@@ -400,20 +400,20 @@ export default function Navbar() {
                               const today = new Date();
                               const yesterday = new Date();
                               yesterday.setDate(today.getDate() - 1);
-                              
+
                               let dateLabel = "";
                               if (date.toDateString() === today.toDateString()) {
                                 dateLabel = "Today";
                               } else if (date.toDateString() === yesterday.toDateString()) {
                                 dateLabel = "Yesterday";
                               } else {
-                                dateLabel = date.toLocaleDateString(undefined, { 
-                                  month: 'long', 
-                                  day: 'numeric', 
-                                  year: 'numeric' 
+                                dateLabel = date.toLocaleDateString(undefined, {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric'
                                 });
                               }
-                              
+
                               if (!groups[dateLabel]) groups[dateLabel] = [];
                               groups[dateLabel].push(notif);
                               return groups;
@@ -422,16 +422,16 @@ export default function Navbar() {
                             <div key={dateLabel} className="notif-date-group">
                               <div className="notif-date-header">{dateLabel}</div>
                               {groupNotifs.map((notif) => (
-                                <div 
-                                  key={notif.id} 
+                                <div
+                                  key={notif.id}
                                   className={`notification-item ${!notif.isRead ? 'unread' : ''}`}
                                   onClick={() => handleNotifClick(notif)}
                                 >
                                   <div className="notif-avatar-wrapper">
                                     {notif.metadata?.imageUrl ? (
-                                      <img 
-                                        src={notif.metadata.imageUrl.startsWith('http') ? notif.metadata.imageUrl : `${API_BASE_URL}${notif.metadata.imageUrl}`} 
-                                        alt="Notification" 
+                                      <img
+                                        src={notif.metadata.imageUrl.startsWith('http') ? notif.metadata.imageUrl : `${API_BASE_URL}${notif.metadata.imageUrl}`}
+                                        alt="Notification"
                                         className="notif-image"
                                       />
                                     ) : (
@@ -458,14 +458,14 @@ export default function Navbar() {
                           ))
                         )}
                       </div>
-                      
+
                       {notifications.length > 0 && (
                         <div className="notification-footer professional-footer">
                           <span className="total-notif-text">
                             Showing {notifications.length} results of {totalNotifs} notifications
                           </span>
                           {notifications.length < totalNotifs ? (
-                            <button 
+                            <button
                               className="view-more-link"
                               onClick={() => fetchNotifications(page + 1, true)}
                               disabled={loadingMore}
@@ -538,9 +538,9 @@ export default function Navbar() {
       ) : (
         <div className="mobile-search-full-width">
           <form className="mobile-search-container" onSubmit={handleSearch}>
-            <Search 
-              size={20} 
-              className="mobile-search-icon" 
+            <Search
+              size={20}
+              className="mobile-search-icon"
               onClick={handleSearch}
             />
             <input
@@ -558,15 +558,15 @@ export default function Navbar() {
             >
               <X size={24} />
             </button>
-            
+
             {showResults && searchQuery.length >= 1 && (
               <div className="mobile-search-results search-dropdown">
                 {searchResults.length > 0 ? (
                   <div className="search-results-list">
                     {searchResults.map(product => (
-                      <Link 
-                        href={`/product/${product.id}`} 
-                        key={product.id} 
+                      <Link
+                        href={`/product/${product.id}`}
+                        key={product.id}
                         className="search-result-item"
                         onClick={() => {
                           setMobileSearchOpen(false);
@@ -574,9 +574,9 @@ export default function Navbar() {
                         }}
                       >
                         <div className="result-img">
-                          <img 
-                            src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'} 
-                            alt={product.name} 
+                          <img
+                            src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'}
+                            alt={product.name}
                           />
                         </div>
                         <div className="result-info">

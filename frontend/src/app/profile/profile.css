@@ -181,11 +181,52 @@
   padding: 2px;
 }
 
+.item-detail-brief {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.item-meta-lite {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.item-specs-lite {
+  display: flex;
+  gap: 12px;
+}
+
+.spec {
+  font-size: 11px;
+  color: #888;
+}
+
+.spec strong {
+  color: #444;
+  font-weight: 700;
+}
+
 .more-count {
   font-size: 12px;
   font-weight: 700;
   color: #888;
-  padding-left: 5px;
+  padding-left: 10px;
+  border-left: 1px solid #eee;
+  height: 15px;
+  display: flex;
+  align-items: center;
 }
 
 .order-summary-lite {
@@ -220,12 +261,18 @@
   text-transform: capitalize;
 }
 
+.order-actions-lite {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .track-btn-lite {
   background: #000;
   color: #fff;
   border: none;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 62px;
   font-size: 12px;
   font-weight: 700;
   display: flex;
@@ -237,6 +284,32 @@
 
 .track-btn-lite:hover {
   opacity: 0.8;
+}
+
+.cancel-btn-lite {
+  background: #FFF0F0;
+  color: #FF3333;
+  border: 1px solid #FFCCCC;
+  padding: 8px 16px;
+  border-radius: 62px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn-lite:hover {
+  background: #FF3333;
+  color: #FFF;
+  border-color: #FF3333;
+}
+
+.invoice-btn-lite svg {
+  margin-top: 2px;
+}
+
+.invoice-btn-lite span {
+  transform: translateY(-1px);
 }
 
 .status-pill {
