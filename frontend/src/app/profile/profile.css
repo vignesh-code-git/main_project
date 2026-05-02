@@ -213,6 +213,13 @@
   color: #000;
 }
 
+.payment-method-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-transform: capitalize;
+}
+
 .track-btn-lite {
   background: #000;
   color: #fff;

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { fetchCart } from '@/lib/redux/slices/cartSlice';
-import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell } from 'lucide-react';
+import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell, Info } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import './Navbar.css';
 
@@ -263,6 +263,9 @@ export default function Navbar() {
             <li className="mobile-link-item">
               <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
             </li>
+            <li className="mobile-link-item">
+              <Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            </li>
           </ul>
 
           <div className="search-bar desktop-only" ref={searchRef}>
@@ -512,6 +515,9 @@ export default function Navbar() {
                       </Link>
                       <Link href="/settings" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
                         <Settings size={16} /> Settings
+                      </Link>
+                      <Link href="/about" className="dropdown-item" onClick={() => setUserDropdownOpen(false)}>
+                        <Info size={16} /> About
                       </Link>
                       <div className="dropdown-divider"></div>
                       <button onClick={handleLogout} className="dropdown-item logout-item">

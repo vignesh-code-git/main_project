@@ -1,15 +1,37 @@
-const { Order, OrderItem, Product, ProductImage, User, Notification } = require('../models/associations');
+const { Order, OrderItem, Product, ProductImage, User, Notification, Payment } = require('../models/associations');
 
 exports.createOrder = async (req, res) => {
   try {
-    const { userId, totalAmount, shippingAddress, zipcode, items } = req.body;
+    const { userId, totalAmount, shippingAddress, zipcode, items, paymentMethod } = req.body;
+
+    // Map frontend method to Backend ENUM
+    const methodMap = {
+      'cod': 'COD',
+      'card': 'Card',
+      'upi': 'UPI',
+      'netbanking': 'NetBanking',
+      'wallet': 'Wallet'
+    };
+    const normalizedMethod = methodMap[paymentMethod?.toLowerCase()] || 'Card';
 
     const order = await Order.create({
       userId: req.user.id,
       totalAmount,
       shippingAddress,
       zipcode,
-      trackingNumber: 'TCK-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+      trackingNumber: 'TCK-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+      paymentStatus: normalizedMethod === 'COD' ? 'Pending' : 'Paid'
+    });
+
+    // Create Payment record
+    await Payment.create({
+      userId: req.user.id,
+      orderId: order.id,
+      amount: totalAmount,
+      method: normalizedMethod,
+      status: normalizedMethod === 'COD' ? 'Pending' : 'Completed',
+      gateway: 'Razorpay',
+      transactionId: normalizedMethod === 'COD' ? null : 'pay_' + Math.random().toString(36).substr(2, 9)
     });
 
     for (const item of items) {
@@ -22,10 +44,9 @@ exports.createOrder = async (req, res) => {
         color: item.color
       });
     }
-
-    // Create Notifications & Manage Stock
+    
+    // ... (rest of the notification logic remains same)
     try {
-      // Get image for the first item
       const firstItem = items[0];
       const productForImage = await Product.findByPk(firstItem.id, {
         include: [{ model: ProductImage, as: 'images', limit: 1 }]
@@ -36,27 +57,23 @@ exports.createOrder = async (req, res) => {
         imageUrl = productForImage.images[0].url;
       }
       
-      // Notify User
       await Notification.create({
         userId: req.user.id,
         role: 'customer',
         title: 'Order Placed!',
-        message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been placed successfully.`,
+        message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been placed successfully via ${normalizedMethod === 'COD' ? 'Cash on Delivery' : normalizedMethod}.`,
         type: 'order',
         actorId: req.user.id,
         metadata: {
-          imageUrl: imageUrl || '/placeholder.png', // Fallback to placeholder
+          imageUrl: imageUrl || '/placeholder.png',
           orderId: order.id,
           productCount: items.length
         }
       });
 
-      // Notify Sellers & Check Stock
       const sellerIds = new Set();
       for (const item of items) {
-        const product = await Product.findByPk(item.id, {
-          include: [{ model: ProductImage, as: 'images', limit: 1 }]
-        });
+        const product = await Product.findByPk(item.id);
         
         if (product) {
           // 1. Decrement Stock
@@ -65,6 +82,10 @@ exports.createOrder = async (req, res) => {
 
           // 2. Check for Low Stock Notification
           if (newStock <= 5 && product.sellerId) {
+            const productWithImages = await Product.findByPk(product.id, {
+              include: [{ model: ProductImage, as: 'images', limit: 1 }]
+            });
+            
             await Notification.create({
               userId: product.sellerId,
               role: 'seller',
@@ -73,7 +94,7 @@ exports.createOrder = async (req, res) => {
               type: 'inventory',
               actorId: req.user.id,
               metadata: {
-                imageUrl: product.images?.[0]?.url,
+                imageUrl: productWithImages.images?.[0]?.url,
                 productId: product.id,
                 currentStock: newStock
               }
@@ -122,6 +143,10 @@ exports.getUserOrders = async (req, res) => {
               include: [{ model: ProductImage, as: 'images' }]
             }
           ]
+        },
+        {
+          model: Payment,
+          limit: 1 // Usually one primary payment per order
         }
       ],
       order: [['createdAt', 'DESC']]
@@ -169,6 +194,10 @@ exports.getOrderById = async (req, res) => {
               include: [{ model: ProductImage, as: 'images' }]
             }
           ]
+        },
+        {
+          model: Payment,
+          limit: 1
         },
         User
       ]

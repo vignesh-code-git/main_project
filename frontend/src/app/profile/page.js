@@ -230,6 +230,12 @@ export default function UserProfile() {
 
                         <div className="order-summary-lite">
                           <div className="summary-item">
+                            <label>METHOD</label>
+                            <span className="payment-method-text">
+                              {order.Payments?.[0]?.method === 'cod' ? 'Cash on Delivery' : (order.Payments?.[0]?.method || 'Card')}
+                            </span>
+                          </div>
+                          <div className="summary-item">
                             <label>TOTAL</label>
                             <strong>₹{order.totalAmount}</strong>
                           </div>

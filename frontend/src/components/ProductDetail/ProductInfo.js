@@ -76,7 +76,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
     setShowRazorpay(true);
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (method) => {
     setShowRazorpay(false);
     setLoading(true);
     try {
@@ -85,6 +85,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         totalAmount: product.price * quantity,
         shippingAddress: '123 High Street, Downtown, Mumbai',
         zipcode: '400001',
+        paymentMethod: method,
         items: [{
           id: product.id,
           quantity: quantity,

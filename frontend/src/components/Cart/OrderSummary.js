@@ -34,7 +34,7 @@ export default function OrderSummary() {
     setShowRazorpay(true);
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (method) => {
     setShowRazorpay(false);
     setLoading(true);
     try {
@@ -43,6 +43,7 @@ export default function OrderSummary() {
         totalAmount: Math.round(grandTotal),
         shippingAddress: '123 High Street, Downtown, Mumbai',
         zipcode: '400001',
+        paymentMethod: method,
         items: cartItems.map(item => ({
           id: item.id,
           quantity: item.quantity,

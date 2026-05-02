@@ -145,8 +145,23 @@ export default function TrackOrder() {
                 ))}
               </div>
               <div className="mini-footer">
-                <span>Total Amount Paid</span>
-                <strong>₹{order.totalAmount}</strong>
+                <div className="footer-meta">
+                  <span className="meta-label">Payment Method</span>
+                  <div className="payment-method-info">
+                    {order.Payments?.[0]?.method === 'cod' ? (
+                      <span className="cod-badge-mini">Cash on Delivery</span>
+                    ) : (
+                      <>
+                        <ShieldCheck size={14} color="#2D6CFF" />
+                        <span>{order.Payments?.[0]?.method || 'Credit/Debit Card'}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="footer-amount">
+                  <span>Total Amount</span>
+                  <strong>₹{order.totalAmount}</strong>
+                </div>
               </div>
             </div>
           </div>

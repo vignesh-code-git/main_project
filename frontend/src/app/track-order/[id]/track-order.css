@@ -290,21 +290,63 @@
 }
 
 .mini-footer {
-  margin-top: 20px;
-  padding-top: 16px;
+  margin-top: 24px;
+  padding-top: 20px;
   border-top: 1px dashed #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
-.mini-footer span {
+.meta-label {
   font-size: 13px;
   color: #64748B;
+  font-weight: 500;
 }
 
-.mini-footer strong {
-  font-size: 18px;
+.payment-method-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.cod-badge-mini {
+  background: #F0FDF4;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.footer-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-top: 12px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.footer-amount span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.footer-amount strong {
+  font-size: 20px;
   color: #2D6CFF;
 }
 
