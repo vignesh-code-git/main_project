@@ -20,6 +20,7 @@ export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState('inventory');
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [statsData, setStatsData] = useState({ revenue: 0, orders: 0, products: 0, customers: 0 });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, productId: null });
   
   // Onboarding State
@@ -49,8 +50,23 @@ export default function SellerDashboard() {
       
       fetchSellerProducts(user.id);
       fetchSellerOrders(user.id);
+      fetchDashboardStats();
     }
   }, [isAuthenticated, user]);
+
+  const fetchDashboardStats = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/seller/stats`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.stats) {
+        setStatsData(data.stats);
+      }
+    } catch (err) {
+      console.error("Failed to fetch dashboard stats:", err);
+    }
+  };
 
   const fetchSellerProducts = async (sellerId) => {
     try {
@@ -183,20 +199,15 @@ export default function SellerDashboard() {
           <div className="stats-grid">
             <div className="stat-card">
               <h3>Total Products</h3>
-              <p>{products.length}</p>
+              <p>{statsData.products}</p>
             </div>
             <div className="stat-card">
               <h3>Total Revenue</h3>
-              <p>₹{(orders || []).reduce((acc, order) => {
-                const sellerTotal = (order.OrderItems || [])
-                  .filter(item => item.Product?.sellerId === user?.id)
-                  .reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                return acc + (sellerTotal || 0);
-              }, 0).toFixed(2)}</p>
+              <p>₹{statsData.revenue.toLocaleString('en-IN')}</p>
             </div>
             <div className="stat-card highlight">
-              <h3>Active Orders</h3>
-              <p>{orders.filter(o => o.status !== 'Delivered').length}</p>
+              <h3>Total Orders</h3>
+              <p>{statsData.orders}</p>
             </div>
           </div>
 

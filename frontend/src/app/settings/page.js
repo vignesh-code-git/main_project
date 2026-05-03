@@ -47,14 +47,14 @@ export default function SettingsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await axios.put(`${API_BASE_URL}/api/auth/profile`, {
         name: formData.name
       }, {
         withCredentials: true
       });
-      
+
       dispatch(updateUser(response.data.user));
       showToast('Settings updated successfully!', 'success');
     } catch (error) {
@@ -80,7 +80,7 @@ export default function SettingsPage() {
         },
         withCredentials: true
       });
-      
+
       dispatch(updateUser({ avatar: response.data.avatar }));
       showToast('Profile picture updated!', 'success');
     } catch (error) {
@@ -127,20 +127,20 @@ export default function SettingsPage() {
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Full Name</label>
-                    <input 
-                      type="text" 
-                      name="name" 
-                      value={formData.name} 
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
                       placeholder="Enter your full name"
                     />
                   </div>
                   <div className="form-group">
                     <label>Email Address</label>
-                    <input 
-                      type="email" 
-                      name="email" 
-                      value={formData.email} 
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
                       onChange={handleChange}
                       disabled
                     />
@@ -161,10 +161,10 @@ export default function SettingsPage() {
                     {uploading && <div className="upload-overlay">...</div>}
                   </div>
                   <div className="upload-actions">
-                    <input 
-                      type="file" 
-                      id="avatar-input" 
-                      hidden 
+                    <input
+                      type="file"
+                      id="avatar-input"
+                      hidden
                       onChange={handleFileChange}
                       accept="image/*"
                     />

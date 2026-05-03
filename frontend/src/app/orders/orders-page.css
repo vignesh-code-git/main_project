@@ -1,5 +1,5 @@
 .orders-page {
-  padding: 40px 0 100px;
+  padding: 100px 0 100px;
   background: #fff;
   min-height: 100vh;
 }
@@ -189,34 +189,53 @@
   padding-top: 15px;
 }
 
-.item-detail-entry {
+.item-detail-entry.row-layout {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.item-detail-entry.row-layout:last-child {
+  border-bottom: none;
+}
+
+.item-image-col {
+  flex-shrink: 0;
 }
 
 .detail-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+}
+
+.detail-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
 }
 
 .buy-again-btn-lite {
-  background: transparent;
-  color: #000;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 6px 14px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  border-radius: 62px;
+  padding: 8px 18px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .buy-again-btn-lite:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
+  background: #333;
+  border-color: #333;
+  transform: translateY(-1px);
 }
 
 .items-list {
@@ -260,8 +279,9 @@
 
 .item-variant-info {
   display: flex;
-  gap: 12px;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
 }
 
 .variant-tag {
@@ -374,6 +394,8 @@
 @media (max-width: 992px) {
   .order-card-body {
     grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 30px;
   }
 
   .header-left {
@@ -382,18 +404,117 @@
 }
 
 @media (max-width: 768px) {
+  .orders-page {
+    padding: 80px 0 60px;
+  }
+
+  .orders-header {
+    margin-bottom: 25px;
+    text-align: center;
+  }
+
+  .orders-header h1 {
+    font-size: 24px;
+  }
+
+  .orders-header p {
+    font-size: 14px;
+  }
+
+  .orders-list {
+    gap: 20px;
+  }
+
   .order-card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .header-left {
+    flex-wrap: wrap;
+    gap: 15px 25px;
   }
 
   .header-right {
     width: 100%;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 15px;
   }
 
   .header-right .info-group {
     align-items: flex-start;
+  }
+
+  .status-text {
+    font-size: 18px;
+  }
+
+  .item-detail-entry.row-layout {
+    gap: 15px;
+  }
+
+  .detail-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .buy-again-btn-lite {
+    width: auto;
+    padding: 8px 18px;
+    align-self: flex-start;
+  }
+
+  .item-variant-info {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-left {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .header-left .info-group:first-child {
+    grid-column: span 2;
+  }
+
+  .order-card-header {
+    padding: 15px;
+  }
+
+  .order-card-body {
+    padding: 15px;
+  }
+
+  .order-item-thumb {
+    width: 65px;
+    height: 65px;
+  }
+
+  .item-title {
+    font-size: 14px;
+  }
+
+  .variant-tag {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .action-buttons {
+    gap: 8px;
+  }
+
+  .primary-action-btn,
+  .secondary-action-btn {
+    padding: 10px;
+    font-size: 13px;
   }
 }
 

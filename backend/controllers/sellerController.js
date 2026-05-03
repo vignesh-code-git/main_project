@@ -51,6 +51,31 @@ exports.getSellerStats = async (req, res) => {
       .sort((a, b) => new Date(b.time) - new Date(a.time))
       .slice(0, 8);
 
+    // 6. Chart Data (Last 7 Days)
+    const dailyRevenue = {};
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      dailyRevenue[dateStr] = 0;
+    }
+
+    orderItems.forEach(item => {
+      if (item.Order && item.Order.createdAt) {
+        const dateStr = new Date(item.Order.createdAt).toISOString().split('T')[0];
+        if (dailyRevenue[dateStr] !== undefined) {
+          dailyRevenue[dateStr] += (Number(item.price) * Number(item.quantity));
+        }
+      }
+    });
+
+    const chartData = Object.keys(dailyRevenue)
+      .sort()
+      .map(date => ({
+        date: new Date(date).toLocaleDateString('en-IN', { weekday: 'short' }),
+        revenue: dailyRevenue[date]
+      }));
+
     res.json({
       stats: {
         revenue: totalRevenue,
@@ -58,6 +83,7 @@ exports.getSellerStats = async (req, res) => {
         customers: totalCustomers,
         products: products.length
       },
+      chartData,
       activity: activityFeed
     });
   } catch (error) {

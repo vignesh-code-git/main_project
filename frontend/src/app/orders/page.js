@@ -166,8 +166,7 @@ export default function OrdersPage() {
                         : `Your order is ${order.status.toLowerCase()}`}
                     </p>
                   </div>
-                  <div className="order-items-container">
-                    <div className="horizontal-images-row">
+                  <div className="items-details-list">
                       {order.OrderItems?.map((item, idx) => {
                         const allImages = [...(item.Product?.images || [])].sort((a, b) => a.id - b.id);
                         const colorImage = allImages.find(img =>
@@ -177,38 +176,36 @@ export default function OrdersPage() {
                         const imgUrl = colorImage ? colorImage.url : (allImages[0]?.url || '/placeholder.png');
 
                         return (
-                          <div key={idx} className="order-item-thumb">
-                            <img
-                              src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
-                              alt={item.Product?.name}
-                            />
+                          <div key={idx} className="item-detail-entry row-layout">
+                            <div className="item-image-col">
+                              <div className="order-item-thumb">
+                                <img
+                                  src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
+                                  alt={item.Product?.name}
+                                />
+                              </div>
+                            </div>
+                            <div className="detail-main">
+                              <div className="detail-header-row">
+                                <a href={`/product/${item.Product?.id}`} className="item-title">{item.Product?.name}</a>
+                                <button className="buy-again-btn-lite" onClick={() => handleBuyAgain(item)}>Buy it again</button>
+                              </div>
+                              <div className="item-variant-info">
+                                {item.color && (
+                                  <span className="variant-tag color-prop-history">
+                                    <span className="color-label-mini">Color:</span>
+                                    <span className="color-swatch-mini" style={{ backgroundColor: item.color.toLowerCase() }}></span>
+                                    <strong>{item.color}</strong>
+                                  </span>
+                                )}
+                                {item.size && <span className="variant-tag size">Size: <strong>{item.size}</strong></span>}
+                                <span className="variant-tag qty">Qty: <strong>{item.quantity}</strong></span>
+                              </div>
+                            </div>
                           </div>
                         );
                       })}
                     </div>
-
-                    <div className="items-details-list">
-                      {order.OrderItems?.map((item, idx) => (
-                        <div key={idx} className="item-detail-entry">
-                          <div className="detail-main">
-                            <a href={`/product/${item.Product?.id}`} className="item-title">{item.Product?.name}</a>
-                            <div className="item-variant-info">
-                              {item.color && (
-                                <span className="variant-tag color-prop-history">
-                                  <span className="color-label-mini">Color:</span>
-                                  <span className="color-swatch-mini" style={{ backgroundColor: item.color.toLowerCase() }}></span>
-                                  <strong>{item.color}</strong>
-                                </span>
-                              )}
-                              {item.size && <span className="variant-tag size">Size: <strong>{item.size}</strong></span>}
-                              <span className="variant-tag qty">Qty: <strong>{item.quantity}</strong></span>
-                            </div>
-                          </div>
-                          <button className="buy-again-btn-lite" onClick={() => handleBuyAgain(item)}>Buy it again</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
 
                 <div className="body-right">

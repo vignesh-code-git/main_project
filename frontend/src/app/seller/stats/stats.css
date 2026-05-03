@@ -139,7 +139,8 @@
   background: #fff;
   padding: 24px;
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -217,10 +218,11 @@
 
 .chart-card {
   background: #fff;
-  padding: 24px;
+  padding: 16px;
   border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  min-height: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 380px;
 }
 
 .chart-header {
@@ -295,5 +297,22 @@
 @media (max-width: 576px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 }

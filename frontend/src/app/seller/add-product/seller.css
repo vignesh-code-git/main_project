@@ -384,7 +384,7 @@
 
 .final-create-btn {
   width: 100%;
-  padding: 16px;
+  padding: 12px 28px;
   background: #000;
   color: #fff;
   display: flex;
@@ -392,10 +392,11 @@
   justify-content: center;
   border-radius: 62px;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .final-create-btn:hover {
@@ -775,21 +776,23 @@ input:checked+.slider:before {
 
 
 .action-buttons-row {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
+  display: flex;
+  justify-content: center;
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .preview-btn {
   background: #f0f0f0;
   color: #000;
-  padding: 16px;
+  padding: 12px 28px;
   border-radius: 62px;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .preview-btn:hover {

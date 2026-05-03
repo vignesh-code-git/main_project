@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  ShoppingBag, 
-  Users, 
+import {
+  BarChart3,
+  TrendingUp,
+  ShoppingBag,
+  Users,
   Eye,
   ArrowUpRight,
   ArrowDownRight,
@@ -14,12 +14,23 @@ import {
   Download,
   Check
 } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell
+} from 'recharts';
 import { API_BASE_URL } from '@/config/api';
 import './stats.css';
 
 export default function PerformancePage() {
   const [statsData, setStatsData] = useState(null);
   const [activityFeed, setActivityFeed] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('All Time');
   const [showTimeframe, setShowTimeframe] = useState(false);
@@ -53,6 +64,7 @@ export default function PerformancePage() {
       });
       setStatsData(response.data.stats);
       setActivityFeed(response.data.activity);
+      setChartData(response.data.chartData || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -61,33 +73,33 @@ export default function PerformancePage() {
   };
 
   const stats = [
-    { 
-      label: 'Total Revenue', 
-      value: statsData ? `$${statsData.revenue.toLocaleString()}` : '$0', 
-      trend: '+0.0%', 
-      icon: TrendingUp, 
-      color: 'sales' 
+    {
+      label: 'Total Revenue',
+      value: statsData ? `₹${statsData.revenue.toLocaleString('en-IN')}` : '₹0',
+      trend: '+0.0%',
+      icon: TrendingUp,
+      color: 'sales'
     },
-    { 
-      label: 'Total Orders', 
-      value: statsData ? statsData.orders.toString() : '0', 
-      trend: '+0.0%', 
-      icon: ShoppingBag, 
-      color: 'orders' 
+    {
+      label: 'Total Orders',
+      value: statsData ? statsData.orders.toString() : '0',
+      trend: '+0.0%',
+      icon: ShoppingBag,
+      color: 'orders'
     },
-    { 
-      label: 'Total Customers', 
-      value: statsData ? statsData.customers.toString() : '0', 
-      trend: '+0.0%', 
-      icon: Users, 
-      color: 'customers' 
+    {
+      label: 'Total Customers',
+      value: statsData ? statsData.customers.toString() : '0',
+      trend: '+0.0%',
+      icon: Users,
+      color: 'customers'
     },
-    { 
-      label: 'Total Products', 
-      value: statsData ? statsData.products.toString() : '0', 
-      trend: '+0.0%', 
-      icon: Eye, 
-      color: 'views' 
+    {
+      label: 'Total Products',
+      value: statsData ? statsData.products.toString() : '0',
+      trend: '+0.0%',
+      icon: Eye,
+      color: 'views'
     },
   ];
 
@@ -114,18 +126,18 @@ export default function PerformancePage() {
           </div>
           <div className="header-actions">
             <div className="timeframe-selector" ref={timeframeRef}>
-              <button 
+              <button
                 className={`add-btn secondary ${showTimeframe ? 'open' : ''}`}
                 onClick={() => setShowTimeframe(!showTimeframe)}
               >
                 <Calendar size={18} /> {timeframe}
               </button>
-              
+
               {showTimeframe && (
                 <div className="timeframe-dropdown">
                   {timeframes.map((tf) => (
-                    <button 
-                      key={tf} 
+                    <button
+                      key={tf}
                       className={`timeframe-item ${timeframe === tf ? 'active' : ''}`}
                       onClick={() => handleTimeframeChange(tf)}
                     >
@@ -135,7 +147,7 @@ export default function PerformancePage() {
                 </div>
               )}
             </div>
-            
+
             <button className="add-btn">
               <Download size={18} /> Export Report
             </button>
@@ -164,14 +176,45 @@ export default function PerformancePage() {
           <div className="chart-card">
             <div className="chart-header">
               <h3>Revenue Growth</h3>
-              <div className="header-actions">
-                <BarChart3 size={20} color="#999" />
-              </div>
             </div>
-            <div className="chart-placeholder">
-              <BarChart3 size={48} />
-              <p>Revenue visualization will appear here</p>
-              <span style={{fontSize: '12px', color: '#ccc'}}>Syncing live data...</span>
+            <div className="chart-container" style={{ width: '100%', height: '300px', marginTop: '20px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 5, right: 5, left: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="date"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#666', fontSize: 12 }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#666', fontSize: 12 }}
+                    tickFormatter={(value) => `₹${value}`}
+                  />
+                  <Tooltip
+                    cursor={{ fill: '#f8f9fa' }}
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                      padding: '12px'
+                    }}
+                    formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
+                  />
+                  <Bar
+                    dataKey="revenue"
+                    radius={[6, 6, 0, 0]}
+                    barSize={40}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#000' : '#E2E8F0'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
@@ -188,7 +231,7 @@ export default function PerformancePage() {
                   </div>
                 </div>
               )) : (
-                <p style={{textAlign: 'center', color: '#999', padding: '20px'}}>No recent activity found.</p>
+                <p style={{ textAlign: 'center', color: '#999', padding: '20px' }}>No recent activity found.</p>
               )}
             </div>
           </div>

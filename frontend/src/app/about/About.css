@@ -239,81 +239,59 @@
 }
 
 /* Responsive */
-@media (max-width: 992px) {
-  .dev-main {
-    grid-template-columns: 1fr;
-    gap: 60px;
+@media (max-width: 1200px) {
+  .hero-title {
+    font-size: 3.5rem;
   }
 
   .dev-header .created-by {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
-  .dev-premium-card {
-    padding: 60px 30px;
+  .dev-main {
+    gap: 40px;
   }
 }
 
-.dev-badge {
-  padding: 8px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.social-link:hover {
-  background: #fff;
-  color: #000;
-}
-
-/* About Footer */
-.about-footer {
-  padding: 40px 0;
-  border-top: 1px solid #eee;
-  text-align: center;
-}
-
-.copyright {
-  color: #888;
-  font-size: 0.9rem;
-}
-
-/* Responsive */
 @media (max-width: 992px) {
   .about-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 50px;
+  }
+
+  .about-content {
+    text-align: center;
   }
 
   .hero-title {
     font-size: 3rem;
   }
+
+  .dev-main {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .dev-bio-section, .dev-skills-section {
+    text-align: center;
+  }
+
+  .dev-bio {
+    text-align: center;
+    margin: 0 auto 40px;
+  }
+
+  .dev-socials {
+    justify-content: center;
+  }
+
+  .dev-premium-card {
+    padding: 60px 30px;
+    border-radius: 30px;
+  }
 }
 
 @media (max-width: 768px) {
-  .values-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
   .about-hero {
     padding: 60px 0 40px;
   }
@@ -322,7 +300,81 @@
     font-size: 2.5rem;
   }
 
+  .hero-subtitle {
+    font-size: 1.1rem;
+    padding: 0 15px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+  }
+
+  .about-section, .values-section {
+    padding: 60px 0;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .value-item {
+    padding: 30px 20px;
+  }
+
+  .dev-header .created-by {
+    font-size: 2.2rem;
+  }
+
   .developer-full-width {
     padding: 60px 0;
+  }
+
+  .skills-grid {
+    gap: 16px;
+  }
+
+  .skill-item {
+    padding: 15px;
+  }
+
+  .skill-item span {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.1rem;
+  }
+
+  .about-content h2 {
+    font-size: 2rem;
+  }
+
+  .about-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-card h3 {
+    font-size: 1.75rem;
+  }
+
+  .dev-header .created-by {
+    font-size: 1.8rem;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dev-badge {
+    font-size: 0.85rem;
+    padding: 6px 15px;
   }
 }

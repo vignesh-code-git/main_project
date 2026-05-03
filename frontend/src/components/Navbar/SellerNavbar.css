@@ -3,10 +3,9 @@
   background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   position: sticky;
-  top: var(--header-total-height);
+  top: calc(var(--header-total-height) + 10px);
   z-index: 999;
   width: 100%;
-  margin: 0;
   margin-bottom: 20px;
 }
 
@@ -295,5 +294,75 @@
 
   .seller-nav-container {
     padding: 0 20px;
+    grid-template-columns: auto 1fr auto;
+    gap: 15px;
+  }
+  
+  .seller-nav-links {
+    gap: 10px;
+  }
+  
+  .seller-nav-item {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .seller-navbar {
+    height: 64px;
+  }
+
+  .seller-nav-container {
+    padding: 0 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .seller-panel-title {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .seller-nav-center {
+    overflow-x: auto;
+    scrollbar-width: none; /* Hide scrollbar for clean look */
+    -ms-overflow-style: none;
+  }
+
+  .seller-nav-center::-webkit-scrollbar {
+    display: none;
+  }
+
+  .seller-nav-links {
+    background: transparent;
+    padding: 0;
+  }
+
+  .seller-nav-item {
+    padding: 8px;
+    min-width: 40px;
+    justify-content: center;
+  }
+
+  .seller-nav-item span {
+    display: none; /* Hide text on mobile to save space */
+  }
+
+  .seller-nav-right {
+    gap: 10px;
+  }
+
+  .seller-user-name {
+    display: none; /* Hide name on mobile */
+  }
+
+  .seller-profile-trigger {
+    padding: 4px;
+  }
+  
+  .seller-nav-icons {
+    display: none; /* Hide extra icons on small mobile */
   }
 }
