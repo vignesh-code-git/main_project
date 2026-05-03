@@ -70,7 +70,7 @@ export default function OrdersPage() {
         size: item.size || 'M',
         color: item.color || 'Black'
       })).unwrap();
-      
+
       setSuccessData({
         title: 'Added to Cart',
         message: `${item.Product.name} has been successfully added to your shopping cart.`
@@ -169,7 +169,7 @@ export default function OrdersPage() {
                   <div className="info-group align-right">
                     <span className="label">ORDER # {order.id.toString().slice(-8).toUpperCase()}</span>
                     <div className="header-links">
-                      <button className="text-link" onClick={() => handleGenericAction('Order Details')}>Order Details</button>
+                      <button className="text-link" onClick={() => handleAction('Order Details', order)}>Order Details</button>
                       <span className="divider">|</span>
                       <button className="text-link" onClick={() => handleInvoice(order)}>Invoice</button>
                     </div>
@@ -190,45 +190,45 @@ export default function OrdersPage() {
                     </p>
                   </div>
                   <div className="items-details-list">
-                      {order.OrderItems?.map((item, idx) => {
-                        const allImages = [...(item.Product?.images || [])].sort((a, b) => a.id - b.id);
-                        const colorImage = allImages.find(img =>
-                          img.color && item.color &&
-                          img.color.trim().toLowerCase() === item.color.trim().toLowerCase()
-                        ) || allImages.find(img => !img.color);
-                        const imgUrl = colorImage ? colorImage.url : (allImages[0]?.url || '/placeholder.png');
+                    {order.OrderItems?.map((item, idx) => {
+                      const allImages = [...(item.Product?.images || [])].sort((a, b) => a.id - b.id);
+                      const colorImage = allImages.find(img =>
+                        img.color && item.color &&
+                        img.color.trim().toLowerCase() === item.color.trim().toLowerCase()
+                      ) || allImages.find(img => !img.color);
+                      const imgUrl = colorImage ? colorImage.url : (allImages[0]?.url || '/placeholder.png');
 
-                        return (
-                          <div key={idx} className="item-detail-entry row-layout">
-                            <div className="item-image-col">
-                              <div className="order-item-thumb">
-                                <img
-                                  src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
-                                  alt={item.Product?.name}
-                                />
-                              </div>
-                            </div>
-                            <div className="detail-main">
-                              <div className="detail-header-row">
-                                <a href={`/product/${item.Product?.id}`} className="item-title">{item.Product?.name}</a>
-                                <button className="buy-again-btn-lite" onClick={() => handleBuyAgain(item)}>Buy it again</button>
-                              </div>
-                              <div className="item-variant-info">
-                                {item.color && (
-                                  <span className="variant-tag color-prop-history">
-                                    <span className="color-label-mini">Color:</span>
-                                    <span className="color-swatch-mini" style={{ backgroundColor: item.color.toLowerCase() }}></span>
-                                    <strong>{item.color}</strong>
-                                  </span>
-                                )}
-                                {item.size && <span className="variant-tag size">Size: <strong>{item.size}</strong></span>}
-                                <span className="variant-tag qty">Qty: <strong>{item.quantity}</strong></span>
-                              </div>
+                      return (
+                        <div key={idx} className="item-detail-entry row-layout">
+                          <div className="item-image-col">
+                            <div className="order-item-thumb">
+                              <img
+                                src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
+                                alt={item.Product?.name}
+                              />
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
+                          <div className="detail-main">
+                            <div className="detail-header-row">
+                              <a href={`/product/${item.Product?.id}`} className="item-title">{item.Product?.name}</a>
+                              <button className="buy-again-btn-lite" onClick={() => handleBuyAgain(item)}>Buy it again</button>
+                            </div>
+                            <div className="item-variant-info">
+                              {item.color && (
+                                <span className="variant-tag color-prop-history">
+                                  <span className="color-label-mini">Color:</span>
+                                  <span className="color-swatch-mini" style={{ backgroundColor: item.color.toLowerCase() }}></span>
+                                  <strong>{item.color}</strong>
+                                </span>
+                              )}
+                              {item.size && <span className="variant-tag size">Size: <strong>{item.size}</strong></span>}
+                              <span className="variant-tag qty">Qty: <strong>{item.quantity}</strong></span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="body-right">
@@ -249,7 +249,7 @@ export default function OrdersPage() {
       )}
 
       {/* Action Modal */}
-      <OrderActionModal 
+      <OrderActionModal
         isOpen={isActionModalOpen}
         onClose={() => setIsActionModalOpen(false)}
         type={actionModalType}

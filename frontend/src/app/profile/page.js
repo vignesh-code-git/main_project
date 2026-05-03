@@ -27,14 +27,25 @@ export default function UserProfile() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isSuccessModal, setIsSuccessModal] = useState(false);
 
+  // Address Delete Modal State
+  const [isAddressDeleteModalOpen, setIsAddressDeleteModalOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState(null);
+
   const [addressForm, setAddressForm] = useState({
     title: 'Home',
     addressLine: '',
     city: '',
     state: '',
     zipCode: '',
+    phoneNumber: '',
     country: 'India',
     isDefault: false
+  });
+
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    phoneNumber: '',
+    zipCode: ''
   });
 
   const router = useRouter();
@@ -52,6 +63,11 @@ export default function UserProfile() {
     if (mounted && user) {
       fetchOrders();
       fetchAddresses();
+      setProfileForm({
+        name: user.name || '',
+        phoneNumber: user.phoneNumber || '',
+        zipCode: user.zipCode || ''
+      });
     }
   }, [mounted, isAuthenticated, user, router]);
 
@@ -108,14 +124,39 @@ export default function UserProfile() {
     }
   };
 
-  const handleDeleteAddress = async (id) => {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const res = await fetch(`${API_BASE_URL}/api/addresses/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileForm),
+        credentials: 'include'
+      });
+      if (res.ok) {
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Error updating profile:', err);
+    }
+  };
+
+  const handleDeleteAddress = (id) => {
+    setAddressToDelete(id);
+    setIsAddressDeleteModalOpen(true);
+  };
+
+  const confirmDeleteAddress = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/addresses/${addressToDelete}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-      if (res.ok) fetchAddresses();
+      if (res.ok) {
+        fetchAddresses();
+        setIsAddressDeleteModalOpen(false);
+        setAddressToDelete(null);
+      }
     } catch (err) {
       console.error('Error deleting address:', err);
     }
@@ -128,6 +169,7 @@ export default function UserProfile() {
       city: addr.city,
       state: addr.state,
       zipCode: addr.zipCode,
+      phoneNumber: addr.phoneNumber || '',
       country: addr.country,
       isDefault: addr.isDefault
     });
@@ -143,6 +185,7 @@ export default function UserProfile() {
       city: '',
       state: '',
       zipCode: '',
+      phoneNumber: user?.phoneNumber || '',
       country: 'India',
       isDefault: false
     });
@@ -231,6 +274,7 @@ export default function UserProfile() {
                       {addr.isDefault && <span className="tag">DEFAULT</span>}
                     </div>
                     <p>{addr.addressLine}</p>
+                    {addr.phoneNumber && <p style={{ fontWeight: '500', color: '#000', margin: '4px 0' }}>Phone: {addr.phoneNumber}</p>}
                     <p>{addr.city}, {addr.state} - {addr.zipCode}</p>
                     <p>{addr.country}</p>
                     <div className="card-actions">
@@ -255,11 +299,11 @@ export default function UserProfile() {
                 <p>Update your personal information and preferences.</p>
               </header>
 
-              <form className="settings-form">
+              <form className="settings-form" onSubmit={handleProfileSubmit}>
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Full Name</label>
-                    <input type="text" defaultValue={user.name} />
+                    <input type="text" value={profileForm.name} onChange={(e) => setProfileForm({...profileForm, name: e.target.value})} required />
                   </div>
                   <div className="form-group">
                     <label>Email Address</label>
@@ -267,11 +311,11 @@ export default function UserProfile() {
                   </div>
                   <div className="form-group">
                     <label>Phone Number</label>
-                    <input type="text" placeholder="+91 00000 00000" />
+                    <input type="tel" maxLength="10" pattern="\d{10}" value={profileForm.phoneNumber} onChange={(e) => setProfileForm({...profileForm, phoneNumber: e.target.value.replace(/\D/g, '')})} placeholder="10-digit mobile number" />
                   </div>
                   <div className="form-group">
                     <label>Zipcode / Location</label>
-                    <input type="text" placeholder="400001" />
+                    <input type="text" value={profileForm.zipCode} onChange={(e) => setProfileForm({...profileForm, zipCode: e.target.value})} placeholder="400001" />
                   </div>
                 </div>
                 <button type="submit" className="save-btn">Save Changes</button>
@@ -318,6 +362,18 @@ export default function UserProfile() {
                   type="text"
                   value={addressForm.addressLine}
                   onChange={(e) => setAddressForm({ ...addressForm, addressLine: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input
+                  type="tel"
+                  maxLength="10"
+                  pattern="\d{10}"
+                  placeholder="10-digit mobile number"
+                  value={addressForm.phoneNumber}
+                  onChange={(e) => setAddressForm({ ...addressForm, phoneNumber: e.target.value.replace(/\D/g, '') })}
                   required
                 />
               </div>
@@ -384,6 +440,17 @@ export default function UserProfile() {
           : "Are you sure you want to cancel this order? This action will restore the product stock and cannot be undone."}
         confirmText={isSuccessModal ? "Close" : "Yes, Cancel Order"}
         cancelText={isSuccessModal ? "" : "No, Keep Order"}
+      />
+
+      {/* Professional Address Deletion Modal */}
+      <ConfirmModal
+        isOpen={isAddressDeleteModalOpen}
+        onClose={() => setIsAddressDeleteModalOpen(false)}
+        onConfirm={confirmDeleteAddress}
+        title="Remove Address"
+        message="Are you sure you want to remove this address? This action cannot be undone."
+        confirmText="Yes, Remove"
+        cancelText="Cancel"
       />
     </div>
   );

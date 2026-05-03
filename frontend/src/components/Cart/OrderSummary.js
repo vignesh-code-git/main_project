@@ -18,7 +18,7 @@ export default function OrderSummary() {
   const totalAmount = useSelector((state) => state.cart.totalAmount);
   const cartItems = useSelector((state) => state.cart.items);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  
+
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -51,7 +51,7 @@ export default function OrderSummary() {
     setIsAddressModalOpen(false);
     localStorage.setItem('activeCheckoutAddressId', addr.id.toString());
   };
-  
+
   // Design values from reference image
   const discountRate = 0.20; // 20%
   const discountAmount = totalAmount * discountRate;
@@ -129,31 +129,31 @@ export default function OrderSummary() {
   return (
     <div className="order-summary-card">
       <h2 className="summary-title">Order Summary</h2>
-      
+
       <div className="summary-details">
         <div className="summary-line">
           <span className="label">Subtotal</span>
           <span className="value">₹{totalAmount}</span>
         </div>
-        
+
         <div className="summary-line">
           <span className="label">Discount (-20%)</span>
           <span className="value discount-value">-₹{Math.round(discountAmount)}</span>
         </div>
-        
+
         <div className="summary-line">
           <span className="label">Delivery Fee</span>
           <span className="value">₹{deliveryFee}</span>
         </div>
-        
+
         <div className="summary-divider"></div>
-        
+
         <div className="summary-line total-line">
           <span className="label">Total</span>
           <span className="value">₹{Math.round(grandTotal)}</span>
         </div>
       </div>
-      
+
       <div className="shipping-address-block">
         <div className="address-block-header">
           <h3><MapPin size={16} /> Shipping Address</h3>
@@ -182,9 +182,9 @@ export default function OrderSummary() {
         </div>
         <button className="apply-promo-btn">Apply</button>
       </div>
-      
-      <button 
-        className="checkout-action-btn" 
+
+      <button
+        className="checkout-action-btn"
         disabled={totalAmount === 0 || loading}
         onClick={handleCheckout}
       >
@@ -192,14 +192,14 @@ export default function OrderSummary() {
       </button>
 
       {showRazorpay && (
-        <RazorpayDemo 
-          amount={Math.round(grandTotal) * 100} 
+        <RazorpayDemo
+          amount={Math.round(grandTotal) * 100}
           onSuccess={handlePaymentSuccess}
           onCancel={() => setShowRazorpay(false)}
         />
       )}
 
-      <AlertModal 
+      <AlertModal
         isOpen={alertConfig.isOpen}
         onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
         title={alertConfig.title}
@@ -214,8 +214,8 @@ export default function OrderSummary() {
             <h3>Select Shipping Address</h3>
             <div className="address-list">
               {addresses.map(addr => (
-                <div 
-                  key={addr.id} 
+                <div
+                  key={addr.id}
                   className={`address-option ${selectedAddress?.id === addr.id ? 'selected' : ''}`}
                   onClick={() => handleSelectAddress(addr)}
                 >

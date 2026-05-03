@@ -37,6 +37,10 @@ const Address = sequelize.define('Address', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  phoneNumber: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   country: {
     type: DataTypes.STRING,
     allowNull: false,

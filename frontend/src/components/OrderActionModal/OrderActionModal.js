@@ -1,18 +1,45 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown } from 'lucide-react';
+import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown, Package, Copy } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 import './OrderActionModal.css';
 
 export default function OrderActionModal({ isOpen, onClose, type, order, onAction }) {
+  const { user } = useSelector((state) => state.auth);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
+  const [isCopied, setIsCopied] = useState(false);
+  
+  const handleCopyFullDetails = () => {
+    if (!order) return;
+    
+    const details = `ORDER DETAILS
+-------------------
+Order ID: ${order.id}
+Date: ${new Date(order.createdAt).toLocaleDateString()}
+Status: ${order.status}
+Total Amount: ₹${order.totalAmount}
+
+ITEMS
+-------------------
+${order.OrderItems?.map(item => `${item.quantity}x ${item.Product?.name} (Size: ${item.size}, Color: ${item.color}) - ₹${item.price}`).join('\n')}
+
+SHIPPING TO
+-------------------
+${user?.name || ''}
+${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + '\n' : ''}${order.shippingAddress} - ${order.zipcode}`;
+
+    navigator.clipboard.writeText(details.trim());
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
   
   // Custom Dropdown State
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -187,6 +214,48 @@ export default function OrderActionModal({ isOpen, onClose, type, order, onActio
           </div>
         );
 
+      case 'Order Details':
+        return (
+          <div className="modal-form-content" style={{ paddingBottom: '0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, fontSize: '15px' }}>Order Summary</h3>
+              <button 
+                onClick={handleCopyFullDetails} 
+                title={isCopied ? "Copied!" : "Copy Full Details"}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px', color: '#666', transition: 'color 0.2s' }}
+              >
+                {isCopied ? <Check size={16} /> : <Copy size={16} />}
+              </button>
+            </div>
+            <div style={{ background: '#f9f9f9', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '13px' }}><strong>Order ID:</strong> #{order.id.toString().slice(-8).toUpperCase()}</p>
+              <p style={{ margin: '0 0 4px 0', fontSize: '13px' }}><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+              <p style={{ margin: '0', fontSize: '13px' }}><strong>Total:</strong> ₹{order.totalAmount} | <strong>Status:</strong> {order.status}</p>
+            </div>
+            
+            <h3 style={{ marginBottom: '12px', fontSize: '15px' }}>Items</h3>
+            <div className="item-review-list" style={{ marginBottom: '16px', gap: '8px' }}>
+              {order.OrderItems?.map((item, idx) => (
+                <div key={idx} className="order-detail-item">
+                  <div className="item-info">
+                    <strong>{item.Product?.name}</strong>
+                    <p style={{ fontSize: '13px', margin: '4px 0' }}>Qty: {item.quantity} | Size: {item.size} | Color: {item.color}</p>
+                    <p style={{ marginTop: '2px', fontWeight: 'bold', fontSize: '14px' }}>₹{item.price}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <h3 style={{ marginBottom: '12px', fontSize: '15px' }}>Shipping Address</h3>
+            <div style={{ background: '#f9f9f9', padding: '12px 16px', borderRadius: '8px', fontSize: '13px' }}>
+              <p style={{ margin: '0 0 2px 0' }}><strong>{user?.name}</strong></p>
+              {user?.phoneNumber && <p style={{ margin: '0 0 2px 0' }}>{user?.phoneNumber}</p>}
+              {user?.email && <p style={{ margin: '0 0 6px 0', color: '#666' }}>{user?.email}</p>}
+              <p style={{ margin: '0' }}>{order.shippingAddress} - {order.zipcode}</p>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -200,7 +269,8 @@ export default function OrderActionModal({ isOpen, onClose, type, order, onActio
             {type === 'Return' && <RefreshCw size={20} />}
             {type === 'Feedback' && <Truck size={20} />}
             {type === 'Reviews' && <MessageSquare size={20} />}
-            <h2>{type === 'Return' ? 'Return Request' : type === 'Feedback' ? 'Delivery Feedback' : 'Write a Review'}</h2>
+            {type === 'Order Details' && <Package size={20} />}
+            <h2>{type === 'Return' ? 'Return Request' : type === 'Feedback' ? 'Delivery Feedback' : type === 'Order Details' ? 'Order Details' : 'Write a Review'}</h2>
           </div>
           <button className="close-modal-v2" onClick={onClose}><X size={20} /></button>
         </div>

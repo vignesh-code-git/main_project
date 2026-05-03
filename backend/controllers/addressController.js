@@ -2,7 +2,7 @@ const { Address } = require('../models/associations');
 
 exports.getAddresses = async (req, res) => {
   try {
-    const addresses = await Address.findAll({ 
+    const addresses = await Address.findAll({
       where: { userId: req.user.id },
       order: [['isDefault', 'DESC'], ['createdAt', 'DESC']]
     });
@@ -14,8 +14,8 @@ exports.getAddresses = async (req, res) => {
 
 exports.addAddress = async (req, res) => {
   try {
-    const { title, addressLine, city, state, zipCode, country, isDefault } = req.body;
-    
+    const { title, addressLine, city, state, zipCode, country, isDefault, phoneNumber } = req.body;
+
     // If setting as default, unset other defaults for this user
     if (isDefault) {
       await Address.update({ isDefault: false }, { where: { userId: req.user.id } });
@@ -28,6 +28,7 @@ exports.addAddress = async (req, res) => {
       city,
       state,
       zipCode,
+      phoneNumber,
       country,
       isDefault
     });
@@ -40,7 +41,7 @@ exports.addAddress = async (req, res) => {
 
 exports.updateAddress = async (req, res) => {
   try {
-    const { title, addressLine, city, state, zipCode, country, isDefault } = req.body;
+    const { title, addressLine, city, state, zipCode, country, isDefault, phoneNumber } = req.body;
     const address = await Address.findOne({ where: { id: req.params.id, userId: req.user.id } });
 
     if (!address) return res.status(404).json({ message: 'Address not found' });
@@ -54,6 +55,7 @@ exports.updateAddress = async (req, res) => {
     address.city = city || address.city;
     address.state = state || address.state;
     address.zipCode = zipCode || address.zipCode;
+    if (phoneNumber !== undefined) address.phoneNumber = phoneNumber;
     address.country = country || address.country;
     address.isDefault = isDefault !== undefined ? isDefault : address.isDefault;
 

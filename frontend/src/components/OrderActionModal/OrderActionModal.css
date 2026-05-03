@@ -83,7 +83,7 @@
 }
 
 .modal-body-v2 {
-  padding: 32px;
+  padding: 24px 32px;
 }
 
 .modal-form-content h3 {
@@ -374,4 +374,15 @@
 
 .rotate-180 {
   transform: rotate(180deg);
+}
+
+.order-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  cursor: default;
 }

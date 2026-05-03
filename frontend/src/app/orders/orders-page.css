@@ -118,11 +118,13 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0;
-  text-decoration: underline;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .text-link:hover {
-  opacity: 0.7;
+  color: #000;
+  opacity: 0.6;
 }
 
 .divider {
