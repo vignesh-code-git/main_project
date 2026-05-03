@@ -78,7 +78,7 @@
 .footer-content {
   display: flex;
   justify-content: space-between;
-  padding: 140px 0 60px; /* Increased top padding for newsletter overlap */
+  padding: 140px 16px 60px; /* Added side padding and kept top/bottom */
   border-bottom: 1px solid rgba(0,0,0,0.1);
   gap: 50px;
 }
@@ -159,7 +159,7 @@
 }
 
 .footer-bottom {
-  padding: 25px 0 80px;
+  padding: 25px 16px 80px;
 }
 
 .bottom-container {
@@ -176,6 +176,7 @@
 .payment-methods {
   display: flex;
   gap: 12px;
+  padding: 0 5px;
 }
 
 .payment-methods img {
@@ -199,15 +200,33 @@
   }
   .footer-content {
     flex-direction: column;
-    padding-top: 180px;
+    padding: 180px 20px 60px; /* Increased gap for tablet */
   }
   .footer-links {
     flex-wrap: wrap;
     gap: 30px;
   }
+  .footer-bottom {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .payment-methods {
+    padding: 0 10px;
+  }
 }
 
 @media (max-width: 480px) {
+  .newsletter-section {
+    padding: 0 15px;
+  }
+  .footer-content {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .footer-bottom {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
   .footer-links {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -219,6 +238,11 @@
   }
   .newsletter-form {
     width: 100%;
+  }
+  .payment-methods {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 20px;
   }
 }
 
