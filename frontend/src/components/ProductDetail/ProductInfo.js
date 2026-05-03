@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { addItemToCart, fetchCart } from '@/lib/redux/slices/cartSlice';
-import { Loader2 } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import RazorpayDemo from '../Payment/RazorpayDemo';
+import AlertModal from '../AlertModal/AlertModal';
 import './ProductInfo.css';
 
 export default function ProductInfo({ product, selectedColor, setSelectedColor }) {
@@ -15,6 +16,40 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [loading, setLoading] = useState(false);
   const [showRazorpay, setShowRazorpay] = useState(false);
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, title: '', message: '', onAction: null });
+
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const fetchAddresses = async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/addresses`, {
+            credentials: 'include'
+          });
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setAddresses(data);
+            const savedAddressId = localStorage.getItem('activeCheckoutAddressId');
+            const savedAddr = savedAddressId ? data.find(a => a.id.toString() === savedAddressId) : null;
+            const defaultAddr = data.find(a => a.isDefault) || data[0];
+            setSelectedAddress(savedAddr || defaultAddr);
+          }
+        } catch (err) {
+          console.error('Error fetching addresses:', err);
+        }
+      };
+      fetchAddresses();
+    }
+  }, [isAuthenticated, user]);
+
+  const handleSelectAddress = async (addr) => {
+    setSelectedAddress(addr);
+    setIsAddressModalOpen(false);
+    localStorage.setItem('activeCheckoutAddressId', addr.id.toString());
+  };
 
   const sizes = product.size ? product.size.split(',').map(s => s.trim()) : [];
   const [selectedSize, setSelectedSize] = useState(sizes[0] || '');
@@ -54,10 +89,10 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         size: selectedSize,
         color: selectedColor
       })).unwrap();
-      
+
       // Refresh cart to get the latest state
       dispatch(fetchCart());
-      
+
       setSuccessMsg('Added to cart successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
@@ -69,10 +104,27 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
 
   const handleBuyNow = () => {
     if (!isAuthenticated) {
-      alert('Please log in to proceed with purchase.');
-      router.push('/auth/login');
+      setAlertConfig({
+        isOpen: true,
+        title: 'Login Required',
+        message: 'Please log in to proceed with your purchase.',
+        actionText: 'Go to Login',
+        onAction: () => router.push('/auth/login')
+      });
       return;
     }
+
+    if (!selectedAddress) {
+      setAlertConfig({
+        isOpen: true,
+        title: 'Address Missing',
+        message: 'Please add a shipping address in your profile before checking out.',
+        actionText: 'Add Address',
+        onAction: () => router.push('/profile')
+      });
+      return;
+    }
+
     setShowRazorpay(true);
   };
 
@@ -83,8 +135,8 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       const orderData = {
         userId: user.id,
         totalAmount: product.price * quantity,
-        shippingAddress: '123 High Street, Downtown, Mumbai',
-        zipcode: '400001',
+        shippingAddress: [selectedAddress.addressLine, selectedAddress.city, selectedAddress.state, selectedAddress.country].filter(Boolean).join(', '),
+        zipcode: selectedAddress.zipCode,
         paymentMethod: method,
         items: [{
           id: product.id,
@@ -212,6 +264,26 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         </div>
       </div>
 
+      <div className="shipping-address-block-mini">
+        <div className="address-block-header-mini">
+          <h4><MapPin size={14} /> Deliver to</h4>
+          {addresses.length > 0 && (
+            <button className="change-address-btn-mini" onClick={() => setIsAddressModalOpen(true)}>Change</button>
+          )}
+        </div>
+        {selectedAddress ? (
+          <div className="selected-address-card-mini">
+            <strong>{selectedAddress.title} {selectedAddress.isDefault && <span className="def-tag">Default</span>}</strong>
+            <p>{selectedAddress.addressLine}, {selectedAddress.city} - {selectedAddress.zipCode}</p>
+          </div>
+        ) : (
+          <div className="no-address-warning-mini">
+            <p>No shipping address found.</p>
+            <button onClick={() => router.push('/profile')}>Add Address</button>
+          </div>
+        )}
+      </div>
+
       <div className="actions-group-container sticky-actions">
         <div className="all-actions-row">
           <div className="quantity-selector">
@@ -248,6 +320,40 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
           onSuccess={handlePaymentSuccess}
           onCancel={() => setShowRazorpay(false)}
         />
+      )}
+
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        actionText={alertConfig.actionText}
+        onAction={alertConfig.onAction}
+      />
+
+      {isAddressModalOpen && (
+        <div className="address-selector-modal" onClick={() => setIsAddressModalOpen(false)}>
+          <div className="address-selector-content" onClick={e => e.stopPropagation()}>
+            <h3>Select Shipping Address</h3>
+            <div className="address-list">
+              {addresses.map(addr => (
+                <div
+                  key={addr.id}
+                  className={`address-option ${selectedAddress?.id === addr.id ? 'selected' : ''}`}
+                  onClick={() => handleSelectAddress(addr)}
+                >
+                  <div className="address-option-header">
+                    <strong>{addr.title}</strong>
+                    {addr.isDefault && <span className="default-tag">Default</span>}
+                  </div>
+                  <p>{addr.addressLine}</p>
+                  <p>{addr.city}, {addr.state} - {addr.zipCode}</p>
+                </div>
+              ))}
+            </div>
+            <button className="close-selector-btn" onClick={() => setIsAddressModalOpen(false)}>Cancel</button>
+          </div>
+        </div>
       )}
     </div>
   );

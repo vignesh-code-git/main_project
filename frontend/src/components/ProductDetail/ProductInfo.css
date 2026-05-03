@@ -2,7 +2,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 535px; /* Match Gallery Height */
+  min-height: 535px;
+  height: auto;
+  /* Match Gallery Height but allow expansion */
   padding-left: 20px;
 }
 
@@ -137,6 +139,104 @@
 .meta-value {
   color: #000;
   font-weight: 600;
+}
+
+.meta-va.low-stock {
+  color: #FF3333;
+  font-weight: 600;
+}
+
+/* Shipping Address Mini Block */
+.shipping-address-block-mini {
+  margin: 24px 0 16px;
+  padding: 16px;
+  background: #fcfcfc;
+  border-radius: 12px;
+  border: 1px solid #eaeaea;
+}
+
+.address-block-header-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.address-block-header-mini h4 {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #000;
+}
+
+.change-address-btn-mini {
+  background: none;
+  border: none;
+  color: #2D6CFF;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.change-address-btn-mini:hover {
+  text-decoration: underline;
+}
+
+.selected-address-card-mini {
+  font-size: 13px;
+  color: #555;
+}
+
+.selected-address-card-mini strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.selected-address-card-mini p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.def-tag,
+.default-tag {
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+.no-address-warning-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFF5F5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #FFE5E5;
+}
+
+.no-address-warning-mini p {
+  margin: 0;
+  color: #FF3333;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.no-address-warning-mini button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .meta-row.delivery {
@@ -332,4 +432,80 @@
     height: 48px;
     font-size: 14px;
   }
+}
+
+/* Address Selector Modal */
+.address-selector-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.address-selector-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.address-selector-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address-option {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.address-option:hover {
+  border-color: #ccc;
+}
+
+.address-option.selected {
+  border-color: #000;
+  background: #fafafa;
+}
+
+.address-option-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.address-option p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.close-selector-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
 }

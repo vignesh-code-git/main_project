@@ -669,3 +669,191 @@ exports.getSellerFeedback = async (req, res) => {
     res.status(500).json({ message: 'Error fetching feedback' });
   }
 };
+
+exports.generateInvoice = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    
+    const order = await Order.findByPk(orderId, {
+      include: [
+        { model: User }, // Customer
+        { 
+          model: OrderItem,
+          include: [{
+            model: Product,
+            include: [{ model: User }] // Seller
+          }]
+        }
+      ]
+    });
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // Check if the user requesting is either the customer, or an admin, or one of the sellers
+    // Simplified for now: just render it.
+
+    // Group items by seller
+    const sellerGroups = {};
+    order.OrderItems.forEach(item => {
+      const sellerId = item.Product.User ? item.Product.User.id : 'unknown';
+      if (!sellerGroups[sellerId]) {
+        sellerGroups[sellerId] = {
+          sellerInfo: item.Product.User || { storeName: 'SHOP.CO', address: 'Main Warehouse' },
+          items: [],
+          subtotal: 0
+        };
+      }
+      sellerGroups[sellerId].items.push(item);
+      sellerGroups[sellerId].subtotal += (item.price * item.quantity);
+    });
+
+    // We will pick the primary seller for the invoice header, or if multiple, just use the first one
+    // or SHOP.CO as the marketplace.
+    const primarySellerId = Object.keys(sellerGroups)[0];
+    const primarySeller = sellerGroups[primarySellerId].sellerInfo;
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Invoice - ${order.id.slice(0,8).toUpperCase()}</title>
+      <style>
+        body { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; margin: 0; padding: 0; background: #f8f9fa; }
+        .invoice-container { max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        .invoice-title h1 { margin: 0; font-size: 32px; color: #000; letter-spacing: -1px; }
+        .invoice-title p { margin: 4px 0 0; color: #666; font-size: 14px; }
+        .store-details { text-align: right; }
+        .store-details h2 { margin: 0; font-size: 20px; color: #000; }
+        .store-details p { margin: 2px 0; color: #555; font-size: 14px; }
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .billing-info h3, .shipping-info h3 { margin: 0 0 10px; font-size: 16px; color: #000; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .info-block p { margin: 2px 0; font-size: 14px; color: #444; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #000; font-weight: 600; border-bottom: 2px solid #ddd; font-size: 14px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; color: #333; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .totals { width: 300px; float: right; }
+        .totals-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
+        .totals-row.grand-total { font-size: 18px; font-weight: 700; border-top: 2px solid #000; padding-top: 12px; margin-top: 12px; }
+        .footer { clear: both; margin-top: 60px; text-align: center; color: #888; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px; }
+        @media print {
+          body { background: #fff; }
+          .invoice-container { box-shadow: none; margin: 0; padding: 20px; max-width: 100%; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="invoice-container">
+        <div class="invoice-header">
+          <div class="invoice-title">
+            <h1>INVOICE</h1>
+            <p>Order # ${order.id}</p>
+            <p>Date: ${new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+          <div class="store-details">
+            <h2>${primarySeller.storeName || 'SHOP.CO marketplace'}</h2>
+            <p>${primarySeller.address || '123 E-commerce Blvd'}</p>
+            <p>${primarySeller.city || 'Tech City'}, ${primarySeller.state || 'State'} ${primarySeller.zipCode || '10001'}</p>
+            <p>${primarySeller.country || 'India'}</p>
+            <p>Phone: ${primarySeller.phoneNumber || 'N/A'}</p>
+            <p>Email: ${primarySeller.email || 'contact@shop.co'}</p>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <div class="info-block billing-info">
+            <h3>Bill To</h3>
+            <p><strong>${order.User.name}</strong></p>
+            <p>${order.User.email}</p>
+            <p>${order.User.phoneNumber || ''}</p>
+          </div>
+          <div class="info-block shipping-info">
+            <h3>Ship To</h3>
+            <p><strong>${order.User.name}</strong></p>
+            <p>${order.shippingAddress.replace(/\\n/g, '<br>')}</p>
+            <p>ZIP: ${order.zipcode}</p>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Item Description</th>
+              <th class="text-center">Qty</th>
+              <th class="text-right">Unit Price</th>
+              <th class="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.OrderItems.map(item => `
+            <tr>
+              <td>
+                <strong>${item.Product.name}</strong><br>
+                <span style="font-size: 12px; color: #666;">
+                  ${item.color ? 'Color: ' + item.color : ''}
+                  ${item.size ? ' | Size: ' + item.size : ''}
+                  <br>Seller: ${item.Product.User ? item.Product.User.storeName : 'SHOP.CO'}
+                </span>
+              </td>
+              <td class="text-center">${item.quantity}</td>
+              <td class="text-right">₹${parseFloat(item.price).toFixed(2)}</td>
+              <td class="text-right">₹${(item.price * item.quantity).toFixed(2)}</td>
+            </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="totals-row">
+            <span>Subtotal</span>
+            <span>₹${order.totalAmount.toFixed(2)}</span>
+          </div>
+          <div class="totals-row">
+            <span>Shipping</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="totals-row">
+            <span>Tax (Included)</span>
+            <span>₹0.00</span>
+          </div>
+          <div class="totals-row grand-total">
+            <span>Total</span>
+            <span>₹${order.totalAmount.toFixed(2)}</span>
+          </div>
+          <div class="totals-row" style="margin-top: 10px; color: #555;">
+            <span>Payment Status</span>
+            <span style="color: ${order.paymentStatus === 'Paid' ? '#166534' : '#991B1B'}; font-weight: bold;">
+              ${order.paymentStatus.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>Thank you for your business!</p>
+          <p>If you have any questions about this invoice, please contact the seller directly.</p>
+        </div>
+      </div>
+      
+      <script>
+        // Automatically open print dialog
+        window.onload = function() {
+          setTimeout(() => {
+            window.print();
+          }, 500);
+        }
+      </script>
+    </body>
+    </html>
+    `;
+
+    res.send(htmlContent);
+  } catch (error) {
+    console.error('generateInvoice Error:', error);
+    res.status(500).send('Error generating invoice');
+  }
+};

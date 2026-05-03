@@ -82,7 +82,21 @@
 
 .info-group .user-name {
   color: #000;
-  text-decoration: underline;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.info-group .shipping-address {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  margin-top: 2px;
+  max-width: 220px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .header-right .info-group {

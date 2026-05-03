@@ -160,6 +160,9 @@ export default function OrdersPage() {
                   <div className="info-group">
                     <span className="label">SHIP TO</span>
                     <span className="value user-name">{user.name}</span>
+                    <span className="shipping-address" title={`${order.shippingAddress} - ${order.zipcode}`}>
+                      {order.shippingAddress} - {order.zipcode}
+                    </span>
                   </div>
                 </div>
                 <div className="header-right">

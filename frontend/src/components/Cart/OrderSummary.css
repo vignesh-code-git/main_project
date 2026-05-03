@@ -119,3 +119,150 @@
 .checkout-action-btn:hover:not(:disabled) {
   opacity: 0.85;
 }
+
+/* Shipping Address Styles */
+.shipping-address-block {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.address-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.address-block-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #333;
+}
+
+.change-address-btn {
+  background: none;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.selected-address-card p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.def-tag, .default-tag {
+  background: #000;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+.no-address-warning {
+  text-align: center;
+  padding: 10px;
+}
+
+.no-address-warning p {
+  margin-bottom: 10px;
+  color: #FF3333;
+  font-weight: 500;
+}
+
+.no-address-warning button {
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Address Selector Modal */
+.address-selector-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.address-selector-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.address-selector-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.address-option {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.address-option:hover {
+  border-color: #ccc;
+}
+
+.address-option.selected {
+  border-color: #000;
+  background: #fafafa;
+}
+
+.address-option-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.address-option p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.close-selector-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -351,14 +351,18 @@ export default function UserProfile() {
                 </div>
               </div>
               <div className="form-group checkbox-group">
-                <label className="checkbox-label" style={{ flexDirection: 'row', display: 'flex', alignItems: 'center' }}>
+                <label className="checkbox-label" style={{ flexDirection: 'row', display: 'flex', alignItems: 'center', opacity: addresses.some(a => a.isDefault && a.id !== currentAddressId) ? 0.5 : 1 }}>
                   <input
                     type="checkbox"
                     checked={addressForm.isDefault}
                     onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
+                    disabled={addresses.some(a => a.isDefault && a.id !== currentAddressId)}
                     style={{ margin: '0 10px 0 0', width: '20px', height: '20px' }}
                   />
                   Set as default address
+                  {addresses.some(a => a.isDefault && a.id !== currentAddressId) && (
+                    <span style={{ fontSize: '12px', color: '#666', marginLeft: '8px' }}>(Another address is already default)</span>
+                  )}
                 </label>
               </div>
               <button type="submit" className="submit-btn">
