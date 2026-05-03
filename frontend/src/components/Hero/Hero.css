@@ -178,7 +178,7 @@
 }
 
 /* All Devices - Responsiveness */
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .hero-sticky-wrapper {
     height: 350vh;
   }
@@ -278,6 +278,20 @@
     height: 30px;
   }
 
+  /* Tablet specific adjustments */
+  @media (min-width: 481px) and (max-width: 1024px) {
+    .star-large-middle {
+      left: 20% !important;
+      right: auto !important;
+      top: 12% !important;
+      transform: none !important;
+      font-size: 56px !important;
+    }
+  }
+
+
+
+
   .star-large-middle {
     font-size: 56px;
     left: 45%;
@@ -313,7 +327,7 @@
   display: none;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .mobile-only {
     display: inline;
   }

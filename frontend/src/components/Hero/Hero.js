@@ -111,7 +111,7 @@ export default function Hero() {
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        const isMobile = window.innerWidth <= 992;
+        const isMobile = window.innerWidth <= 1024;
         const scale = isMobile ? 1.5 : 1.28;
         if (canvasAspect > imgAspect) {
           drawHeight = visibleHeight * scale;
@@ -123,8 +123,8 @@ export default function Hero() {
 
         if (isMobile) {
           // Perfectly centered with a moderate left shift (12%) and an upward shift (5%)
-          offsetX = ((canvas.width - drawWidth) / 2) - (canvas.width * 0.12);
-          offsetY = ((visibleHeight - drawHeight) / 2) - (canvas.height * 0.05);
+          offsetX = ((canvas.width - drawWidth) / 2) - (canvas.width * 0.17);
+          offsetY = ((visibleHeight - drawHeight) / 2) + (canvas.height * 0.06);
         } else {
 
 
