@@ -259,19 +259,114 @@
   color: #166534;
 }
 
-/* Dropdown */
-.status-dropdown-seller {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #E2E8F0;
-  font-size: 13px;
-  font-weight: 600;
-  outline: none;
-  cursor: pointer;
+/* Custom Status Dropdown */
+.custom-status-dropdown {
+  position: relative;
+  width: 140px;
 }
 
-.status-dropdown-seller:hover {
+.status-trigger-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #F0F0F0;
+  border: 1px solid transparent;
+  border-radius: 62px; /* Pill shape like Add Product page */
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.status-trigger-btn:hover {
+  background: #E8E8E8;
+}
+
+.status-trigger-btn.open {
+  background: #fff;
   border-color: #000;
+  border-radius: 20px 20px 0 0;
+}
+
+.status-trigger-btn svg {
+  transition: transform 0.2s;
+}
+
+.status-trigger-btn svg.rotate {
+  transform: rotate(180deg);
+}
+
+/* Status-specific button colors */
+.status-trigger-btn.pending { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+.status-trigger-btn.processing { color: #1E40AF; background: #DBEAFE; border-color: #93C5FD; }
+.status-trigger-btn.shipped { color: #3730A3; background: #E0E7FF; border-color: #A5B4FC; }
+.status-trigger-btn.delivered { color: #166534; background: #DCFCE7; border-color: #86EFAC; }
+
+.status-options-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #000;
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  padding: 0;
+  animation: statusDropdownSlideUp 0.2s ease-out;
+  list-style: none;
+  overflow: hidden;
+}
+
+@keyframes statusDropdownSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-option-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-option-item:hover {
+  background: #F0F0F0;
+  color: #000;
+}
+
+/* Status-specific option backgrounds */
+.status-option-item.pending:hover, .status-option-item.pending.active { background: #FEF3C7; color: #92400E; }
+.status-option-item.processing:hover, .status-option-item.processing.active { background: #DBEAFE; color: #1E40AF; }
+.status-option-item.shipped:hover, .status-option-item.shipped.active { background: #E0E7FF; color: #3730A3; }
+.status-option-item.delivered:hover, .status-option-item.delivered.active { background: #DCFCE7; color: #166534; }
+
+.status-option-item.active {
+  font-weight: 700;
+}
+
+.dropdown-overlay-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
 }
 
 /* Mini Item List */

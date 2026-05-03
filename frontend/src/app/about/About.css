@@ -253,7 +253,7 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .about-grid {
     grid-template-columns: 1fr;
     gap: 50px;
@@ -288,6 +288,14 @@
   .dev-premium-card {
     padding: 60px 30px;
     border-radius: 30px;
+  }
+
+  .about-hero {
+    text-align: center !important;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto !important;
   }
 }
 

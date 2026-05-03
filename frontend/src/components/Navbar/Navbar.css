@@ -970,31 +970,27 @@
 .notification-item {
   display: flex !important;
   gap: 12px !important;
-  padding: 14px 20px !important;
-  border-bottom: 1px solid #f9fafb !important;
-  transition: background 0.2s ease !important;
+  padding: 16px !important;
+  margin: 8px 12px !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
   position: relative;
   cursor: pointer;
+  border: 1px solid #d1d5db !important;
 }
 
 .notification-item:hover {
   background: #f3f4f6 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .notification-item.unread {
-  background: #fcfdfe !important;
+  background: #f1fbf0 !important;
+  /* True Light Green, no cyan */
+  border-color: #dcfce7 !important;
 }
 
-.notification-item.unread::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 12px;
-  bottom: 12px;
-  width: 3px;
-  background: #2563eb;
-  border-radius: 0 4px 4px 0;
-}
 
 .notif-avatar-wrapper {
   flex-shrink: 0;

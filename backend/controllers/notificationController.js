@@ -47,6 +47,18 @@ exports.markAsRead = async (req, res) => {
   }
 };
 
+exports.markIndividualAsRead = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Notification.update({ isRead: true }, {
+      where: { id, userId: req.user.id }
+    });
+    res.json({ message: 'Notification marked as read' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // Internal helper to create notification
 exports.createNotification = async (data) => {
   try {

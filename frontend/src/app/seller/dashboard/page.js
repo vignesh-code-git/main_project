@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X } from 'lucide-react';
+import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { API_BASE_URL } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
@@ -160,6 +160,44 @@ export default function SellerDashboard() {
     } catch (err) {
       console.error("Delete error:", err);
     }
+  };
+  // Custom Status Dropdown Component
+  const StatusDropdown = ({ currentStatus, onUpdate }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+
+    return (
+      <div className="custom-status-dropdown">
+        <button 
+          className={`status-trigger-btn ${currentStatus.toLowerCase()} ${isOpen ? 'open' : ''}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span>{currentStatus}</span>
+          <ChevronDown size={14} className={isOpen ? 'rotate' : ''} />
+        </button>
+
+        {isOpen && (
+          <>
+            <div className="dropdown-overlay-fixed" onClick={() => setIsOpen(false)} />
+            <div className="status-options-menu">
+              {statuses.map(status => (
+                <button
+                  key={status}
+                  className={`status-option-item ${status.toLowerCase()} ${status === currentStatus ? 'active' : ''}`}
+                  onClick={() => {
+                    onUpdate(status);
+                    setIsOpen(false);
+                  }}
+                >
+                  <span>{status}</span>
+                  {status === currentStatus && <Check size={14} />}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    );
   };
 
   if (loading || !user) return <div className="loading-dashboard-overlay">Loading Dashboard...</div>;
@@ -331,17 +369,10 @@ export default function SellerDashboard() {
                             </span>
                           </td>
                           <td>
-                            <select
-                              className="status-dropdown-seller"
-                              value={order.status}
-                              onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
-                              disabled={isUpdating}
-                            >
-                              <option value="Pending">Pending</option>
-                              <option value="Processing">Processing</option>
-                              <option value="Shipped">Shipped</option>
-                              <option value="Delivered">Delivered</option>
-                            </select>
+                            <StatusDropdown 
+                              currentStatus={order.status} 
+                              onUpdate={(newStatus) => handleStatusUpdate(order.id, newStatus)} 
+                            />
                           </td>
                         </tr>
                       ))

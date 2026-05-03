@@ -128,6 +128,35 @@ export default function Navbar() {
     }
   };
 
+  const handleNotifClick = async (notif) => {
+    // 1. Mark as read in backend if not already read
+    if (!notif.isRead) {
+      try {
+        await fetch(`${API_BASE_URL}/api/notifications/mark-read/${notif.id}`, {
+          method: 'PUT',
+          credentials: 'include'
+        });
+        // Update local state
+        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
+      } catch (err) {
+        console.error('Error marking individual notification as read:', err);
+      }
+    }
+
+    // 2. Route based on type
+    setNotificationOpen(false);
+    
+    if (notif.type === 'order') {
+      router.push('/orders');
+    } else if (notif.type === 'inventory') {
+      router.push('/seller/dashboard');
+    } else if (notif.type === 'system' || notif.title.includes('Cart')) {
+      router.push('/cart');
+    } else if (notif.metadata?.productId) {
+      router.push(`/product/${notif.metadata.productId}`);
+    }
+  };
+
   // Live Search Logic
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -356,10 +385,7 @@ export default function Navbar() {
                 <div className="notification-container" ref={notificationRef}>
                   <button
                     className="notification-trigger"
-                    onClick={() => {
-                      setNotificationOpen(!notificationOpen);
-                      if (!notificationOpen) handleMarkAsRead();
-                    }}
+                    onClick={() => setNotificationOpen(!notificationOpen)}
                     title="Notifications"
                   >
                     <Bell size={24} />
@@ -375,9 +401,6 @@ export default function Navbar() {
                       <div className="notification-header">
                         <div className="header-info">
                           <h3>Notifications</h3>
-                          <span className="unread-count">
-                            {notifications.filter(n => !n.isRead).length} New
-                          </span>
                         </div>
                         <span className="mark-all-read-link" onClick={handleMarkAsRead}>
                           Mark all as read

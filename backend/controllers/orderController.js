@@ -49,13 +49,17 @@ exports.createOrder = async (req, res) => {
     // ... (rest of the notification logic remains same)
     try {
       const firstItem = items[0];
-      const productForImage = await Product.findByPk(firstItem.id, {
-        include: [{ model: ProductImage, as: 'images', limit: 1 }]
+      const productWithImages = await Product.findByPk(firstItem.id, {
+        include: [{ model: ProductImage, as: 'images' }]
       });
 
       let imageUrl = null;
-      if (productForImage && productForImage.images && productForImage.images.length > 0) {
-        imageUrl = productForImage.images[0].url;
+      if (productWithImages && productWithImages.images) {
+        // Try to find image matching the selected color
+        const colorMatch = productWithImages.images.find(img => 
+          img.color && img.color.toLowerCase() === firstItem.color?.toLowerCase()
+        );
+        imageUrl = colorMatch ? colorMatch.url : productWithImages.images[0]?.url;
       }
 
       await Notification.create({
@@ -116,7 +120,8 @@ exports.createOrder = async (req, res) => {
           actorId: req.user.id,
           metadata: {
             imageUrl: imageUrl || '/placeholder.png',
-            orderId: order.id
+            orderId: order.id,
+            color: items[0]?.color
           }
         });
       }
@@ -265,10 +270,19 @@ exports.updateOrderStatus = async (req, res) => {
     try {
       const firstItem = await OrderItem.findOne({
         where: { orderId: order.id },
-        include: [{ model: Product, include: [{ model: ProductImage, as: 'images', limit: 1 }] }]
+        include: [{ 
+          model: Product, 
+          include: [{ model: ProductImage, as: 'images' }] 
+        }]
       });
 
-      const imageUrl = firstItem?.Product?.images?.[0]?.url;
+      let imageUrl = firstItem?.Product?.images?.[0]?.url;
+      if (firstItem?.Product?.images && firstItem.color) {
+        const colorMatch = firstItem.Product.images.find(img => 
+          img.color && img.color.toLowerCase() === firstItem.color.toLowerCase()
+        );
+        if (colorMatch) imageUrl = colorMatch.url;
+      }
 
       await Notification.create({
         userId: order.userId,
@@ -374,7 +388,12 @@ exports.generateInvoice = async (req, res) => {
           <tbody>
             ${order.OrderItems.map(item => `
               <tr>
-                <td><strong>${item.Product?.name}</strong><br><small>${item.size} / ${item.color}</small></td>
+                <td>
+                  <strong>${item.Product?.name}</strong><br>
+                  <div style="color: #666; font-size: 11px; margin-top: 4px;">
+                    Size: ${item.size} | Color: ${item.color}
+                  </div>
+                </td>
                 <td>${item.quantity}</td>
                 <td>₹${item.price}</td>
                 <td>₹${(item.quantity * item.price).toFixed(2)}</td>
@@ -463,15 +482,35 @@ exports.cancelOrder = async (req, res) => {
     }
 
     // 3. Create Notification for Customer
-    await Notification.create({
-      userId: order.userId,
-      role: 'customer',
-      title: 'Order Cancelled',
-      message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been cancelled and stock has been restored.`,
-      type: 'order',
-      actorId: req.user.id,
-      metadata: { orderId: order.id }
-    });
+    try {
+      const firstItem = await OrderItem.findOne({
+        where: { orderId: order.id },
+        include: [{ model: Product, include: [{ model: ProductImage, as: 'images' }] }]
+      });
+
+      let imageUrl = firstItem?.Product?.images?.[0]?.url;
+      if (firstItem?.Product?.images && firstItem.color) {
+        const colorMatch = firstItem.Product.images.find(img => 
+          img.color && img.color.toLowerCase() === firstItem.color.toLowerCase()
+        );
+        if (colorMatch) imageUrl = colorMatch.url;
+      }
+
+      await Notification.create({
+        userId: order.userId,
+        role: 'customer',
+        title: 'Order Cancelled',
+        message: `Your order #${order.id.toString().slice(-8).toUpperCase()} has been cancelled and stock has been restored.`,
+        type: 'order',
+        actorId: req.user.id,
+        metadata: { 
+          orderId: order.id,
+          imageUrl: imageUrl || '/placeholder.png'
+        }
+      });
+    } catch (notifErr) {
+      console.error('Failed to create cancellation notification:', notifErr);
+    }
 
     // 4. Create Notification for Seller(s)
     const sellerIds = new Set();

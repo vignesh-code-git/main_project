@@ -9,6 +9,7 @@ import { API_BASE_URL } from '@/config/api';
 import { useDispatch } from 'react-redux';
 import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
+import SuccessModal from '@/components/SuccessModal/SuccessModal';
 import './orders-page.css';
 
 export default function OrdersPage() {
@@ -49,6 +50,10 @@ export default function OrdersPage() {
     }
   };
 
+  // Success Modal State
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [successData, setSuccessData] = useState({ title: '', message: '' });
+
   const handleBuyAgain = async (item) => {
     try {
       await dispatch(addItemToCart({
@@ -57,7 +62,12 @@ export default function OrdersPage() {
         size: item.size || 'M',
         color: item.color || 'Black'
       })).unwrap();
-      alert(`${item.Product.name} added to cart!`);
+      
+      setSuccessData({
+        title: 'Added to Cart',
+        message: `${item.Product.name} has been successfully added to your shopping cart.`
+      });
+      setIsSuccessOpen(true);
     } catch (err) {
       console.error('Failed to add item to cart:', err);
     }
@@ -236,6 +246,14 @@ export default function OrdersPage() {
           : "Are you sure you want to cancel this order? This action will restore the product stock and cannot be undone."}
         confirmText={isSuccessModal ? "Close" : "Yes, Cancel Order"}
         cancelText={isSuccessModal ? "" : "No, Keep Order"}
+      />
+
+      <SuccessModal
+        isOpen={isSuccessOpen}
+        onClose={() => setIsSuccessOpen(false)}
+        title={successData.title}
+        message={successData.message}
+        onAction={() => router.push('/cart')}
       />
     </div>
   );

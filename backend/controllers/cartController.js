@@ -51,9 +51,19 @@ exports.addToCart = async (req, res) => {
     // Create Notification
     try {
       const product = await Product.findByPk(productId, {
-        include: [{ model: ProductImage, as: 'images', limit: 1 }]
+        include: [{ model: ProductImage, as: 'images' }]
       });
       if (product) {
+        let imageUrl = product.images?.[0]?.url;
+        
+        // Try to find image matching the selected color
+        if (product.images && color) {
+          const colorMatch = product.images.find(img => 
+            img.color && img.color.toLowerCase() === color.toLowerCase()
+          );
+          if (colorMatch) imageUrl = colorMatch.url;
+        }
+
         const { Notification } = require('../models/associations');
         await Notification.create({
           userId: req.user.id,
@@ -63,8 +73,9 @@ exports.addToCart = async (req, res) => {
           type: 'system',
           actorId: req.user.id,
           metadata: {
-            imageUrl: product.images?.[0]?.url,
-            productId: product.id
+            imageUrl: imageUrl || '/placeholder.png',
+            productId: product.id,
+            color: color
           }
         });
       }
