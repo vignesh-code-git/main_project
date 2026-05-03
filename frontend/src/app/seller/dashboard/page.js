@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check } from 'lucide-react';
+import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check, Star } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { API_BASE_URL } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
@@ -22,6 +22,10 @@ export default function SellerDashboard() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [statsData, setStatsData] = useState({ revenue: 0, orders: 0, products: 0, customers: 0 });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, productId: null });
+  
+  // New States for Returns & Feedback
+  const [returns, setReturns] = useState([]);
+  const [feedback, setFeedback] = useState([]);
   
   // Onboarding State
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -51,8 +55,13 @@ export default function SellerDashboard() {
       fetchSellerProducts(user.id);
       fetchSellerOrders(user.id);
       fetchDashboardStats();
+
+      if (activeTab === 'support') {
+        fetchSellerReturns(user.id);
+        fetchSellerFeedback(user.id);
+      }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, activeTab]);
 
   const fetchDashboardStats = async () => {
     try {
@@ -89,6 +98,30 @@ export default function SellerDashboard() {
       console.error("Failed to fetch orders:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSellerReturns = async (sellerId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}/returns`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setReturns(data);
+    } catch (err) {
+      console.error("Failed to fetch returns:", err);
+    }
+  };
+
+  const fetchSellerFeedback = async (sellerId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}/feedback`, {
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setFeedback(data);
+    } catch (err) {
+      console.error("Failed to fetch feedback:", err);
     }
   };
 
@@ -262,6 +295,12 @@ export default function SellerDashboard() {
             >
               Recent Orders
             </button>
+            <button
+              className={activeTab === 'support' ? 'active' : ''}
+              onClick={() => setActiveTab('support')}
+            >
+              Returns & Feedback
+            </button>
           </div>
 
           {activeTab === 'inventory' && (
@@ -385,6 +424,66 @@ export default function SellerDashboard() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'support' && (
+            <div className="support-section">
+              <div className="support-header-v2">
+                <h2>Customer Support</h2>
+                <p>Manage return requests and view delivery feedback</p>
+              </div>
+              <div className="support-grid">
+                <div className="support-card">
+                  <div className="card-header-v2">
+                    <h3>Recent Return Requests</h3>
+                    <span className="count-badge">{returns.length}</span>
+                  </div>
+                  <div className="support-list">
+                    {returns.length > 0 ? returns.map((ret) => (
+                      <div key={ret.id} className="support-item">
+                        <div className="item-main">
+                          <div className="item-user">
+                            <strong>{ret.User?.name}</strong>
+                            <span className={`status-pill-small ${ret.status.toLowerCase()}`}>{ret.status}</span>
+                          </div>
+                          <p className="item-reason">Reason: {ret.reason}</p>
+                          {ret.comment && <p className="item-comment">"{ret.comment}"</p>}
+                          <div className="item-order-ref">Order #{ret.orderId.toString().slice(-8).toUpperCase()}</div>
+                        </div>
+                        <div className="item-date">{new Date(ret.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    )) : <p className="empty-msg">No return requests yet.</p>}
+                  </div>
+                </div>
+
+                <div className="support-card">
+                  <div className="card-header-v2">
+                    <h3>Delivery Feedback</h3>
+                    <span className="count-badge">{feedback.length}</span>
+                  </div>
+                  <div className="support-list">
+                    {feedback.length > 0 ? feedback.map((fb) => (
+                      <div key={fb.id} className="support-item">
+                        <div className="item-main">
+                          <div className="item-user">
+                            <strong>{fb.User?.name}</strong>
+                            <div className="star-rating-mini">
+                              {[1, 2, 3, 4, 5].map(s => (
+                                <Star key={s} size={12} fill={s <= fb.rating ? "#FFC107" : "transparent"} color={s <= fb.rating ? "#FFC107" : "#DDD"} />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="item-behavior">Courier: {fb.courierBehavior}</p>
+                          {fb.comment && <p className="item-comment">"{fb.comment}"</p>}
+                          <div className="item-order-ref">Order #{fb.orderId.toString().slice(-8).toUpperCase()}</div>
+                        </div>
+                        <div className="item-date">{new Date(fb.createdAt).toLocaleDateString()}</div>
+                      </div>
+                    )) : <p className="empty-msg">No feedback received yet.</p>}
+                  </div>
+                </div>
               </div>
             </div>
           )}

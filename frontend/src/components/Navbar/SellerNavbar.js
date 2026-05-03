@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-  Search
+  Search,
+  Store
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -38,6 +39,7 @@ export default function SellerNavbar() {
     { name: 'Overview', href: '/seller/dashboard', icon: LayoutDashboard, title: 'SELLER DASHBOARD' },
     { name: 'Add Product', href: '/seller/add-product', icon: PlusCircle, title: 'ADD NEW PRODUCT' },
     { name: 'Performance', href: '/seller/stats', icon: BarChart3, title: 'PERFORMANCE STATS' },
+    { name: 'Store', href: '/seller/store', icon: Store, title: 'MY STORE' },
   ];
 
   if (!mounted) return null;

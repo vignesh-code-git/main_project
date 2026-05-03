@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import SuccessModal from '@/components/SuccessModal/SuccessModal';
+import OrderActionModal from '@/components/OrderActionModal/OrderActionModal';
 import './orders-page.css';
 
 export default function OrdersPage() {
@@ -30,12 +31,14 @@ export default function OrdersPage() {
   }, []);
 
   useEffect(() => {
-    if (mounted && isAuthenticated && user) {
-      fetchOrders();
-    } else if (mounted && !isAuthenticated) {
-      setLoading(false);
+    if (mounted) {
+      if (isAuthenticated && user?.id) {
+        fetchOrders();
+      } else if (!isAuthenticated) {
+        setLoading(false);
+      }
     }
-  }, [mounted, isAuthenticated, user]);
+  }, [mounted, isAuthenticated, user?.id]);
 
   const fetchOrders = async () => {
     try {
@@ -53,6 +56,11 @@ export default function OrdersPage() {
   // Success Modal State
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [successData, setSuccessData] = useState({ title: '', message: '' });
+
+  // Action Modal State
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [actionModalType, setActionModalType] = useState('');
+  const [activeOrder, setActiveOrder] = useState(null);
 
   const handleBuyAgain = async (item) => {
     try {
@@ -100,8 +108,10 @@ export default function OrdersPage() {
     window.open(`${API_BASE_URL}/api/orders/${order.id}/invoice`, '_blank');
   };
 
-  const handleGenericAction = (action) => {
-    alert(`${action} feature coming soon!`);
+  const handleAction = (type, order) => {
+    setActionModalType(type);
+    setActiveOrder(order);
+    setIsActionModalOpen(true);
   };
 
   if (loading) {
@@ -220,13 +230,13 @@ export default function OrdersPage() {
 
                 <div className="body-right">
                   <div className="action-buttons">
-                    <button className="primary-action-btn" onClick={() => window.location.href = `/track-order/${order.id}`}>Track package</button>
+                    <button className="primary-action-btn" onClick={() => router.push(`/track-order/${order.id}`)}>Track package</button>
                     {['Pending', 'Processing', 'Placed'].includes(order.status) && (
                       <button className="secondary-action-btn cancel-btn-red" onClick={() => handleCancelOrder(order.id)}>Cancel order</button>
                     )}
-                    <button className="secondary-action-btn" onClick={() => handleGenericAction('Returns')}>Return or replace items</button>
-                    <button className="secondary-action-btn" onClick={() => handleGenericAction('Feedback')}>Leave delivery feedback</button>
-                    <button className="secondary-action-btn" onClick={() => handleGenericAction('Reviews')}>Write a product review</button>
+                    <button className="secondary-action-btn" onClick={() => handleAction('Return', order)}>Return or replace items</button>
+                    <button className="secondary-action-btn" onClick={() => handleAction('Feedback', order)}>Leave delivery feedback</button>
+                    <button className="secondary-action-btn" onClick={() => handleAction('Reviews', order)}>Write a product review</button>
                   </div>
                 </div>
               </div>
@@ -234,6 +244,14 @@ export default function OrdersPage() {
           ))}
         </div>
       )}
+
+      {/* Action Modal */}
+      <OrderActionModal 
+        isOpen={isActionModalOpen}
+        onClose={() => setIsActionModalOpen(false)}
+        type={actionModalType}
+        order={activeOrder}
+      />
 
       {/* Professional Cancellation Modal */}
       <ConfirmModal

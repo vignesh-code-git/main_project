@@ -365,8 +365,165 @@
 
 .dropdown-overlay-fixed {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 40;
+}
+
+/* Support Section Styles */
+.support-section {
+  padding: 20px 0;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.support-header-v2 {
+  margin-bottom: 24px;
+}
+
+.support-header-v2 h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #000;
+  margin-bottom: 4px;
+}
+
+.support-header-v2 p {
+  font-size: 14px;
+  color: #666;
+}
+
+.support-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.support-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+}
+
+.card-header-v2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.card-header-v2 h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #000;
+}
+
+.count-badge {
+  background: #000;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.support-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.support-item {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.support-item:hover {
+  border-color: #000;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.item-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.item-user strong {
+  font-size: 14px;
+  color: #000;
+}
+
+.status-pill-small {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.status-pill-small.pending { background: #FEF3C7; color: #92400E; }
+.status-pill-small.approved { background: #DCFCE7; color: #166534; }
+.status-pill-small.rejected { background: #FEE2E2; color: #991B1B; }
+
+.item-reason, .item-behavior {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.item-comment {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.item-order-ref {
+  font-size: 11px;
+  font-family: monospace;
+  color: #999;
+  font-weight: 600;
+}
+
+.item-date {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 8px;
+  text-align: right;
+}
+
+.star-rating-mini {
+  display: flex;
+  gap: 2px;
+}
+
+.empty-msg {
+  text-align: center;
+  color: #999;
+  padding: 40px 0;
+  font-size: 14px;
+}
+
+@media (max-width: 992px) {
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Mini Item List */

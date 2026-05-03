@@ -10,6 +10,8 @@ const Address = require('./Address');
 const CartItem = require('./CartItem');
 const WebsiteSettings = require('./WebsiteSettings');
 const Payment = require('./Payment');
+const Return = require('./Return');
+const DeliveryFeedback = require('./DeliveryFeedback');
 
 // Define associations
 User.hasMany(Product, { foreignKey: 'sellerId' });
@@ -55,6 +57,18 @@ Payment.belongsTo(User, { foreignKey: 'userId' });
 Order.hasMany(Payment, { foreignKey: 'orderId' });
 Payment.belongsTo(Order, { foreignKey: 'orderId' });
 
+// Return Associations
+User.hasMany(Return, { foreignKey: 'userId' });
+Return.belongsTo(User, { foreignKey: 'userId' });
+Order.hasMany(Return, { foreignKey: 'orderId' });
+Return.belongsTo(Order, { foreignKey: 'orderId' });
+
+// Feedback Associations
+User.hasMany(DeliveryFeedback, { foreignKey: 'userId' });
+DeliveryFeedback.belongsTo(User, { foreignKey: 'userId' });
+Order.hasMany(DeliveryFeedback, { foreignKey: 'orderId' });
+DeliveryFeedback.belongsTo(Order, { foreignKey: 'orderId' });
+
 module.exports = {
   User,
   Product,
@@ -67,5 +81,7 @@ module.exports = {
   Address,
   CartItem,
   WebsiteSettings,
-  Payment
+  Payment,
+  Return,
+  DeliveryFeedback
 };

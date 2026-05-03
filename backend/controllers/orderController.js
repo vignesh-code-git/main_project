@@ -539,3 +539,133 @@ exports.cancelOrder = async (req, res) => {
     res.status(500).json({ message: 'Error cancelling order' });
   }
 };
+
+const { Return, DeliveryFeedback } = require('../models/associations');
+
+exports.createReturn = async (req, res) => {
+  try {
+    const { orderId, itemIds, reason, comment } = req.body;
+    const returnRequest = await Return.create({
+      orderId,
+      userId: req.user.id,
+      itemIds: itemIds.join(','),
+      reason,
+      comment
+    });
+
+    // Notify Seller
+    const order = await Order.findByPk(orderId, { include: [OrderItem] });
+    const sellerIds = new Set();
+    for (const item of order.OrderItems) {
+      const product = await Product.findByPk(item.productId);
+      if (product && product.sellerId) sellerIds.add(product.sellerId);
+    }
+
+    for (const sId of sellerIds) {
+      await Notification.create({
+        userId: sId,
+        role: 'seller',
+        title: 'New Return Request',
+        message: `A customer has requested a return for order #${orderId.toString().slice(-8).toUpperCase()}.`,
+        type: 'order',
+        actorId: req.user.id,
+        metadata: { orderId, returnId: returnRequest.id }
+      });
+    }
+
+    res.status(201).json({ message: 'Return request submitted successfully', returnRequest });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error submitting return request' });
+  }
+};
+
+exports.createFeedback = async (req, res) => {
+  try {
+    const { orderId, rating, courierBehavior, comment } = req.body;
+    const feedback = await DeliveryFeedback.create({
+      orderId,
+      userId: req.user.id,
+      rating,
+      courierBehavior,
+      comment
+    });
+
+    res.status(201).json({ message: 'Feedback submitted successfully', feedback });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error submitting feedback' });
+  }
+};
+
+exports.getSellerReturns = async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+    
+    // 1. Find all orders that contain products from this seller
+    const sellerOrderItems = await OrderItem.findAll({
+      include: [{
+        model: Product,
+        where: { sellerId },
+        required: true
+      }]
+    });
+    
+    const orderIds = [...new Set(sellerOrderItems.map(item => item.orderId))];
+    
+    if (orderIds.length === 0) {
+      return res.json([]);
+    }
+
+    // 2. Fetch returns for these orders
+    const returns = await Return.findAll({
+      where: { orderId: orderIds },
+      include: [
+        { model: Order },
+        { model: User }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json(returns);
+  } catch (error) {
+    console.error('getSellerReturns Error:', error);
+    res.status(500).json({ message: 'Error fetching returns' });
+  }
+};
+
+exports.getSellerFeedback = async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+    
+    // 1. Find all orders that contain products from this seller
+    const sellerOrderItems = await OrderItem.findAll({
+      include: [{
+        model: Product,
+        where: { sellerId },
+        required: true
+      }]
+    });
+    
+    const orderIds = [...new Set(sellerOrderItems.map(item => item.orderId))];
+    
+    if (orderIds.length === 0) {
+      return res.json([]);
+    }
+
+    // 2. Fetch feedback for these orders
+    const feedback = await DeliveryFeedback.findAll({
+      where: { orderId: orderIds },
+      include: [
+        { model: Order },
+        { model: User }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json(feedback);
+  } catch (error) {
+    console.error('getSellerFeedback Error:', error);
+    res.status(500).json({ message: 'Error fetching feedback' });
+  }
+};
