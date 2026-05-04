@@ -11,7 +11,7 @@ export default function Hero() {
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
-  const frameCount = 240;
+  const frameCount = 120;
 
   const containerRef = useRef(null);
   const heroContentRef = useRef(null);
@@ -122,8 +122,12 @@ export default function Hero() {
     const smoothAnimate = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
 
+      // If we are at the very end or start, snap faster to prevent "lagging" behind the scroll
+      const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
+      const lerpFactor = isNearEnd ? 0.4 : 0.15;
+
       if (Math.abs(diff) > 0.05) {
-        currentFrameRef.current += diff * 0.15;
+        currentFrameRef.current += diff * lerpFactor;
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
       } else {
@@ -134,11 +138,35 @@ export default function Hero() {
     };
 
     const handleScroll = () => {
-      const { totalScrollHeight } = layoutMetrics.current;
-      if (totalScrollHeight <= 0) return;
-
+      if (!containerRef.current) return;
+      
+      const container = containerRef.current;
+      const stickyTop = 110; 
+      
+      // Calculate the scroll point where the hero section becomes sticky
+      const startPoint = container.offsetTop - stickyTop;
+      // Calculate the total distance the user scrolls while the hero is sticky
+      const totalStickySpace = container.offsetHeight - (window.innerHeight - stickyTop);
+      
       const currentScroll = window.scrollY;
-      const scrollFraction = Math.max(0, Math.min(currentScroll / totalScrollHeight, 1));
+      const scrolledDistance = currentScroll - startPoint;
+
+      // BUFFER: Reach frame 120 early (at 90% of the scroll)
+      const bufferPercent = 0.90;
+      const animationRange = totalStickySpace * bufferPercent;
+      
+      if (scrolledDistance >= animationRange) {
+        targetFrameRef.current = frameCount;
+        currentFrameRef.current = frameCount;
+        updateCanvas(frameCount);
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        return;
+      }
+
+      const scrollFraction = Math.max(0, Math.min(scrolledDistance / animationRange, 1));
       const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
 
       targetFrameRef.current = frameIndex;
@@ -193,16 +221,6 @@ export default function Hero() {
               Browse through our diverse range of meticulously crafted garments, designed <br />
               to bring out your individuality and cater to your sense of style.
             </p>
-
-
-
-
-
-
-
-
-
-
             <button className="shop-now-btn">Shop Now</button>
 
             <div className="hero-stats">
@@ -239,4 +257,3 @@ export default function Hero() {
     </div>
   );
 }
-
