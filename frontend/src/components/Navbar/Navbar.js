@@ -292,6 +292,26 @@ export default function Navbar() {
             <li className="mobile-link-item">
               <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
             </li>
+
+            {/* Mobile-only: Become a Seller / Dashboard link */}
+            {mounted && (
+              <li className="mobile-link-item">
+                {user && user.role === 'admin' ? (
+                  <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    Admin Panel
+                  </Link>
+                ) : user && user.role === 'seller' ? (
+                  <Link href="/seller/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    Seller Panel
+                  </Link>
+                ) : (
+                  <Link href="/seller/auth" onClick={() => setMobileMenuOpen(false)}>
+                    Become a Seller
+                  </Link>
+                )}
+              </li>
+            )}
+
             <li className="mobile-link-item">
               <Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
             </li>
@@ -555,7 +575,7 @@ export default function Navbar() {
                 </Link>
               )}
             </div>
-            {renderAuthLinks()}
+            <div className="desktop-only">{renderAuthLinks()}</div>
           </div>
         </div>
       ) : (
