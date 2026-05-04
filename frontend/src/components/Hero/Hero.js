@@ -8,9 +8,6 @@ import './Hero.css';
 export default function Hero() {
   const [stats, setStats] = useState({ brands: '0+', products: '0+', customers: '0+' });
   const [loading, setLoading] = useState(true);
-  const [preloading, setPreloading] = useState(true);
-  const [overlayVisible, setOverlayVisible] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
@@ -28,7 +25,6 @@ export default function Hero() {
     }
 
     const preloadImages = async () => {
-      let loadedCount = 0;
       const batchSize = 10; // Load in small batches to not choke the network
 
       for (let i = 1; i <= frameCount; i += batchSize) {
@@ -37,11 +33,7 @@ export default function Hero() {
           const frameNum = String(i + j).padStart(3, '0');
           const img = new Image();
           const promise = new Promise((resolve) => {
-            img.onload = () => {
-              loadedCount++;
-              setLoadProgress(Math.floor((loadedCount / frameCount) * 100));
-              resolve();
-            };
+            img.onload = resolve;
             img.onerror = resolve; // Continue even if one fails
             img.src = `/images/hero-animation/ezgif-frame-${frameNum}.png`;
           });
@@ -49,12 +41,10 @@ export default function Hero() {
           promises.push(promise);
         }
         await Promise.all(promises);
+        
+        // Draw first frame as soon as batch 1 is ready
+        if (i === 1) updateCanvas(1);
       }
-      setPreloading(false);
-      // Ensure the first frame is drawn immediately after preloading
-      updateCanvas(1);
-      // Allow for a smooth fade out
-      setTimeout(() => setOverlayVisible(false), 500);
     };
 
     preloadImages();
@@ -97,7 +87,6 @@ export default function Hero() {
 
       if (img && img.complete) {
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
-        const dpr = window.devicePixelRatio || 1;
 
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
           offscreen.width = canvasWidth;
@@ -210,14 +199,6 @@ export default function Hero() {
 
   return (
     <div className="hero-sticky-wrapper" ref={containerRef}>
-      {overlayVisible && (
-        <div className={`hero-loading-overlay ${!preloading ? 'fade-out' : ''}`}>
-          <div className="loader-content">
-            <div className="spinner"></div>
-            <p>Loading Experience {loadProgress}%</p>
-          </div>
-        </div>
-      )}
       <section className="hero">
         <div className="container hero-container">
           <div className="hero-content" ref={heroContentRef}>
