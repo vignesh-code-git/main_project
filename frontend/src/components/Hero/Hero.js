@@ -24,26 +24,15 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    const preloadImages = async () => {
-      const batchSize = 10; // Load in small batches to not choke the network
-
-      for (let i = 1; i <= frameCount; i += batchSize) {
-        const promises = [];
-        for (let j = 0; j < batchSize && (i + j) <= frameCount; j++) {
-          const frameNum = String(i + j).padStart(3, '0');
-          const img = new Image();
-          const promise = new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve; // Continue even if one fails
-            img.src = `/images/hero-animation/ezgif-frame-${frameNum}.png`;
-          });
-          imagesRef.current[i + j] = img;
-          promises.push(promise);
-        }
-        await Promise.all(promises);
-        
-        // Draw first frame as soon as batch 1 is ready
-        if (i === 1) updateCanvas(1);
+    const preloadImages = () => {
+      for (let i = 1; i <= frameCount; i++) {
+        const frameNum = String(i).padStart(3, '0');
+        const img = new Image();
+        img.src = `/images/hero-animation/ezgif-frame-${frameNum}.png`;
+        img.onload = () => {
+          if (i === 1) updateCanvas(1);
+        };
+        imagesRef.current[i] = img;
       }
     };
 
@@ -85,7 +74,9 @@ export default function Hero() {
       const offContext = offscreen.getContext('2d', { alpha: false });
       const img = imagesRef.current[index];
 
-      if (img && img.complete) {
+      // CRITICAL: Only draw if the image is actually loaded.
+      // If not, we do NOTHING (keep the previous frame) to avoid flickering.
+      if (img && img.complete && img.naturalWidth !== 0) {
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
 
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
@@ -125,11 +116,6 @@ export default function Hero() {
 
         // Final swap to visible canvas
         context.drawImage(offscreen, 0, 0);
-      } else {
-        // Fallback: fill visible canvas with theme color if image not ready
-        const context = canvas.getContext('2d', { alpha: false });
-        context.fillStyle = '#F2F0F1';
-        context.fillRect(0, 0, canvas.width, canvas.height);
       }
     };
 
