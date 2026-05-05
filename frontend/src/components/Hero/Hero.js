@@ -175,9 +175,9 @@ export default function Hero() {
     const smoothAnimate = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
 
-      // If we are at the very end or start, snap faster to prevent "lagging" behind the scroll
-      const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
-      const lerpFactor = isNearEnd ? 0.4 : 0.15;
+      // Increased inertia for "buttery" feel (lower = smoother)
+      const isNearEnd = targetFrameRef.current > frameCount * 0.99 || targetFrameRef.current < 1.1;
+      const lerpFactor = isNearEnd ? 0.3 : 0.08;
 
       if (Math.abs(diff) > 0.05) {
         currentFrameRef.current += diff * lerpFactor;
@@ -294,9 +294,11 @@ export default function Hero() {
       }
 
       const scrollFraction = Math.max(0, Math.min(activeImageDistance / animationBuffer, 1));
-      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
+      
+      // Use floating point target for sub-frame interpolation smoothness
+      const targetFrameFloat = scrollFraction * (frameCount - 1) + 1;
 
-      targetFrameRef.current = frameIndex;
+      targetFrameRef.current = targetFrameFloat;
       if (!animationFrameRef.current) {
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
       }
