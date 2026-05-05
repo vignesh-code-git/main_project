@@ -10,6 +10,7 @@ export default function Hero() {
   const [loading, setLoading] = useState(true);
   const [preloading, setPreloading] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0); // 0: VIBE, 1: LOOK, 2: STYLE
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
@@ -17,6 +18,7 @@ export default function Hero() {
 
   const containerRef = useRef(null);
   const heroContentRef = useRef(null);
+  const isLockedRef = useRef(true);
   const layoutMetrics = useRef({ totalScrollHeight: 0, canvasWidth: 0, canvasHeight: 0 });
 
   // Preload images
@@ -49,6 +51,10 @@ export default function Hero() {
       setFadeOut(true);
       setTimeout(() => {
         setPreloading(false);
+        // Unlock scroll interaction after text animations finish (approx 1.5s after reveal)
+        setTimeout(() => {
+          isLockedRef.current = false;
+        }, 1500);
       }, 1200);
 
       // Phase 2: Smooth Start
@@ -189,22 +195,32 @@ export default function Hero() {
       const container = containerRef.current;
       const stickyTop = 110;
 
-      // Calculate the scroll point where the hero section becomes sticky
       const startPoint = container.offsetTop - stickyTop;
-      // Calculate the total distance the user scrolls while the hero is sticky
       const totalStickySpace = container.offsetHeight - (window.innerHeight - stickyTop);
 
       const currentScroll = window.scrollY;
-      const scrolledDistance = currentScroll - startPoint;
+      const scrolledDistance = Math.max(0, currentScroll - startPoint);
 
-      // BUFFER: Reach frame 140 early (at 90% of the scroll)
-      const bufferPercent = 0.90;
-      const animationRange = totalStickySpace * bufferPercent;
+      // --- PHASE 1: TEXT NARRATIVE (0% - 30% of scroll) ---
+      const textZoneRatio = 0.30; 
+      const textZoneLimit = totalStickySpace * textZoneRatio;
 
-      if (scrolledDistance >= animationRange) {
-        targetFrameRef.current = frameCount;
-        currentFrameRef.current = frameCount;
-        updateCanvas(frameCount);
+      if (scrolledDistance <= textZoneLimit) {
+        // Precise 3-way split for the text narrative
+        let newWordIndex = 0;
+        const textProgress = scrolledDistance / textZoneLimit;
+        
+        if (textProgress < 0.33) newWordIndex = 0;
+        else if (textProgress < 0.66) newWordIndex = 1;
+        else newWordIndex = 2;
+
+        setWordIndex(prev => prev !== newWordIndex ? newWordIndex : prev);
+
+        // HARD LOCK: Image stays at Frame 1
+        targetFrameRef.current = 1;
+        currentFrameRef.current = 1;
+        updateCanvas(1);
+        
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
@@ -212,7 +228,35 @@ export default function Hero() {
         return;
       }
 
-      const scrollFraction = Math.max(0, Math.min(scrolledDistance / animationRange, 1));
+      // --- PHASE 2: IMAGE REVEAL (30% - 100% of scroll) ---
+      setWordIndex(prev => prev !== 2 ? 2 : prev);
+
+      const imageScrolledDistance = scrolledDistance - textZoneLimit;
+      const imageZoneSpace = totalStickySpace * (1 - textZoneRatio);
+      
+      // Reserve 5% as a hold at the start of Phase 2
+      const midBuffer = imageZoneSpace * 0.05;
+      
+      if (imageScrolledDistance <= midBuffer) {
+        targetFrameRef.current = 1;
+        updateCanvas(1);
+        return;
+      }
+
+      const activeImageDistance = imageScrolledDistance - midBuffer;
+      const activeImageRange = imageZoneSpace - midBuffer;
+      
+      // Last 5% hold for the final frame
+      const animationBuffer = activeImageRange * 0.95;
+
+      if (activeImageDistance >= animationBuffer) {
+        targetFrameRef.current = frameCount;
+        currentFrameRef.current = frameCount;
+        updateCanvas(frameCount);
+        return;
+      }
+
+      const scrollFraction = Math.max(0, Math.min(activeImageDistance / animationBuffer, 1));
       const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
 
       targetFrameRef.current = frameIndex;
@@ -249,6 +293,7 @@ export default function Hero() {
 
     // Initial setup
     handleResize();
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -266,14 +311,23 @@ export default function Hero() {
       <section className="hero">
         <div className="container hero-container">
           <div className="hero-content" ref={heroContentRef}>
-            <h1 className="hero-title">FIND CLOTHES <span className="hide-mobile"><br /></span>THAT MATCHES <span className="hide-mobile"><br /></span>YOUR STYLE</h1>
-            <p className="hero-description">
+            <h1 className="hero-title animate-text">
+              FIND CLOTHES <br />THAT MATCHES <br />YOUR{' '}
+              <span className="word-flipper-container">
+                <span className="word-flipper" style={{ transform: `translateY(-${wordIndex * 1.1}em)` }}>
+                  <span className="text-vibe">VIBE</span>
+                  <span className="text-look">LOOK</span>
+                  <span className="text-style">STYLE</span>
+                </span>
+              </span>
+            </h1>
+            <p className="hero-description animate-text">
               Browse through our diverse range of meticulously crafted garments, designed <br />
               to bring out your individuality and cater to your sense of style.
             </p>
-            <button className="shop-now-btn">Shop Now</button>
+            <button className="shop-now-btn animate-text">Shop Now</button>
 
-            <div className="hero-stats">
+            <div className="hero-stats animate-text">
               <div className="stat-item">
                 {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.brands}</h2>}
                 <p>International Brands</p>

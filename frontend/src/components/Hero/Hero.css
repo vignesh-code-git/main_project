@@ -26,7 +26,6 @@
 .hero-content {
   width: 65%;
   padding: 80px 0;
-  /* Reduced top padding to move content higher */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -96,6 +95,92 @@
   background: rgba(0, 0, 0, 0.1);
 }
 
+.word-flipper-container {
+  display: inline-block;
+  vertical-align: baseline;
+  height: 1.1em;
+  overflow: hidden;
+  position: relative;
+  top: 0.2em;
+  /* Nudged down again */
+  text-align: left;
+}
+
+.word-flipper {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.word-flipper span {
+  display: block;
+  height: 1.1em;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+/* Premium Gradients */
+.text-vibe {
+  background: linear-gradient(to right, #1D4ED8, #FF0000);
+  /* Deep Royal Blue to Red */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.text-look {
+  background: linear-gradient(to right, #C2410C, #F12711, #4B0082);
+  /* Rich Orange -> Red -> Purple */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.text-style {
+  background: linear-gradient(to right, #1D4ED8, #00E5FF);
+  /* Deep Royal Blue to Cyan */
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Deep Crimson */
+
+/* Entry Animations */
+.animate-text {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: textReveal 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+.hero-title {
+  animation-delay: 0.1s;
+  display: block;
+  /* Removed flex to fix spacing gap */
+}
+
+.hero-description {
+  animation-delay: 0.3s;
+}
+
+.shop-now-btn {
+  animation-delay: 0.5s;
+}
+
+.hero-stats {
+  animation-delay: 0.7s;
+}
+
+@keyframes textReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 100% Precision Image Positioning - FINAL */
 .hero-image-wrapper {
   position: absolute;
@@ -106,6 +191,14 @@
   z-index: 1;
   /* Moved behind the text */
   display: flex;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 
@@ -186,8 +279,24 @@
     font-size: 28px !important;
     margin-bottom: 16px !important;
     padding: 0 20px;
-    line-height: 1.1;
+    line-height: 1.2;
     text-align: left;
+    display: block !important;
+  }
+
+  .word-flipper-container {
+    height: 1.2em;
+    margin-left: 0;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    top: 0.1em;
+    /* Slight adjustment for better visual baseline on mobile */
+  }
+
+  .word-flipper span {
+    font-size: 28px !important;
+    line-height: 1.2;
   }
 
   .hero-description {
@@ -298,11 +407,14 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(209, 207, 208, 0.6); /* Soft Stone Grey with Transparency */
-  backdrop-filter: blur(20px); /* Frosted Glass Effect */
+  background: rgba(209, 207, 208, 0.6);
+  /* Soft Stone Grey with Transparency */
+  backdrop-filter: blur(20px);
+  /* Frosted Glass Effect */
   -webkit-backdrop-filter: blur(20px);
   z-index: 9999;
-  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1); /* Synced to your 1200ms timeout */
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Synced to your 1200ms timeout */
   pointer-events: none;
 }
 
