@@ -42,36 +42,35 @@ export default function Hero() {
         });
       };
 
-      // Phase 1: Instant - First frame only to show content ASAP
+      // Phase 1: Instant - First frame only
       await loadFrame(1);
-      
-      // Hide loader earlier since we have the first frame
-      setFadeOut(true);
-      setTimeout(() => setPreloading(false), 400);
 
-      // Phase 2: Smooth Start - Next 15 frames for initial scroll
+      // Hide loader early with a smooth reveal
+      setFadeOut(true);
+      setTimeout(() => {
+        setPreloading(false);
+      }, 1200);
+
+      // Phase 2: Smooth Start
       const initialBatch = [];
       for (let i = 2; i <= Math.min(15, frameCount); i++) {
         initialBatch.push(loadFrame(i));
       }
       await Promise.all(initialBatch);
 
-      // Phase 3: Rough Sequence - Every 5th frame to cover the whole scroll range
-      // This ensures if a user scrolls fast, they see a rough animation instead of static
+      // Phase 3: Rough Sequence
       const roughBatch = [];
       for (let i = 20; i <= frameCount; i += 5) {
         roughBatch.push(loadFrame(i));
       }
       await Promise.all(roughBatch);
 
-      // Phase 4: Final Polish - Fill all remaining gaps in the background
-      // We do this in smaller batches to avoid saturating the network
+      // Phase 4: Final Polish
       const remainingFrames = [];
       for (let i = 1; i <= frameCount; i++) {
         if (!imagesRef.current[i]) remainingFrames.push(i);
       }
 
-      // Load remaining in chunks of 10
       for (let i = 0; i < remainingFrames.length; i += 10) {
         const chunk = remainingFrames.slice(i, i + 10);
         await Promise.all(chunk.map(frame => loadFrame(frame)));
@@ -114,7 +113,7 @@ export default function Hero() {
 
       const context = canvas.getContext('2d', { alpha: false });
       const offContext = offscreen.getContext('2d', { alpha: false });
-      
+
       // STICKY FRAME LOGIC: Never show white space. 
       // If the frame isn't ready, find the closest one that is.
       let img = null;
@@ -186,22 +185,22 @@ export default function Hero() {
 
     const handleScroll = () => {
       if (!containerRef.current) return;
-      
+
       const container = containerRef.current;
-      const stickyTop = 110; 
-      
+      const stickyTop = 110;
+
       // Calculate the scroll point where the hero section becomes sticky
       const startPoint = container.offsetTop - stickyTop;
       // Calculate the total distance the user scrolls while the hero is sticky
       const totalStickySpace = container.offsetHeight - (window.innerHeight - stickyTop);
-      
+
       const currentScroll = window.scrollY;
       const scrolledDistance = currentScroll - startPoint;
 
       // BUFFER: Reach frame 140 early (at 90% of the scroll)
       const bufferPercent = 0.90;
       const animationRange = totalStickySpace * bufferPercent;
-      
+
       if (scrolledDistance >= animationRange) {
         targetFrameRef.current = frameCount;
         currentFrameRef.current = frameCount;
@@ -262,10 +261,6 @@ export default function Hero() {
     <div className="hero-sticky-wrapper" ref={containerRef}>
       {preloading && (
         <div className={`hero-loading-overlay ${fadeOut ? 'fade-out' : ''}`}>
-          <div className="loader-content">
-            <div className="spinner"></div>
-            <p>Experience Loading...</p>
-          </div>
         </div>
       )}
       <section className="hero">
