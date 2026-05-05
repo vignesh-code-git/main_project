@@ -52,8 +52,29 @@
 .hero-description {
   font-size: 18px;
   color: rgba(0, 0, 0, 0.6);
-  margin-bottom: 40px;
   line-height: 1.4;
+  margin: 0;
+}
+
+.hero-description-container {
+  position: relative;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.hero-description.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(10deg, #1D4ED8, #FF0000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+  z-index: 2;
+  white-space: normal;
 }
 
 .shop-now-btn {
@@ -147,6 +168,45 @@
   display: inline-block;
 }
 
+/* Shared Container Styles */
+.hero-stats-container {
+  position: relative;
+  width: fit-content;
+}
+
+.shop-now-btn {
+  background: #000;
+  color: #fff;
+  padding: 16px 64px;
+  border-radius: 62px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 48px;
+  cursor: pointer;
+  border: none;
+  width: fit-content;
+  transition: opacity 0.2s;
+}
+
+.hero-stats-container {
+  width: 100%;
+}
+
+.hero-stats.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(10deg, #1D4ED8, #FF0000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+}
+
 /* Deep Crimson */
 
 /* Entry Animations */
@@ -228,7 +288,6 @@
 }
 
 .star-large-middle {
-  font-size: 120px;
   top: 15%;
   left: 55%;
   transform: translate(-50%, -50%);
@@ -299,15 +358,27 @@
     line-height: 1.2;
   }
 
-  .hero-description {
+  .hero-description-container {
     order: 2;
-    font-size: 13px !important;
+    width: 100%;
     margin-bottom: 0 !important;
     padding: 0 20px;
+  }
+
+  .hero-description {
+    font-size: 13px !important;
     line-height: 1.5;
     color: rgba(0, 0, 0, 0.6);
     text-align: left;
     width: 100%;
+  }
+
+  .hero-description.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: calc(100% - 40px);
+    white-space: normal;
   }
 
   .hero-image-wrapper {
@@ -322,23 +393,31 @@
     z-index: 5;
   }
 
+  .hero-stats-container {
+    order: 5;
+    z-index: 10;
+    width: 100%;
+    padding: 0 20px 20px;
+  }
+
+  .hero-stats {
+    padding: 0 !important;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .hero-stats.gradient-overlay {
+    padding: 0 !important;
+    left: 20px;
+    width: calc(100% - 40px);
+  }
+
   .shop-now-btn {
     order: 4;
     width: calc(100% - 40px);
     max-width: 320px;
     padding: 14px 0;
     margin: 10px auto;
-    z-index: 10;
-  }
-
-
-  .hero-stats {
-    order: 5;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-    padding: 0 20px 20px;
     z-index: 10;
   }
 

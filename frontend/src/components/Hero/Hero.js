@@ -11,6 +11,7 @@ export default function Hero() {
   const [preloading, setPreloading] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [wordIndex, setWordIndex] = useState(0); // 0: VIBE, 1: LOOK, 2: STYLE
+  const [descProgress, setDescProgress] = useState(0); // 0 to 1 for gradient wipe
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
@@ -201,26 +202,25 @@ export default function Hero() {
       const currentScroll = window.scrollY;
       const scrolledDistance = Math.max(0, currentScroll - startPoint);
 
-      // --- PHASE 1: TEXT NARRATIVE (0% - 30% of scroll) ---
-      const textZoneRatio = 0.30; 
-      const textZoneLimit = totalStickySpace * textZoneRatio;
+      // --- PHASE 1: WORD FLIPPER (0% - 25% of scroll) ---
+      const flipperRatio = 0.25;
+      const flipperLimit = totalStickySpace * flipperRatio;
 
-      if (scrolledDistance <= textZoneLimit) {
-        // Precise 3-way split for the text narrative
+      if (scrolledDistance <= flipperLimit) {
+        const textProgress = scrolledDistance / flipperLimit;
         let newWordIndex = 0;
-        const textProgress = scrolledDistance / textZoneLimit;
-        
+
         if (textProgress < 0.33) newWordIndex = 0;
         else if (textProgress < 0.66) newWordIndex = 1;
         else newWordIndex = 2;
 
         setWordIndex(prev => prev !== newWordIndex ? newWordIndex : prev);
+        setDescProgress(0); // Reset description wipe
 
-        // HARD LOCK: Image stays at Frame 1
         targetFrameRef.current = 1;
         currentFrameRef.current = 1;
         updateCanvas(1);
-        
+
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
@@ -228,15 +228,38 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 2: IMAGE REVEAL (30% - 100% of scroll) ---
-      setWordIndex(prev => prev !== 2 ? 2 : prev);
+      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (25% - 65% of scroll) ---
+      const descRatio = 0.65;
+      const descLimit = totalStickySpace * descRatio;
 
-      const imageScrolledDistance = scrolledDistance - textZoneLimit;
-      const imageZoneSpace = totalStickySpace * (1 - textZoneRatio);
-      
-      // Reserve 5% as a hold at the start of Phase 2
+      if (scrolledDistance <= descLimit) {
+        setWordIndex(prev => prev !== 2 ? 2 : prev); // Keep STYLE
+
+        const progress = (scrolledDistance - flipperLimit) / (descLimit - flipperLimit);
+        setDescProgress(progress);
+
+        // HARD LOCK: Image stays at Frame 1 during description wipe
+        targetFrameRef.current = 1;
+        currentFrameRef.current = 1;
+        updateCanvas(1);
+
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+        return;
+      }
+
+      // --- PHASE 3: IMAGE REVEAL (65% - 100% of scroll) ---
+      setWordIndex(prev => prev !== 2 ? 2 : prev);
+      setDescProgress(1); // Full gradient
+
+      const imageScrolledDistance = scrolledDistance - descLimit;
+      const imageZoneSpace = totalStickySpace - descLimit;
+
+      // Reserve 5% as a hold at the start of Phase 3
       const midBuffer = imageZoneSpace * 0.05;
-      
+
       if (imageScrolledDistance <= midBuffer) {
         targetFrameRef.current = 1;
         updateCanvas(1);
@@ -245,7 +268,7 @@ export default function Hero() {
 
       const activeImageDistance = imageScrolledDistance - midBuffer;
       const activeImageRange = imageZoneSpace - midBuffer;
-      
+
       // Last 5% hold for the final frame
       const animationBuffer = activeImageRange * 0.95;
 
@@ -321,26 +344,57 @@ export default function Hero() {
                 </span>
               </span>
             </h1>
-            <p className="hero-description animate-text">
-              Browse through our diverse range of meticulously crafted garments, designed <br />
-              to bring out your individuality and cater to your sense of style.
-            </p>
+            <div className="hero-description-container">
+              <p className="hero-description animate-text">
+                Browse through our diverse range of meticulously crafted garments, designed <br />
+                to bring out your individuality and cater to your sense of style.
+              </p>
+              <p
+                className="hero-description gradient-overlay animate-text"
+                style={{ clipPath: `polygon(0% 0%, ${descProgress * 105}% 0%, ${descProgress * 105 - 5}% 100%, 0% 100%)` }}
+              >
+                Browse through our diverse range of meticulously crafted garments, designed <br />
+                to bring out your individuality and cater to your sense of style.
+              </p>
+            </div>
             <button className="shop-now-btn animate-text">Shop Now</button>
 
-            <div className="hero-stats animate-text">
-              <div className="stat-item">
-                {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.brands}</h2>}
-                <p>International Brands</p>
+            <div className="hero-stats-container">
+              <div className="hero-stats animate-text">
+                <div className="stat-item">
+                  {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.brands}</h2>}
+                  <p>International Brands</p>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  {loading ? <Skeleton width="120px" height="40px" /> : <h2>{stats.products}</h2>}
+                  <p>High-Quality Products</p>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.customers}</h2>}
+                  <p>Happy Customers</p>
+                </div>
               </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                {loading ? <Skeleton width="120px" height="40px" /> : <h2>{stats.products}</h2>}
-                <p>High-Quality Products</p>
-              </div>
-              <div className="stat-divider"></div>
-              <div className="stat-item">
-                {loading ? <Skeleton width="100px" height="40px" /> : <h2>{stats.customers}</h2>}
-                <p>Happy Customers</p>
+
+              <div
+                className="hero-stats gradient-overlay animate-text"
+                style={{ clipPath: `polygon(0% 0%, ${descProgress * 105}% 0%, ${descProgress * 105 - 5}% 100%, 0% 100%)` }}
+              >
+                <div className="stat-item">
+                  <h2>{stats.brands}</h2>
+                  <p>International Brands</p>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  <h2>{stats.products}</h2>
+                  <p>High-Quality Products</p>
+                </div>
+                <div className="stat-divider"></div>
+                <div className="stat-item">
+                  <h2>{stats.customers}</h2>
+                  <p>Happy Customers</p>
+                </div>
               </div>
             </div>
           </div>
@@ -353,9 +407,6 @@ export default function Hero() {
           />
 
           <span className="star star-large star-large-middle">✦</span>
-
-
-
         </div>
       </section>
     </div>
