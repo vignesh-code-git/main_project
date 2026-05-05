@@ -209,8 +209,8 @@ export default function Hero() {
       let newWordIndex = 0;
       if (scrolledDistance <= flipperLimit) {
         const textProgress = scrolledDistance / flipperLimit;
-        if (textProgress < 0.33) newWordIndex = 0;
-        else if (textProgress < 0.66) newWordIndex = 1;
+        if (textProgress < 0.10) newWordIndex = 0;
+        else if (textProgress < 0.55) newWordIndex = 1;
         else newWordIndex = 2;
       } else {
         newWordIndex = 2; // Lockdown on STYLE after flipper phase
@@ -232,8 +232,8 @@ export default function Hero() {
         return;
       }
 
-      // --- STAY ZONE: Pause before description starts (22% - 28% of scroll) ---
-      const stayRatio = 0.28;
+      // --- STAY ZONE: Pause before description starts (22% - 24% of scroll) ---
+      const stayRatio = 0.24;
       const stayLimit = totalStickySpace * stayRatio;
 
       if (scrolledDistance <= stayLimit) {
@@ -245,7 +245,7 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (28% - 50% of scroll) ---
+      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (24% - 50% of scroll) ---
       const descRatio = 0.50;
       const descLimit = totalStickySpace * descRatio;
 
