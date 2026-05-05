@@ -202,8 +202,8 @@ export default function Hero() {
       const currentScroll = window.scrollY;
       const scrolledDistance = Math.max(0, currentScroll - startPoint);
 
-      // --- PHASE 1: WORD FLIPPER (0% - 25% of scroll) ---
-      const flipperRatio = 0.25;
+      // --- PHASE 1: WORD FLIPPER (0% - 20% of scroll) ---
+      const flipperRatio = 0.20;
       const flipperLimit = totalStickySpace * flipperRatio;
 
       if (scrolledDistance <= flipperLimit) {
@@ -228,8 +228,8 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (25% - 65% of scroll) ---
-      const descRatio = 0.65;
+      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (20% - 60% of scroll) ---
+      const descRatio = 0.60;
       const descLimit = totalStickySpace * descRatio;
 
       if (scrolledDistance <= descLimit) {
@@ -250,7 +250,7 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 3: IMAGE REVEAL (65% - 100% of scroll) ---
+      // --- PHASE 3: IMAGE REVEAL (60% - 100% of scroll) ---
       setWordIndex(prev => prev !== 2 ? 2 : prev);
       setDescProgress(1); // Full gradient
 
