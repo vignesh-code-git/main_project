@@ -51,7 +51,7 @@
 .hero-content p,
 .hero-description {
   font-size: 18px;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.5); /* Slightly darker initial text */
   line-height: 1.4;
   margin: 0;
 }
@@ -68,10 +68,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(10deg, #1D4ED8, #FF0000);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: transparent;
+  color: #1A1A1A; /* Charcoal text color */
   pointer-events: none;
   z-index: 2;
   white-space: normal;
@@ -101,12 +99,12 @@
   font-size: 40px;
   font-weight: 700;
   margin-bottom: 4px;
-  color: #000;
+  color: rgba(0, 0, 0, 0.5); /* Initial state for count numbers */
 }
 
 .stat-item p {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.5); /* Darker initial stats */
   margin: 0;
 }
 
@@ -200,10 +198,8 @@
   height: 100%;
   pointer-events: none;
   z-index: 2;
-  background: linear-gradient(10deg, #1D4ED8, #FF0000);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: transparent;
+  color: #1A1A1A; /* Charcoal text color */
   display: flex;
 }
 
@@ -410,6 +406,8 @@
     padding: 0 !important;
     left: 20px;
     width: calc(100% - 40px);
+    top: 0;
+    height: 100%;
   }
 
   .shop-now-btn {
