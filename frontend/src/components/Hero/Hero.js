@@ -29,6 +29,7 @@ export default function Hero() {
     const preloadImages = async () => {
       const loadFrame = (i) => {
         return new Promise((resolve) => {
+          if (imagesRef.current[i]) return resolve();
           const frameNum = String(i).padStart(3, '0');
           const img = new Image();
           img.onload = () => {
@@ -41,20 +42,39 @@ export default function Hero() {
         });
       };
 
-      // Phase 1: Load first 10 frames (Essential for initial experience)
+      // Phase 1: Instant - First frame only to show content ASAP
+      await loadFrame(1);
+      
+      // Hide loader earlier since we have the first frame
+      setFadeOut(true);
+      setTimeout(() => setPreloading(false), 400);
+
+      // Phase 2: Smooth Start - Next 15 frames for initial scroll
       const initialBatch = [];
-      for (let i = 1; i <= Math.min(10, frameCount); i++) {
+      for (let i = 2; i <= Math.min(15, frameCount); i++) {
         initialBatch.push(loadFrame(i));
       }
       await Promise.all(initialBatch);
 
-      // Hide loader once initial frames are ready
-      setFadeOut(true);
-      setTimeout(() => setPreloading(false), 500);
+      // Phase 3: Rough Sequence - Every 5th frame to cover the whole scroll range
+      // This ensures if a user scrolls fast, they see a rough animation instead of static
+      const roughBatch = [];
+      for (let i = 20; i <= frameCount; i += 5) {
+        roughBatch.push(loadFrame(i));
+      }
+      await Promise.all(roughBatch);
 
-      // Phase 2: Load the rest in background
-      for (let i = 11; i <= frameCount; i++) {
-        loadFrame(i);
+      // Phase 4: Final Polish - Fill all remaining gaps in the background
+      // We do this in smaller batches to avoid saturating the network
+      const remainingFrames = [];
+      for (let i = 1; i <= frameCount; i++) {
+        if (!imagesRef.current[i]) remainingFrames.push(i);
+      }
+
+      // Load remaining in chunks of 10
+      for (let i = 0; i < remainingFrames.length; i += 10) {
+        const chunk = remainingFrames.slice(i, i + 10);
+        await Promise.all(chunk.map(frame => loadFrame(frame)));
       }
     };
 
