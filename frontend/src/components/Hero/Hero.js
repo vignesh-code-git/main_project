@@ -202,19 +202,23 @@ export default function Hero() {
       const currentScroll = window.scrollY;
       const scrolledDistance = Math.max(0, currentScroll - startPoint);
 
-      // --- PHASE 1: WORD FLIPPER (0% - 20% of scroll) ---
-      const flipperRatio = 0.20;
+      const flipperRatio = 0.22;
       const flipperLimit = totalStickySpace * flipperRatio;
 
+      // --- WORD INDEX LOGIC (Independent of phases to prevent skipping on fast scroll) ---
+      let newWordIndex = 0;
       if (scrolledDistance <= flipperLimit) {
         const textProgress = scrolledDistance / flipperLimit;
-        let newWordIndex = 0;
-
         if (textProgress < 0.33) newWordIndex = 0;
         else if (textProgress < 0.66) newWordIndex = 1;
         else newWordIndex = 2;
+      } else {
+        newWordIndex = 2; // Lockdown on STYLE after flipper phase
+      }
+      setWordIndex(prev => prev !== newWordIndex ? newWordIndex : prev);
 
-        setWordIndex(prev => prev !== newWordIndex ? newWordIndex : prev);
+      // --- PHASE 1: WORD FLIPPER (0% - 22% of scroll) ---
+      if (scrolledDistance <= flipperLimit) {
         setDescProgress(0); // Reset description wipe
 
         targetFrameRef.current = 1;
@@ -228,14 +232,25 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (20% - 60% of scroll) ---
-      const descRatio = 0.60;
+      // --- STAY ZONE: Pause before description starts (22% - 28% of scroll) ---
+      const stayRatio = 0.28;
+      const stayLimit = totalStickySpace * stayRatio;
+
+      if (scrolledDistance <= stayLimit) {
+        setDescProgress(0); // Hold description at start
+        
+        targetFrameRef.current = 1;
+        currentFrameRef.current = 1;
+        updateCanvas(1);
+        return;
+      }
+
+      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (28% - 50% of scroll) ---
+      const descRatio = 0.50;
       const descLimit = totalStickySpace * descRatio;
 
       if (scrolledDistance <= descLimit) {
-        setWordIndex(prev => prev !== 2 ? 2 : prev); // Keep STYLE
-
-        const progress = (scrolledDistance - flipperLimit) / (descLimit - flipperLimit);
+        const progress = (scrolledDistance - stayLimit) / (descLimit - stayLimit);
         setDescProgress(progress);
 
         // HARD LOCK: Image stays at Frame 1 during description wipe
@@ -250,8 +265,7 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 3: IMAGE REVEAL (60% - 100% of scroll) ---
-      setWordIndex(prev => prev !== 2 ? 2 : prev);
+      // --- PHASE 3: IMAGE REVEAL (50% - 100% of scroll) ---
       setDescProgress(1); // Full gradient
 
       const imageScrolledDistance = scrolledDistance - descLimit;
@@ -335,12 +349,15 @@ export default function Hero() {
         <div className="container hero-container">
           <div className="hero-content" ref={heroContentRef}>
             <h1 className="hero-title animate-text">
-              FIND CLOTHES <br />THAT MATCHES <br />YOUR{' '}
-              <span className="word-flipper-container">
-                <span className="word-flipper" style={{ transform: `translateY(-${wordIndex * 1.1}em)` }}>
-                  <span className="text-vibe">VIBE</span>
-                  <span className="text-look">LOOK</span>
-                  <span className="text-style">STYLE</span>
+              FIND CLOTHES <br />THAT MATCHES <br />
+              <span className="hero-last-line">
+                YOUR{' '}
+                <span className="word-flipper-container">
+                  <span className="word-flipper" style={{ transform: `translateY(-${wordIndex * 1.1}em)` }}>
+                    <span className="text-vibe">VIBE</span>
+                    <span className="text-look">LOOK</span>
+                    <span className="text-style">STYLE</span>
+                  </span>
                 </span>
               </span>
             </h1>
