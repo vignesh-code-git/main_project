@@ -8,10 +8,12 @@ import './Hero.css';
 export default function Hero() {
   const [stats, setStats] = useState({ brands: '0+', products: '0+', customers: '0+' });
   const [loading, setLoading] = useState(true);
+  const [preloading, setPreloading] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
-  const frameCount = 120;
+  const frameCount = 140;
 
   const containerRef = useRef(null);
   const heroContentRef = useRef(null);
@@ -24,15 +26,35 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    const preloadImages = () => {
-      for (let i = 1; i <= frameCount; i++) {
-        const frameNum = String(i).padStart(3, '0');
-        const img = new Image();
-        img.src = `/images/hero-animation/ezgif-frame-${frameNum}.png`;
-        img.onload = () => {
-          if (i === 1) updateCanvas(1);
-        };
-        imagesRef.current[i] = img;
+    const preloadImages = async () => {
+      const loadFrame = (i) => {
+        return new Promise((resolve) => {
+          const frameNum = String(i).padStart(3, '0');
+          const img = new Image();
+          img.onload = () => {
+            if (i === 1) updateCanvas(1);
+            resolve();
+          };
+          img.onerror = resolve;
+          img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
+          imagesRef.current[i] = img;
+        });
+      };
+
+      // Phase 1: Load first 10 frames (Essential for initial experience)
+      const initialBatch = [];
+      for (let i = 1; i <= Math.min(10, frameCount); i++) {
+        initialBatch.push(loadFrame(i));
+      }
+      await Promise.all(initialBatch);
+
+      // Hide loader once initial frames are ready
+      setFadeOut(true);
+      setTimeout(() => setPreloading(false), 500);
+
+      // Phase 2: Load the rest in background
+      for (let i = 11; i <= frameCount; i++) {
+        loadFrame(i);
       }
     };
 
@@ -72,11 +94,19 @@ export default function Hero() {
 
       const context = canvas.getContext('2d', { alpha: false });
       const offContext = offscreen.getContext('2d', { alpha: false });
-      const img = imagesRef.current[index];
+      
+      // STICKY FRAME LOGIC: Never show white space. 
+      // If the frame isn't ready, find the closest one that is.
+      let img = null;
+      for (let i = index; i >= 1; i--) {
+        const check = imagesRef.current[i];
+        if (check && check.complete && check.naturalWidth !== 0) {
+          img = check;
+          break;
+        }
+      }
 
-      // CRITICAL: Only draw if the image is actually loaded.
-      // If not, we do NOTHING (keep the previous frame) to avoid flickering.
-      if (img && img.complete && img.naturalWidth !== 0) {
+      if (img) {
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
 
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
@@ -84,7 +114,6 @@ export default function Hero() {
           offscreen.height = canvasHeight;
         }
 
-        // Draw to offscreen buffer first
         offContext.fillStyle = '#F2F0F1';
         offContext.fillRect(0, 0, offscreen.width, offscreen.height);
 
@@ -113,8 +142,6 @@ export default function Hero() {
         }
 
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-
-        // Final swap to visible canvas
         context.drawImage(offscreen, 0, 0);
       }
     };
@@ -151,7 +178,7 @@ export default function Hero() {
       const currentScroll = window.scrollY;
       const scrolledDistance = currentScroll - startPoint;
 
-      // BUFFER: Reach frame 120 early (at 90% of the scroll)
+      // BUFFER: Reach frame 140 early (at 90% of the scroll)
       const bufferPercent = 0.90;
       const animationRange = totalStickySpace * bufferPercent;
       
@@ -213,6 +240,14 @@ export default function Hero() {
 
   return (
     <div className="hero-sticky-wrapper" ref={containerRef}>
+      {preloading && (
+        <div className={`hero-loading-overlay ${fadeOut ? 'fade-out' : ''}`}>
+          <div className="loader-content">
+            <div className="spinner"></div>
+            <p>Experience Loading...</p>
+          </div>
+        </div>
+      )}
       <section className="hero">
         <div className="container hero-container">
           <div className="hero-content" ref={heroContentRef}>
