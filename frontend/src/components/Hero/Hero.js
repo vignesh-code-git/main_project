@@ -56,8 +56,7 @@ export default function Hero() {
     const mobileAnchorYRef = { current: null };
     const isMobile = checkIsMobile();
     const isMobileRef = { current: isMobile };
-    const scaleRef = { current: isMobile ? 1.15 : 1.28 };
-    const hasVerifiedRef = { current: false };
+    const scaleRef = { current: 1.25 }; // Use consistent scale to prevent jumps
 
     const targetFrameRef = { current: 1 };
     const currentFrameRef = { current: 1 };
@@ -150,18 +149,6 @@ export default function Hero() {
 
     function handleScroll() {
       if (!containerRef.current) return;
-
-      // Verification Check: On the very first scroll, double check if we correctly detected mobile.
-      // This prevents the "large then small" jump if innerWidth was reported wrong at mount.
-      if (!hasVerifiedRef.current) {
-        const actualIsMobile = checkIsMobile();
-        if (actualIsMobile !== isMobileRef.current) {
-          isMobileRef.current = actualIsMobile;
-          scaleRef.current = actualIsMobile ? 1.25 : 1.28;
-          handleResize(); // Force re-calculation with correct scale
-        }
-        hasVerifiedRef.current = true;
-      }
 
       const container = containerRef.current;
       const stickyTop = 110;
@@ -259,7 +246,6 @@ export default function Hero() {
       const actualIsMobile = checkIsMobile();
       if (actualIsMobile !== isMobileRef.current) {
         isMobileRef.current = actualIsMobile;
-        scaleRef.current = actualIsMobile ? 1.25 : 1.28;
       }
 
       const dpr = window.devicePixelRatio || 1;
