@@ -113,10 +113,7 @@ export default function Hero() {
 
         if (isMobileRef.current) {
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
-          // Strictly use width-based height for 100% stability.
-          // This prevents the "jump" when scrolling starts.
-          const virtualHeight = offscreen.width * 1.3;
-          offsetY = ((virtualHeight - drawHeight) / 2);
+          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (offscreen.height - drawHeight) / 2 + (offscreen.height * 0.10);
