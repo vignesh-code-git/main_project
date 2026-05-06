@@ -40,6 +40,17 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
 
+    // --- AUTOMATIC CONNECTIVITY TEST ---
+    fetch(`${API_BASE_URL}/`)
+      .then(res => {
+        if (res.ok) console.log("%c✅ BACKEND CONNECTED!", "color: #00ff00; font-weight: bold; font-size: 16px;");
+        else console.log("%c⚠️ BACKEND LINK WRONG (Status " + res.status + ")", "color: #ffaa00; font-weight: bold; font-size: 16px;");
+      })
+      .catch(err => {
+        console.log("%c❌ BACKEND CONNECTION FAILED!", "color: #ff0000; font-weight: bold; font-size: 16px;");
+        console.error("Technical Error:", err.message);
+      });
+
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
