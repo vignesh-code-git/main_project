@@ -28,6 +28,11 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
+    // --- SESSION STABILITY ---
+    // Lock these values once at mount using matchMedia (more reliable on refresh)
+    const isMobileSession = typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches;
+    const sessionScale = isMobileSession ? 1.25 : 1.28;
+
     const targetFrameRef = { current: 1 };
     const currentFrameRef = { current: 1 };
     const animationFrameRef = { current: null };
@@ -65,19 +70,15 @@ export default function Hero() {
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        // CRITICAL: Stable mobile detection
-        const isMobile = window.innerWidth <= 1024;
-        const scale = isMobile ? 1.25 : 1.28;
-
         if (canvasAspect > imgAspect) {
-          drawHeight = visibleHeight * scale;
+          drawHeight = visibleHeight * sessionScale;
           drawWidth = drawHeight * imgAspect;
         } else {
-          drawWidth = offscreen.width * scale;
+          drawWidth = offscreen.width * sessionScale;
           drawHeight = drawWidth / imgAspect;
         }
 
-        if (isMobile) {
+        if (isMobileSession) {
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
           offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
         } else {
@@ -220,8 +221,11 @@ export default function Hero() {
     }
 
     // --- INITIALIZATION ---
-    handleResize();
-    handleScroll();
+    // Added a small timeout to allow mobile browsers to settle their layout after a refresh
+    const initTimeout = setTimeout(() => {
+      handleResize();
+      handleScroll();
+    }, 100);
 
     const preloadImages = async () => {
       const loadFrame = (i) => {
