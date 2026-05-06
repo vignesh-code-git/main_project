@@ -116,6 +116,7 @@ export default function AddProductPage() {
     if (!formData.categoryId) newErrors.category = 'Category is required';
     if (!formData.price) newErrors.price = 'Price is required';
     if (!formData.brand) newErrors.brand = 'Brand is required';
+    if (!formData.style) newErrors.style = 'Style is required';
     if (formData.sizes.length === 0) newErrors.sizes = 'Select at least one size';
     if (!formData.description || formData.description.length < 10) {
       newErrors.description = 'Description must be at least 10 characters';
@@ -132,7 +133,7 @@ export default function AddProductPage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleBulkSubmit = async (e) => {
