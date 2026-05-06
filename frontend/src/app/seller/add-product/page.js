@@ -174,9 +174,11 @@ export default function AddProductPage() {
     e.preventDefault();
     console.log('Form submission started. Data:', formData);
 
-    if (!validate()) {
-      console.error('Validation failed', errors);
-      setSingleStatus({ type: 'error', message: 'Please fill the required fields' });
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      const firstError = Object.values(validationErrors)[0] || 'Please fill all required fields';
+      console.error('Validation failed', validationErrors);
+      setSingleStatus({ type: 'error', message: `Validation failed: ${firstError}` });
       return;
     }
 
