@@ -28,17 +28,28 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+const sessionStore = new SequelizeStore({
+  db: sequelize,
+  tableName: 'Sessions', // Optional
+});
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your_session_secret',
+  store: sessionStore,
   resave: false,
   saveUninitialized: false,
+  proxy: true,
   cookie: { 
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Required for cross-site cookies
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  },
-  proxy: true // Required for Render/Heroku to trust the X-Forwarded-Proto header
+  }
 }));
+
+// Create the Sessions table if it doesn't exist
+sessionStore.sync();
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
