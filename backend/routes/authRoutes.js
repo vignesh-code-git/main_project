@@ -27,16 +27,11 @@ router.get('/google/callback',
     };
 
     const token = generateToken(req.user.id, req.user.role);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 * 1000
-    });
-
-    // Redirect to frontend home or dashboard
-    res.redirect('http://localhost:3000/');
+    // Redirect to frontend with token in query param
+    // The frontend will need a small logic to capture this token
+    res.redirect(`${frontendUrl}/auth/login?token=${token}`);
   }
 );
 

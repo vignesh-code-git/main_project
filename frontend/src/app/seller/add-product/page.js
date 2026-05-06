@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import './seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
@@ -57,7 +57,9 @@ export default function AddProductPage() {
   ];
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/products/categories`)
+    fetch(`${API_BASE_URL}/api/products/categories`, {
+      headers: getAuthHeaders()
+    })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -137,7 +139,9 @@ export default function AddProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/bulk`, {
         method: 'POST',
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: data,
       });
 
@@ -198,7 +202,9 @@ export default function AddProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: submitData,
       });
 
@@ -388,7 +394,7 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            <div className={`form-group ${errors.CategoryId ? 'has-error' : ''}`}>
+            <div className={`form-group ${errors.categoryId ? 'has-error' : ''}`}>
               <label>Category</label>
               <CustomSelect
                 options={categories}
@@ -399,7 +405,7 @@ export default function AddProductPage() {
                 }}
                 placeholder="Select Category"
               />
-              {errors.CategoryId && <span className="error-text">{errors.CategoryId}</span>}
+              {errors.categoryId && <span className="error-text">{errors.categoryId}</span>}
             </div>
 
             <div className={`form-group ${errors.style ? 'has-error' : ''}`}>

@@ -20,6 +20,23 @@ export default function CustomerAuth() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  // Handle Token from URL (For Google Auth)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      if (token) {
+        localStorage.setItem('token', token);
+        const { checkAuth } = require('@/lib/redux/slices/authSlice');
+        dispatch(checkAuth()).then((res) => {
+          if (res.meta.requestStatus === 'fulfilled') {
+            router.push('/');
+          }
+        });
+      }
+    }
+  }, [dispatch, router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

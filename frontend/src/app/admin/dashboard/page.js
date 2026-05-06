@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -29,14 +29,12 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
       try {
-        const fetchOptions = { credentials: 'include' };
-
         const [usersRes, sellersRes, settingsRes, productsRes, ordersRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/admin/users`, fetchOptions),
-          fetch(`${API_BASE_URL}/api/admin/sellers`, fetchOptions),
-          fetch(`${API_BASE_URL}/api/admin/settings`, fetchOptions),
-          fetch(`${API_BASE_URL}/api/products`, fetchOptions),
-          fetch(`${API_BASE_URL}/api/orders`, fetchOptions)
+          fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/admin/sellers`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/admin/settings`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() })
         ]);
  
         const usersData = await usersRes.json();
@@ -76,8 +74,10 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/settings/upload`, {
         method: 'POST',
-        body: formData,
-        credentials: 'include'
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
       });
       if (res.ok) {
         const data = await res.json();
@@ -109,9 +109,8 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: newStatus })
       });
 
       if (res.ok) {

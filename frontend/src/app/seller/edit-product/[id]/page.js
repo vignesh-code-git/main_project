@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import '../../add-product/seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
@@ -47,8 +47,8 @@ export default function EditProductPage() {
     const fetchData = async () => {
       try {
         const [catRes, prodRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/products/categories`),
-          fetch(`${API_BASE_URL}/api/products/${id}`)
+          fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/${id}`, { headers: getAuthHeaders() })
         ]);
 
         const categoriesData = await catRes.json();
@@ -132,7 +132,9 @@ export default function EditProductPage() {
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'PUT',
-        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: submitData,
       });
 
