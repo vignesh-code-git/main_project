@@ -16,7 +16,16 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [allOrders, setAllOrders] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [styles, setStyles] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newStyleName, setNewStyleName] = useState('');
+  const [newSizeName, setNewSizeName] = useState('');
+  const [newColor, setNewColor] = useState({ name: '', hexCode: '#000000' });
+  const [assetTab, setAssetTab] = useState('categories');
   const [toast, setToast] = useState({ show: false, message: '' });
   const router = useRouter();
 
@@ -31,13 +40,17 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
       try {
-        const [usersRes, sellersRes, settingsRes, productsRes, ordersRes] = await Promise.all([
+        const [usersRes, sellersRes, settingsRes, productsRes, ordersRes, catRes, brandRes, styleRes, sizeRes, colorRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/admin/sellers`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/admin/settings`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() })
+          fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/brands`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/styles`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/sizes`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/colors`, { headers: getAuthHeaders() })
         ]);
  
         const usersData = await usersRes.json();
@@ -45,6 +58,11 @@ export default function AdminDashboard() {
         const settingsData = await settingsRes.json();
         const productsData = await productsRes.json();
         const ordersData = await ordersRes.json();
+        const categoriesData = await catRes.json();
+        const brandsData = await brandRes.json();
+        const stylesData = await styleRes.json();
+        const sizesData = await sizeRes.json();
+        const colorsData = await colorRes.json();
  
         setUsers(Array.isArray(usersData) ? usersData : []);
         setSellers(Array.isArray(sellersData) ? sellersData : []);
@@ -52,6 +70,10 @@ export default function AdminDashboard() {
         setProducts(Array.isArray(productsData) ? productsData : (productsData.products || []));
         setAllOrders(Array.isArray(ordersData) ? ordersData : []);
         setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        setBrands(Array.isArray(brandsData) ? brandsData : []);
+        setStyles(Array.isArray(stylesData) ? stylesData : []);
+        setSizes(Array.isArray(sizesData) ? sizesData : []);
+        setColors(Array.isArray(colorsData) ? colorsData : []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -174,6 +196,36 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddAsset = async (type, payload, setList, setInput) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/${type}`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setList(prev => [...prev, data]);
+        setInput('');
+        showToast(`${type.toUpperCase()} ADDED`);
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteAsset = async (type, id, setList) => {
+    if (!confirm(`Delete this ${type}?`)) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/${type}/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        setList(prev => prev.filter(item => item.id !== id));
+        showToast('DELETED SUCCESSFULLY');
+      }
+    } catch (err) { console.error(err); }
+  };
+
   if (!authUser || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
 
   return (
@@ -188,7 +240,7 @@ export default function AdminDashboard() {
             { id: 'dashboard', label: 'Overview' },
             { id: 'orders', label: 'Orders' },
             { id: 'products', label: 'Products' },
-            { id: 'categories', label: 'Categories' },
+            { id: 'assets', label: 'Store Assets' },
             { id: 'sellers', label: 'Sellers' },
             { id: 'customers', label: 'Customers' },
             { id: 'settings', label: 'Web Settings' },
@@ -339,61 +391,82 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {activeTab === 'categories' && (
+        {activeTab === 'assets' && (
           <div className="view-container-stylish">
             <header className="admin-page-header">
-              <h1>CATEGORY MANAGEMENT</h1>
-              <p>Organize products into logical groups for better browsing.</p>
+              <h1>STORE ASSET MANAGEMENT</h1>
+              <p>Configure dynamic product attributes like Categories, Brands, and Sizes.</p>
             </header>
-            
-            <div className="admin-card-stylish" style={{ marginBottom: '30px' }}>
-              <h2>Add New Category</h2>
-              <form onSubmit={handleAddCategory} className="admin-inline-form">
-                <input 
-                  type="text" 
-                  placeholder="Category Name (e.g. T-Shirts)"
-                  value={newCategoryName}
-                  onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="admin-input-stylish"
-                />
-                <button type="submit" className="btn-upload-premium" style={{ height: '48px', padding: '0 30px' }}>
-                  ADD CATEGORY
-                </button>
-              </form>
-            </div>
+
+            <nav className="asset-sub-tabs">
+              {['categories', 'brands', 'styles', 'sizes', 'colors'].map(t => (
+                <div key={t} className={`asset-tab ${assetTab === t ? 'active' : ''}`} onClick={() => setAssetTab(t)}>
+                  {t.toUpperCase()}
+                </div>
+              ))}
+            </nav>
 
             <div className="admin-card-stylish">
-              <h2>Existing Categories</h2>
+              <div className="asset-header-row">
+                <h2>{assetTab.toUpperCase()} LIST</h2>
+                <div className="admin-inline-form">
+                  {assetTab === 'colors' ? (
+                    <>
+                      <input type="text" placeholder="Color Name" value={newColor.name} onChange={(e) => setNewColor({...newColor, name: e.target.value})} className="admin-input-stylish" />
+                      <input type="color" value={newColor.hexCode} onChange={(e) => setNewColor({...newColor, hexCode: e.target.value})} style={{height: '48px', width: '60px'}} />
+                      <button onClick={() => handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: '#000000'}))} className="btn-upload-premium">ADD</button>
+                    </>
+                  ) : (
+                    <>
+                      <input 
+                        type="text" 
+                        placeholder={`New ${assetTab.slice(0,-1)} name`} 
+                        value={assetTab === 'categories' ? newCategoryName : assetTab === 'brands' ? newBrandName : assetTab === 'styles' ? newStyleName : newSizeName} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if(assetTab === 'categories') setNewCategoryName(val);
+                          else if(assetTab === 'brands') setNewBrandName(val);
+                          else if(assetTab === 'styles') setNewStyleName(val);
+                          else setNewSizeName(val);
+                        }} 
+                        className="admin-input-stylish" 
+                      />
+                      <button 
+                        onClick={() => {
+                          if(assetTab === 'categories') handleAddAsset('categories', {name: newCategoryName}, setCategories, setNewCategoryName);
+                          else if(assetTab === 'brands') handleAddAsset('brands', {name: newBrandName}, setBrands, setNewBrandName);
+                          else if(assetTab === 'styles') handleAddAsset('styles', {name: newStyleName}, setStyles, setNewStyleName);
+                          else handleAddAsset('sizes', {name: newSizeName}, setSizes, setNewSizeName);
+                        }} 
+                        className="btn-upload-premium"
+                      >ADD</button>
+                    </>
+                  )}
+                </div>
+              </div>
+
               <table>
                 <thead>
                   <tr>
-                    <th>Category Name</th>
-                    <th>ID</th>
-                    <th>Product Count</th>
+                    <th>Name</th>
+                    {assetTab === 'colors' && <th>Preview</th>}
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {categories.map(cat => (
-                    <tr key={cat.id}>
-                      <td style={{ fontWeight: '800' }}>{cat.name}</td>
-                      <td style={{ opacity: 0.6 }}>{cat.id}</td>
+                  {(assetTab === 'categories' ? categories : assetTab === 'brands' ? brands : assetTab === 'styles' ? styles : assetTab === 'sizes' ? sizes : colors).map(item => (
+                    <tr key={item.id}>
+                      <td style={{fontWeight: '800'}}>{item.name}</td>
+                      {assetTab === 'colors' && (
+                        <td>
+                          <div style={{width: '30px', height: '30px', borderRadius: '50%', background: item.hexCode, border: '1px solid #ddd'}}></div>
+                        </td>
+                      )}
                       <td>
-                        {products.filter(p => p.categoryId === cat.id).length} Products
-                      </td>
-                      <td>
-                        <button 
-                          className="btn-delete-admin"
-                          onClick={() => handleDeleteCategory(cat.id)}
-                        >
-                          DELETE
-                        </button>
+                        <button className="btn-delete-admin" onClick={() => handleDeleteAsset(assetTab, item.id, assetTab === 'categories' ? setCategories : assetTab === 'brands' ? setBrands : assetTab === 'styles' ? setStyles : assetTab === 'sizes' ? setSizes : setColors)}>DELETE</button>
                       </td>
                     </tr>
                   ))}
-                  {categories.length === 0 && (
-                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No categories found.</td></tr>
-                  )}
                 </tbody>
               </table>
             </div>

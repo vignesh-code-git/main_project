@@ -598,3 +598,45 @@ tr:hover td {
   background: var(--admin-red);
   color: #FFF;
 }
+
+/* Asset Management Styles */
+.asset-sub-tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.asset-tab {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 4px 8px;
+}
+
+.asset-tab:hover { color: #000; }
+
+.asset-tab.active {
+  color: #000;
+  position: relative;
+}
+
+.asset-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -13px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #000;
+}
+
+.asset-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}

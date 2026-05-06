@@ -1,4 +1,4 @@
-const { User, Product, WebsiteSettings, Category, Notification } = require('../models/associations');
+const { User, Product, WebsiteSettings, Category, Notification, Brand, Style, Size, Color } = require('../models/associations');
 
 // @desc    Get all users (customers)
 // @route   GET /api/admin/users
@@ -137,11 +137,79 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+// --- Brand Management ---
+const addBrand = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const brand = await Brand.create({ name });
+    res.status(201).json(brand);
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+const deleteBrand = async (req, res) => {
+  try {
+    await Brand.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Brand deleted' });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+// --- Style Management ---
+const addStyle = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const style = await Style.create({ name });
+    res.status(201).json(style);
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+const deleteStyle = async (req, res) => {
+  try {
+    await Style.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Style deleted' });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+// --- Size Management ---
+const addSize = async (req, res) => {
+  try {
+    const { name } = req.body;
+    const size = await Size.create({ name });
+    res.status(201).json(size);
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+const deleteSize = async (req, res) => {
+  try {
+    await Size.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Size deleted' });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+// --- Color Management ---
+const addColor = async (req, res) => {
+  try {
+    const { name, hexCode } = req.body;
+    const color = await Color.create({ name, hexCode });
+    res.status(201).json(color);
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+const deleteColor = async (req, res) => {
+  try {
+    await Color.destroy({ where: { id: req.params.id } });
+    res.json({ message: 'Color deleted' });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
 module.exports = {
   getAllUsers,
   getAllSellers,
   getSettings,
   updateSettings,
   addCategory,
-  deleteCategory
+  deleteCategory,
+  addBrand,
+  deleteBrand,
+  addStyle,
+  deleteStyle,
+  addSize,
+  deleteSize,
+  addColor,
+  deleteColor
 };
