@@ -175,10 +175,12 @@ export default function AddProductPage() {
     console.log('Form submission started. Data:', formData);
 
     const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      const firstError = Object.values(validationErrors)[0] || 'Please fill all required fields';
+    const errorList = Object.values(validationErrors);
+    
+    if (errorList.length > 0) {
+      const errorMsg = errorList.join(' | ');
       console.error('Validation failed', validationErrors);
-      setSingleStatus({ type: 'error', message: `Validation failed: ${firstError}` });
+      setSingleStatus({ type: 'error', message: `MISSING FIELDS: ${errorMsg}` });
       return;
     }
 
