@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const sequelize = require('../config/database');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const setupAdmin = async () => {
   try {
