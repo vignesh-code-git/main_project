@@ -53,19 +53,9 @@ export default function Hero() {
       );
     };
 
-    // --- SESSION STABILITY LOCKS ---
-    // We lock these on the very first mount to prevent jumps when the browser's 
-    // address bar or header resizes the layout.
-    const sessionMetricsRef = {
-      current: typeof window !== 'undefined' ? {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        isMobile: checkIsMobile()
-      } : { width: 0, height: 0, isMobile: false }
-    };
-
-    const isMobileRef = { current: sessionMetricsRef.current.isMobile };
-    const scaleRef = { current: isMobileRef.current ? 1.25 : 1.28 };
+    const isMobile = checkIsMobile();
+    const isMobileRef = { current: isMobile };
+    const scaleRef = { current: isMobile ? 1.25 : 1.28 };
     const hasVerifiedRef = { current: false };
 
     const targetFrameRef = { current: 1 };
@@ -91,8 +81,6 @@ export default function Hero() {
       }
 
       if (img) {
-        // Use session-locked metrics to prevent jumps during layout settling
-        const session = sessionMetricsRef.current;
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
 
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
@@ -103,26 +91,27 @@ export default function Hero() {
         offContext.fillStyle = '#F2F0F1';
         offContext.fillRect(0, 0, offscreen.width, offscreen.height);
 
-        const dpr = window.devicePixelRatio || 1;
-        // Ensure we never have a 0 base for calculations
-        const baseWidth = (isMobileRef.current && session.width > 0) ? (session.width * dpr) : offscreen.width;
-        const baseHeight = (isMobileRef.current && session.height > 0) ? (session.height * dpr) : offscreen.height;
-        
-        const canvasAspect = baseWidth / baseHeight;
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        if (canvasAspect > imgAspect) {
-          drawHeight = baseHeight * scaleRef.current;
-          drawWidth = drawHeight * imgAspect;
-        } else {
-          drawWidth = baseWidth * scaleRef.current;
+        if (isMobileRef.current) {
+          // On mobile, we anchor scaling to WIDTH because width doesn't change on scroll.
+          // This perfectly prevents the "shrinking image" bug without needing session locks.
+          drawWidth = offscreen.width * scaleRef.current;
           drawHeight = drawWidth / imgAspect;
+        } else {
+          // Desktop/Tablet: standard object-fit: contain logic
+          const canvasAspect = offscreen.width / offscreen.height;
+          if (canvasAspect > imgAspect) {
+            drawHeight = offscreen.height * scaleRef.current;
+            drawWidth = drawHeight * imgAspect;
+          } else {
+            drawWidth = offscreen.width * scaleRef.current;
+            drawHeight = drawWidth / imgAspect;
+          }
         }
 
         if (isMobileRef.current) {
-          // Use offscreen dimensions for centering to guarantee visibility, 
-          // while drawWidth/Height remain stable.
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
           offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
         } else {
