@@ -104,8 +104,9 @@ export default function Hero() {
         offContext.fillRect(0, 0, offscreen.width, offscreen.height);
 
         // We use the locked session height for scaling logic to keep size consistent on mobile
-        const visibleHeight = isMobileRef.current ? sessionHeight : offscreen.height;
-        const visibleWidth = isMobileRef.current ? sessionWidth : offscreen.width;
+        const dpr = window.devicePixelRatio || 1;
+        const visibleHeight = isMobileRef.current ? (sessionHeight * dpr) : offscreen.height;
+        const visibleWidth = isMobileRef.current ? (sessionWidth * dpr) : offscreen.width;
         
         const canvasAspect = visibleWidth / visibleHeight;
         const imgAspect = img.width / img.height;
@@ -120,8 +121,8 @@ export default function Hero() {
         }
 
         if (isMobileRef.current) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
-          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
+          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
