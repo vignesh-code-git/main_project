@@ -263,11 +263,9 @@ export default function Hero() {
       updateCanvas(Math.round(currentFrameRef.current));
     }
 
-    // Populate dimensions with a small delay to let mobile browser settle viewport
-    setTimeout(() => {
-      handleResize();
-      handleScroll();
-    }, 100);
+    // Populate dimensions immediately to ensure scroll animation is ready
+    handleResize();
+    handleScroll();
 
     const preloadImages = async () => {
       const loadFrame = (i) => {
@@ -286,6 +284,11 @@ export default function Hero() {
       };
 
       await loadFrame(1);
+      
+      // Kickstart canvas with first frame
+      updateCanvas(1);
+      handleScroll();
+
       setFadeOut(true);
       setTimeout(() => setPreloading(false), 800);
 
