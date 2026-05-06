@@ -91,7 +91,10 @@ export default function Hero() {
       }
 
       if (img) {
+        // Use session-locked metrics to prevent jumps during layout settling
+        const { width: sessionWidth, height: sessionHeight } = sessionMetricsRef.current;
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
+
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
           offscreen.width = canvasWidth;
           offscreen.height = canvasHeight;
@@ -100,8 +103,11 @@ export default function Hero() {
         offContext.fillStyle = '#F2F0F1';
         offContext.fillRect(0, 0, offscreen.width, offscreen.height);
 
-        const visibleHeight = offscreen.height;
-        const canvasAspect = offscreen.width / visibleHeight;
+        // We use the locked session height for scaling logic to keep size consistent on mobile
+        const visibleHeight = isMobileRef.current ? sessionHeight : offscreen.height;
+        const visibleWidth = isMobileRef.current ? sessionWidth : offscreen.width;
+        
+        const canvasAspect = visibleWidth / visibleHeight;
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
@@ -109,7 +115,7 @@ export default function Hero() {
           drawHeight = visibleHeight * scaleRef.current;
           drawWidth = drawHeight * imgAspect;
         } else {
-          drawWidth = offscreen.width * scaleRef.current;
+          drawWidth = visibleWidth * scaleRef.current;
           drawHeight = drawWidth / imgAspect;
         }
 
