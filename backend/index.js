@@ -90,6 +90,34 @@ app.use((err, req, res, next) => {
 // Sync database and start server
 sequelize.sync({ alter: true })
   .then(async () => {
+    // --- AUTO ADMIN SETUP ---
+    try {
+      const { User } = require('./models/associations');
+      const bcrypt = require('bcryptjs');
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@gmail.com';
+      const adminExists = await User.findOne({ where: { email: adminEmail } });
+      
+      if (!adminExists) {
+        console.log('⚠️ ADMIN NOT FOUND: Creating default admin account...');
+        const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(adminPass, salt);
+        
+        await User.create({
+          name: process.env.ADMIN_NAME || 'Super Admin',
+          email: adminEmail,
+          password: hashedPassword,
+          role: 'admin',
+          isActive: true
+        });
+        console.log('✅ AUTO-SETUP: Admin account created successfully!');
+      } else {
+        console.log('ℹ️ ADMIN CHECK: Admin account already exists.');
+      }
+    } catch (err) {
+      console.log('Admin auto-setup failed:', err);
+    }
+
     // DATA FIX: Assign orphan products to the first seller for demo/testing
     try {
       const { Product, User } = require('./models/associations');
