@@ -9,6 +9,7 @@ require('./models/associations'); // LOAD ASSOCIATIONS FIRST
 require('dotenv').config();
 
 const app = express();
+app.set('trust proxy', 1); // Trust the first proxy (Render)
 const PORT = process.env.PORT || 5000;
 const productRoutes = require('./routes/productRoutes');
 const adminRoutes = require('./routes/adminRoutes');
