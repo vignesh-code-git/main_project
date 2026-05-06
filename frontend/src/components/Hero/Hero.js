@@ -113,7 +113,11 @@ export default function Hero() {
 
         if (isMobileRef.current) {
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
-          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
+          // We use a "virtual height" based on width (width * 2.0) to center the image.
+          // This makes the vertical position perfectly stable even if the bottom 
+          // navigation bar or address bar resizes the actual canvas height.
+          const virtualHeight = offscreen.width * 2.0;
+          offsetY = ((virtualHeight - drawHeight) / 2);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (offscreen.height - drawHeight) / 2 + (offscreen.height * 0.10);
