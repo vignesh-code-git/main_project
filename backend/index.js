@@ -32,7 +32,12 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'your_session_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Required for cross-site cookies
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  },
+  proxy: true // Required for Render/Heroku to trust the X-Forwarded-Proto header
 }));
 app.use(passport.initialize());
 app.use(passport.session());
