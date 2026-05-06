@@ -92,7 +92,7 @@ export default function Hero() {
 
       if (img) {
         // Use session-locked metrics to prevent jumps during layout settling
-        const { width: sessionWidth, height: sessionHeight } = sessionMetricsRef.current;
+        const session = sessionMetricsRef.current;
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
 
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
@@ -103,29 +103,31 @@ export default function Hero() {
         offContext.fillStyle = '#F2F0F1';
         offContext.fillRect(0, 0, offscreen.width, offscreen.height);
 
-        // We use the locked session height for scaling logic to keep size consistent on mobile
         const dpr = window.devicePixelRatio || 1;
-        const visibleHeight = isMobileRef.current ? (sessionHeight * dpr) : offscreen.height;
-        const visibleWidth = isMobileRef.current ? (sessionWidth * dpr) : offscreen.width;
+        // Ensure we never have a 0 base for calculations
+        const baseWidth = (isMobileRef.current && session.width > 0) ? (session.width * dpr) : offscreen.width;
+        const baseHeight = (isMobileRef.current && session.height > 0) ? (session.height * dpr) : offscreen.height;
         
-        const canvasAspect = visibleWidth / visibleHeight;
+        const canvasAspect = baseWidth / baseHeight;
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
         if (canvasAspect > imgAspect) {
-          drawHeight = visibleHeight * scaleRef.current;
+          drawHeight = baseHeight * scaleRef.current;
           drawWidth = drawHeight * imgAspect;
         } else {
-          drawWidth = visibleWidth * scaleRef.current;
+          drawWidth = baseWidth * scaleRef.current;
           drawHeight = drawWidth / imgAspect;
         }
 
         if (isMobileRef.current) {
-          offsetX = ((visibleWidth - drawWidth) / 2) - (visibleWidth * 0.15);
-          offsetY = ((visibleHeight - drawHeight) / 2) + (visibleHeight * 0.05);
+          // Use offscreen dimensions for centering to guarantee visibility, 
+          // while drawWidth/Height remain stable.
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
+          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
-          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
+          offsetY = (offscreen.height - drawHeight) / 2 + (offscreen.height * 0.10);
         }
 
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
