@@ -41,8 +41,17 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    // --- STABLE DETECTION REFS ---
-    const isMobileRef = { current: typeof window !== 'undefined' && (window.innerWidth <= 1024 || window.matchMedia('(max-width: 1024px)').matches) };
+    // --- ROBUST DETECTION ---
+    const checkIsMobile = () => {
+      if (typeof window === 'undefined') return false;
+      return (
+        window.innerWidth <= 1024 ||
+        window.matchMedia('(max-width: 1024px)').matches ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      );
+    };
+
+    const isMobileRef = { current: checkIsMobile() };
     const scaleRef = { current: isMobileRef.current ? 1.25 : 1.28 };
     const hasVerifiedRef = { current: false };
 
@@ -126,7 +135,7 @@ export default function Hero() {
       // Verification Check: On the very first scroll, double check if we correctly detected mobile.
       // This prevents the "large then small" jump if innerWidth was reported wrong at mount.
       if (!hasVerifiedRef.current) {
-        const actualIsMobile = window.innerWidth <= 1024;
+        const actualIsMobile = checkIsMobile();
         if (actualIsMobile !== isMobileRef.current) {
           isMobileRef.current = actualIsMobile;
           scaleRef.current = actualIsMobile ? 1.25 : 1.28;
@@ -228,7 +237,7 @@ export default function Hero() {
       if (!containerRef.current || !canvasRef.current) return;
 
       // Continuous verification: Update detection on every resize/rotation
-      const actualIsMobile = window.innerWidth <= 1024;
+      const actualIsMobile = checkIsMobile();
       if (actualIsMobile !== isMobileRef.current) {
         isMobileRef.current = actualIsMobile;
         scaleRef.current = actualIsMobile ? 1.25 : 1.28;
@@ -254,8 +263,11 @@ export default function Hero() {
       updateCanvas(Math.round(currentFrameRef.current));
     }
 
-    handleResize();
-    handleScroll();
+    // Populate dimensions with a small delay to let mobile browser settle viewport
+    setTimeout(() => {
+      handleResize();
+      handleScroll();
+    }, 100);
 
     const preloadImages = async () => {
       const loadFrame = (i) => {
