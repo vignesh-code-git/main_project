@@ -44,10 +44,12 @@ export default function Hero() {
     // --- ROBUST DETECTION ---
     const checkIsMobile = () => {
       if (typeof window === 'undefined') return false;
+      const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       return (
         window.innerWidth <= 1024 ||
         window.matchMedia('(max-width: 1024px)').matches ||
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        isTouch ||
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
       );
     };
 
