@@ -455,9 +455,9 @@
   }
 
   .star-large-middle {
-    font-size: 56px;
+    font-size: 38px;
     left: 45%;
-    top: 15%;
+    top: 10%;
     transform: translate(-50%, -50%);
     z-index: 2;
   }

@@ -149,7 +149,7 @@ export default function Hero() {
         let drawWidth, drawHeight, offsetX, offsetY;
 
         const isMobile = window.innerWidth <= 1024;
-        const scale = isMobile ? 1.5 : 1.28;
+        const scale = isMobile ? 1.25 : 1.28;
 
         if (canvasAspect > imgAspect) {
           drawHeight = visibleHeight * scale;
@@ -160,7 +160,7 @@ export default function Hero() {
         }
 
         if (isMobile) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.17);
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
           offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
