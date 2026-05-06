@@ -53,9 +53,10 @@ export default function Hero() {
       );
     };
 
+    const mobileAnchorYRef = { current: null };
     const isMobile = checkIsMobile();
     const isMobileRef = { current: isMobile };
-    const scaleRef = { current: isMobile ? 1.25 : 1.28 };
+    const scaleRef = { current: isMobile ? 1.15 : 1.28 };
     const hasVerifiedRef = { current: false };
 
     const targetFrameRef = { current: 1 };
@@ -112,8 +113,15 @@ export default function Hero() {
         }
 
         if (isMobileRef.current) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
-          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.12);
+          
+          // CAPTURE & LOCK: 
+          // We calculate the position once and lock it forever.
+          // This ensures 100% visibility and zero movement.
+          if (mobileAnchorYRef.current === null && offscreen.height > 0) {
+            mobileAnchorYRef.current = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.12);
+          }
+          offsetY = mobileAnchorYRef.current || (((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.12));
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (offscreen.height - drawHeight) / 2 + (offscreen.height * 0.10);
