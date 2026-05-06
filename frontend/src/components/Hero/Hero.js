@@ -121,8 +121,8 @@ export default function Hero() {
         }
 
         if (isMobileRef.current) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.15);
-          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.05);
+          offsetX = ((visibleWidth - drawWidth) / 2) - (visibleWidth * 0.15);
+          offsetY = ((visibleHeight - drawHeight) / 2) + (visibleHeight * 0.05);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
