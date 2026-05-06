@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const passport = require('./config/passport');
 const sequelize = require('./config/database');
 require('./models/associations'); // LOAD ASSOCIATIONS FIRST
