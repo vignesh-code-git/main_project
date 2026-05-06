@@ -43,7 +43,7 @@ export default function Hero() {
 
     // --- STABLE DETECTION REFS ---
     const isMobileRef = { current: typeof window !== 'undefined' && (window.innerWidth <= 1024 || window.matchMedia('(max-width: 1024px)').matches) };
-    const scaleRef = { current: isMobileRef.current ? 1.05 : 1.10 };
+    const scaleRef = { current: isMobileRef.current ? 1.25 : 1.28 };
     const hasVerifiedRef = { current: false };
 
     const targetFrameRef = { current: 1 };
@@ -92,11 +92,11 @@ export default function Hero() {
         }
 
         if (isMobileRef.current) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.03);
-          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.18);
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
+          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
         } else {
-          offsetX = ((offscreen.width - drawWidth) / 2) + (offscreen.width * 0.05);
-          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.22);
+          offsetX = ((offscreen.width - drawWidth) / 2);
+          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
         }
 
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
@@ -231,7 +231,7 @@ export default function Hero() {
       const actualIsMobile = window.innerWidth <= 1024;
       if (actualIsMobile !== isMobileRef.current) {
         isMobileRef.current = actualIsMobile;
-        scaleRef.current = actualIsMobile ? 1.05 : 1.10;
+        scaleRef.current = actualIsMobile ? 1.25 : 1.28;
       }
 
       const dpr = window.devicePixelRatio || 1;
