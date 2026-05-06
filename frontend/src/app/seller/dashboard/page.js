@@ -48,7 +48,9 @@ export default function SellerDashboard() {
     if (user) {
       // Check if profile is complete
       const isComplete = user.phoneNumber && user.address && user.zipCode;
-      if (!isComplete) {
+      const hasDismissed = sessionStorage.getItem('onboarding_dismissed');
+
+      if (!isComplete && !hasDismissed) {
         setShowOnboarding(true);
       }
       
@@ -139,6 +141,7 @@ export default function SellerDashboard() {
       if (res.ok) {
         const data = await res.json();
         dispatch(updateUser(data.user));
+        sessionStorage.setItem('onboarding_dismissed', 'true');
         setShowOnboarding(false);
       } else {
         alert('Failed to update profile. Please try again.');
