@@ -22,15 +22,26 @@ export default function Hero() {
   const isLockedRef = useRef(true);
   const layoutMetrics = useRef({ totalScrollHeight: 0, canvasWidth: 0, canvasHeight: 0 });
 
-  // Preload images
+  // Guaranteed Loader Exit
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFadeOut(true);
+      const hideTimer = setTimeout(() => {
+        setPreloading(false);
+        isLockedRef.current = false;
+      }, 1000);
+      return () => clearTimeout(hideTimer);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Main Hero Animation logic
   useEffect(() => {
     if (!offscreenCanvasRef.current) {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    // --- SESSION STABILITY ---
-    // Lock these values once at mount using matchMedia (more reliable on refresh)
-    const isMobileSession = typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches;
+    const isMobileSession = typeof window !== 'undefined' && (window.innerWidth <= 1024 || window.matchMedia('(max-width: 1024px)').matches);
     const sessionScale = isMobileSession ? 1.25 : 1.28;
 
     const targetFrameRef = { current: 1 };
@@ -220,12 +231,8 @@ export default function Hero() {
       updateCanvas(Math.round(currentFrameRef.current));
     }
 
-    // --- INITIALIZATION ---
-    // Added a small timeout to allow mobile browsers to settle their layout after a refresh
-    const initTimeout = setTimeout(() => {
-      handleResize();
-      handleScroll();
-    }, 100);
+    handleResize();
+    handleScroll();
 
     const preloadImages = async () => {
       const loadFrame = (i) => {
@@ -237,7 +244,7 @@ export default function Hero() {
             if (i === 1) updateCanvas(1);
             resolve();
           };
-          img.onerror = resolve;
+          img.onerror = () => resolve();
           img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
           imagesRef.current[i] = img;
         });
@@ -245,12 +252,7 @@ export default function Hero() {
 
       await loadFrame(1);
       setFadeOut(true);
-      setTimeout(() => {
-        setPreloading(false);
-        setTimeout(() => {
-          isLockedRef.current = false;
-        }, 1500);
-      }, 1200);
+      setTimeout(() => setPreloading(false), 800);
 
       const initialBatch = [];
       for (let i = 2; i <= Math.min(15, frameCount); i++) initialBatch.push(loadFrame(i));
@@ -326,15 +328,15 @@ export default function Hero() {
             </h1>
             <div className="hero-description-container">
               <p className="hero-description animate-text">
-                Browse through our diverse range of meticulously crafted garments, designed <br />
-                to bring out your individuality and cater to your sense of style.
+                Browse our diverse range of meticulously crafted garments, designed
+                to bring out your unique individuality and style.
               </p>
               <p
                 className="hero-description gradient-overlay animate-text"
                 style={{ clipPath: `polygon(0% 0%, ${descProgress * 105}% 0%, ${descProgress * 105 - 5}% 100%, 0% 100%)` }}
               >
-                Browse through our diverse range of meticulously crafted garments, designed <br />
-                to bring out your individuality and cater to your sense of style.
+                Browse our diverse range of meticulously crafted garments, designed
+                to bring out your unique individuality and style.
               </p>
             </div>
             <button className="shop-now-btn animate-text">Shop Now</button>
