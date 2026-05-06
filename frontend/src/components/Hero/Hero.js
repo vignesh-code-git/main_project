@@ -24,17 +24,16 @@ export default function Hero() {
 
   // Preload images
   useEffect(() => {
-    // Create offscreen canvas for double buffering
     if (!offscreenCanvasRef.current) {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    // --- REFS & LOGIC DEFINITIONS ---
     const targetFrameRef = { current: 1 };
     const currentFrameRef = { current: 1 };
     const animationFrameRef = { current: null };
 
-    const updateCanvas = (index) => {
+    // --- HOISTED FUNCTIONS ---
+    function updateCanvas(index) {
       const canvas = canvasRef.current;
       const offscreen = offscreenCanvasRef.current;
       if (!canvas || !offscreen) return;
@@ -53,7 +52,6 @@ export default function Hero() {
 
       if (img) {
         const { canvasWidth, canvasHeight } = layoutMetrics.current;
-
         if (offscreen.width !== canvasWidth || offscreen.height !== canvasHeight) {
           offscreen.width = canvasWidth;
           offscreen.height = canvasHeight;
@@ -67,8 +65,8 @@ export default function Hero() {
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        // Use matchMedia for more reliable initial mobile detection
-        const isMobile = window.innerWidth <= 1024 || (typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches);
+        // CRITICAL: Stable mobile detection
+        const isMobile = window.innerWidth <= 1024;
         const scale = isMobile ? 1.25 : 1.28;
 
         if (canvasAspect > imgAspect) {
@@ -90,9 +88,9 @@ export default function Hero() {
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
         context.drawImage(offscreen, 0, 0);
       }
-    };
+    }
 
-    const smoothAnimate = () => {
+    function smoothAnimate() {
       const diff = targetFrameRef.current - currentFrameRef.current;
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
       const lerpFactor = isNearEnd ? 0.4 : 0.15;
@@ -106,9 +104,9 @@ export default function Hero() {
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = null;
       }
-    };
+    }
 
-    const handleScroll = () => {
+    function handleScroll() {
       if (!containerRef.current) return;
       const container = containerRef.current;
       const stickyTop = 110;
@@ -197,9 +195,9 @@ export default function Hero() {
       if (!animationFrameRef.current) {
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
       }
-    };
+    }
 
-    const handleResize = () => {
+    function handleResize() {
       if (!containerRef.current || !canvasRef.current) return;
       const dpr = window.devicePixelRatio || 1;
       const container = containerRef.current;
@@ -219,7 +217,7 @@ export default function Hero() {
       context.fillRect(0, 0, canvas.width, canvas.height);
 
       updateCanvas(Math.round(currentFrameRef.current));
-    };
+    }
 
     // --- INITIALIZATION ---
     handleResize();
