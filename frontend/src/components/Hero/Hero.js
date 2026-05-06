@@ -54,6 +54,7 @@ export default function Hero() {
     };
 
     const mobileAnchorYRef = { current: null };
+    const initialCanvasHeightRef = { current: null };
     const isMobile = checkIsMobile();
     const isMobileRef = { current: isMobile };
     const scaleRef = { current: 1.25 }; // Use consistent scale to prevent jumps
@@ -112,15 +113,10 @@ export default function Hero() {
         }
 
         if (isMobileRef.current) {
+          // With the Resolution Lock in place, offscreen.height is now stable on mobile.
+          // This allows us to use the simple logic you liked without any jumping.
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.12);
-          
-          // CAPTURE & LOCK: 
-          // We calculate the position once and lock it forever.
-          // This ensures 100% visibility and zero movement.
-          if (mobileAnchorYRef.current === null && offscreen.height > 0) {
-            mobileAnchorYRef.current = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.12);
-          }
-          offsetY = mobileAnchorYRef.current || (((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.12));
+          offsetY = ((offscreen.height - drawHeight) / 2) + (offscreen.height * 0.12);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
           offsetY = (offscreen.height - drawHeight) / 2 + (offscreen.height * 0.10);
@@ -252,10 +248,26 @@ export default function Hero() {
       const container = containerRef.current;
       const canvas = canvasRef.current;
 
+      const newCanvasWidth = canvas.offsetWidth * dpr;
+      const newCanvasHeight = canvas.offsetHeight * dpr;
+
+      // RESOLUTION LOCK: On mobile, we lock the internal canvas resolution 
+      // to the first measurement. This prevents the address bar from 
+      // causing the image to resize or jump.
+      if (isMobileRef.current) {
+        if (initialCanvasHeightRef.current === null && newCanvasHeight > 0) {
+          initialCanvasHeightRef.current = newCanvasHeight;
+        }
+      } else {
+        initialCanvasHeightRef.current = null; // Reset if switching to desktop
+      }
+
       layoutMetrics.current = {
         totalScrollHeight: container.offsetHeight - window.innerHeight,
-        canvasWidth: canvas.offsetWidth * dpr,
-        canvasHeight: canvas.offsetHeight * dpr
+        canvasWidth: newCanvasWidth,
+        canvasHeight: (isMobileRef.current && initialCanvasHeightRef.current) 
+          ? initialCanvasHeightRef.current 
+          : newCanvasHeight
       };
 
       canvas.width = layoutMetrics.current.canvasWidth;
