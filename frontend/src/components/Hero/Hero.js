@@ -56,16 +56,16 @@ export default function Hero() {
     // --- SESSION STABILITY LOCKS ---
     // We lock these on the very first mount to prevent jumps when the browser's 
     // address bar or header resizes the layout.
-    const sessionMetricsRef = { 
+    const sessionMetricsRef = {
       current: typeof window !== 'undefined' ? {
         width: window.innerWidth,
         height: window.innerHeight,
         isMobile: checkIsMobile()
       } : { width: 0, height: 0, isMobile: false }
     };
-    
+
     const isMobileRef = { current: sessionMetricsRef.current.isMobile };
-    const scaleRef = { current: isMobileRef.current ? 1.25 : 1.28 };
+    const scaleRef = { current: isMobileRef.current ? 1.12 : 1.16 };
     const hasVerifiedRef = { current: false };
 
     const targetFrameRef = { current: 1 };
@@ -115,10 +115,10 @@ export default function Hero() {
 
         if (isMobileRef.current) {
           offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
-          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
+          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.15);
         } else {
           offsetX = ((offscreen.width - drawWidth) / 2);
-          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
+          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.20);
         }
 
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
@@ -253,7 +253,7 @@ export default function Hero() {
       const actualIsMobile = checkIsMobile();
       if (actualIsMobile !== isMobileRef.current) {
         isMobileRef.current = actualIsMobile;
-        scaleRef.current = actualIsMobile ? 1.25 : 1.28;
+        scaleRef.current = actualIsMobile ? 1.12 : 1.16;
       }
 
       const dpr = window.devicePixelRatio || 1;
@@ -297,7 +297,7 @@ export default function Hero() {
       };
 
       await loadFrame(1);
-      
+
       // Kickstart canvas with first frame
       updateCanvas(1);
       handleScroll();
