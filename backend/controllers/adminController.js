@@ -1,4 +1,4 @@
-const { User, Product, WebsiteSettings } = require('../models/associations');
+const { User, Product, WebsiteSettings, Category, Notification } = require('../models/associations');
 
 // @desc    Get all users (customers)
 // @route   GET /api/admin/users
@@ -96,9 +96,52 @@ const updateSettings = async (req, res) => {
   }
 };
 
+// @desc    Add a new category
+// @route   POST /api/admin/categories
+// @access  Private/Admin
+const addCategory = async (req, res) => {
+  try {
+    const { name, imageUrl } = req.body;
+    if (!name) {
+      return res.status(400).json({ message: 'Category name is required' });
+    }
+
+    const category = await Category.create({ name, imageUrl });
+    res.status(201).json(category);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete a category
+// @route   DELETE /api/admin/categories/:id
+// @access  Private/Admin
+const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findByPk(id);
+    if (!category) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    // Check if category has products
+    const productCount = await Product.count({ where: { categoryId: id } });
+    if (productCount > 0) {
+      return res.status(400).json({ message: `Cannot delete category: it contains ${productCount} products.` });
+    }
+
+    await category.destroy();
+    res.json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getAllSellers,
   getSettings,
-  updateSettings
+  updateSettings,
+  addCategory,
+  deleteCategory
 };

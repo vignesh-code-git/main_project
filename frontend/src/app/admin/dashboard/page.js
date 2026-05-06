@@ -15,6 +15,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [allOrders, setAllOrders] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [toast, setToast] = useState({ show: false, message: '' });
   const router = useRouter();
 
@@ -34,7 +36,8 @@ export default function AdminDashboard() {
           fetch(`${API_BASE_URL}/api/admin/sellers`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/admin/settings`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() })
+          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() })
         ]);
  
         const usersData = await usersRes.json();
@@ -48,6 +51,7 @@ export default function AdminDashboard() {
         setSettings(Array.isArray(settingsData) ? settingsData : []);
         setProducts(Array.isArray(productsData) ? productsData : (productsData.products || []));
         setAllOrders(Array.isArray(ordersData) ? ordersData : []);
+        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -122,6 +126,54 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/categories`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name: newCategoryName })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(prev => [...prev, data]);
+        setNewCategoryName('');
+        showToast('CATEGORY ADDED SUCCESSFULLY');
+      } else {
+        const err = await res.json();
+        showToast(err.message || 'FAILED TO ADD CATEGORY');
+      }
+    } catch (err) {
+      console.error('Error adding category:', err);
+      showToast('CONNECTION ERROR');
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      if (res.ok) {
+        setCategories(prev => prev.filter(c => c.id !== id));
+        showToast('CATEGORY DELETED');
+      } else {
+        const err = await res.json();
+        showToast(err.message || 'FAILED TO DELETE');
+      }
+    } catch (err) {
+      console.error('Error deleting category:', err);
+      showToast('CONNECTION ERROR');
+    }
+  };
+
   if (!authUser || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
 
   return (
@@ -136,6 +188,7 @@ export default function AdminDashboard() {
             { id: 'dashboard', label: 'Overview' },
             { id: 'orders', label: 'Orders' },
             { id: 'products', label: 'Products' },
+            { id: 'categories', label: 'Categories' },
             { id: 'sellers', label: 'Sellers' },
             { id: 'customers', label: 'Customers' },
             { id: 'settings', label: 'Web Settings' },
@@ -279,6 +332,67 @@ export default function AdminDashboard() {
                   ))}
                   {(!Array.isArray(products) || products.length === 0) && (
                     <tr><td colSpan="5" style={{ textAlign: 'center', padding: '64px' }}>Inventory is currently empty.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'categories' && (
+          <div className="view-container-stylish">
+            <header className="admin-page-header">
+              <h1>CATEGORY MANAGEMENT</h1>
+              <p>Organize products into logical groups for better browsing.</p>
+            </header>
+            
+            <div className="admin-card-stylish" style={{ marginBottom: '30px' }}>
+              <h2>Add New Category</h2>
+              <form onSubmit={handleAddCategory} className="admin-inline-form">
+                <input 
+                  type="text" 
+                  placeholder="Category Name (e.g. T-Shirts)"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="admin-input-stylish"
+                />
+                <button type="submit" className="btn-upload-premium" style={{ height: '48px', padding: '0 30px' }}>
+                  ADD CATEGORY
+                </button>
+              </form>
+            </div>
+
+            <div className="admin-card-stylish">
+              <h2>Existing Categories</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th>ID</th>
+                    <th>Product Count</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map(cat => (
+                    <tr key={cat.id}>
+                      <td style={{ fontWeight: '800' }}>{cat.name}</td>
+                      <td style={{ opacity: 0.6 }}>{cat.id}</td>
+                      <td>
+                        {products.filter(p => p.categoryId === cat.id).length} Products
+                      </td>
+                      <td>
+                        <button 
+                          className="btn-delete-admin"
+                          onClick={() => handleDeleteCategory(cat.id)}
+                        >
+                          DELETE
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {categories.length === 0 && (
+                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No categories found.</td></tr>
                   )}
                 </tbody>
               </table>

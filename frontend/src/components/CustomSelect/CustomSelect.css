@@ -24,7 +24,7 @@
 .custom-select-trigger.open {
   background: #fff;
   border-color: #000;
-  border-radius: 20px 20px 0 0;
+  border-radius: 20px 20px 0 0 !important;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
