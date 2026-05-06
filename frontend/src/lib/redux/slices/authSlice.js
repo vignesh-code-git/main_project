@@ -2,25 +2,31 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
 
-// Professional way: Fetch user from backend using HTTP-Only cookie on app load
+// Professional way: Fetch user from backend using JWT token on app load
 export const checkAuth = createAsyncThunk(
   'auth/checkAuth',
   async (_, { rejectWithValue }) => {
     try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) return rejectWithValue('No token');
+
       const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
-        withCredentials: true // Required for sending cookies
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
 const initialState = {
   user: null,
+  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
   isAuthenticated: false,
-  loading: true, // Start as true while we check the cookie
+  loading: true, 
   error: null,
 };
 
@@ -29,14 +35,23 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     login(state, action) {
-      state.user = action.payload;
+      const { user, token } = action.payload;
+      state.user = user;
+      state.token = token;
       state.isAuthenticated = true;
       state.loading = false;
+      if (typeof window !== 'undefined' && token) {
+        localStorage.setItem('token', token);
+      }
     },
     logout(state) {
       state.user = null;
+      state.token = null;
       state.isAuthenticated = false;
       state.loading = false;
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+      }
     },
     updateUser(state, action) {
       state.user = { ...state.user, ...action.payload };
@@ -57,8 +72,12 @@ const authSlice = createSlice({
       })
       .addCase(checkAuth.rejected, (state) => {
         state.user = null;
+        state.token = null;
         state.isAuthenticated = false;
         state.loading = false;
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+        }
       });
   }
 });

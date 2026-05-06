@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { fetchCart } from '@/lib/redux/slices/cartSlice';
 import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell, Info } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -41,9 +41,12 @@ export default function Navbar() {
     setMounted(true);
 
     // --- AUTOMATIC CONNECTIVITY TEST ---
-    fetch(`${API_BASE_URL}/`)
+    fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: getAuthHeaders()
+    })
       .then(res => {
-        if (res.ok) console.log("%c✅ BACKEND CONNECTED!", "color: #00ff00; font-weight: bold; font-size: 16px;");
+        if (res.ok) console.log("%c✅ BACKEND & AUTH CONNECTED!", "color: #00ff00; font-weight: bold; font-size: 16px;");
+        else if (res.status === 401) console.log("%cℹ️ BACKEND CONNECTED (Please Log In)", "color: #00aaff; font-weight: bold; font-size: 16px;");
         else console.log("%c⚠️ BACKEND LINK WRONG (Status " + res.status + ")", "color: #ffaa00; font-weight: bold; font-size: 16px;");
       })
       .catch(err => {
@@ -78,7 +81,7 @@ export default function Navbar() {
       if (append) setLoadingMore(true);
 
       const res = await fetch(`${API_BASE_URL}/api/notifications?page=${pageNum}&limit=10`, {
-        credentials: 'include',
+        headers: getAuthHeaders(),
         cache: 'no-store'
       });
 
@@ -128,7 +131,7 @@ export default function Navbar() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/notifications/mark-read`, {
         method: 'PUT',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       if (res.ok) {
         // Optimistically clear the unread indicators
@@ -145,7 +148,7 @@ export default function Navbar() {
       try {
         await fetch(`${API_BASE_URL}/api/notifications/mark-read/${notif.id}`, {
           method: 'PUT',
-          credentials: 'include'
+          headers: getAuthHeaders()
         });
         // Update local state
         setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n));
@@ -231,7 +234,7 @@ export default function Navbar() {
     try {
       await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       dispatch(logout());
       window.location.href = '/';

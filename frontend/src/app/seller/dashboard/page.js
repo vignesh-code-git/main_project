@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check, Star } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
 import './seller-dashboard.css';
 
@@ -68,7 +68,7 @@ export default function SellerDashboard() {
   const fetchDashboardStats = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/seller/stats`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       if (data.stats) {
@@ -92,7 +92,7 @@ export default function SellerDashboard() {
   const fetchSellerOrders = async (sellerId) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       setOrders(data);
@@ -106,7 +106,7 @@ export default function SellerDashboard() {
   const fetchSellerReturns = async (sellerId) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}/returns`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       setReturns(data);
@@ -118,7 +118,7 @@ export default function SellerDashboard() {
   const fetchSellerFeedback = async (sellerId) => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}/feedback`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       setFeedback(data);
@@ -133,9 +133,8 @@ export default function SellerDashboard() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(onboardingData),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify(onboardingData)
       });
       
       if (res.ok) {
@@ -158,9 +157,8 @@ export default function SellerDashboard() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status: newStatus })
       });
 
       if (res.ok) {
@@ -185,7 +183,7 @@ export default function SellerDashboard() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
 
       if (res.ok) {

@@ -13,3 +13,14 @@ export const API_ENDPOINTS = {
   NOTIFICATIONS: `${API_BASE_URL}/api/notifications`,
   UPLOADS: `${API_BASE_URL}/uploads`, // For images
 };
+
+// Helper for authenticated requests
+export const getAuthHeaders = () => {
+  if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
+  
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+};

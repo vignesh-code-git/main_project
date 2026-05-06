@@ -41,8 +41,8 @@ export default function CustomerAuth() {
       
       if (!res.ok) throw new Error(data.message || 'Something went wrong');
 
-      // Dispatch login with user data (cookie is handled by browser)
-      dispatch(login(data.user));
+      // Dispatch login with user data and token
+      dispatch(login(data));
 
       // Redirect based on role
       if (data.user.role === 'admin') {

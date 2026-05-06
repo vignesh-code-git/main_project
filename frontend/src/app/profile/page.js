@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { Package, MapPin, User, Settings, ShoppingBag, Truck, ChevronRight, X, Plus, Trash2, Edit3, Loader2, FileText } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './profile.css';
 
@@ -74,7 +74,7 @@ export default function UserProfile() {
   const fetchOrders = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/user/${user.id}`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
@@ -88,7 +88,7 @@ export default function UserProfile() {
   const fetchAddresses = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/addresses`, {
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       setAddresses(Array.isArray(data) ? data : []);
@@ -109,9 +109,8 @@ export default function UserProfile() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(addressForm),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify(addressForm)
       });
 
       if (res.ok) {
@@ -129,9 +128,8 @@ export default function UserProfile() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileForm),
-        credentials: 'include'
+        headers: getAuthHeaders(),
+        body: JSON.stringify(profileForm)
       });
       if (res.ok) {
         window.location.reload();
@@ -150,7 +148,7 @@ export default function UserProfile() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/addresses/${addressToDelete}`, {
         method: 'DELETE',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
       if (res.ok) {
         fetchAddresses();
@@ -203,7 +201,7 @@ export default function UserProfile() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/${selectedOrderId}/cancel`, {
         method: 'PUT',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
 
       if (res.ok) {

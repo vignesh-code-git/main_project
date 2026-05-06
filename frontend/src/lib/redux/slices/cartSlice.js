@@ -7,10 +7,13 @@ export const fetchCart = createAsyncThunk(
   'cart/fetchCart',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/cart`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_BASE_URL}/api/cart`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -19,10 +22,13 @@ export const addItemToCart = createAsyncThunk(
   'cart/addItem',
   async (item, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/cart`, item, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_BASE_URL}/api/cart`, item, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -31,10 +37,13 @@ export const updateCartItem = createAsyncThunk(
   'cart/updateItem',
   async ({ id, quantity, size, color }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/api/cart/${id}`, { quantity, size, color }, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.put(`${API_BASE_URL}/api/cart/${id}`, { quantity, size, color }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -43,10 +52,13 @@ export const removeCartItem = createAsyncThunk(
   'cart/removeItem',
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/cart/${id}`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/cart/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return id;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -55,10 +67,13 @@ export const clearUserCart = createAsyncThunk(
   'cart/clearCart',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/cart`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/api/cart`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return null;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data);
     }
   }
 );
