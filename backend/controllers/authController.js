@@ -50,7 +50,8 @@ const registerUser = async (req, res) => {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
+          storeName: user.storeName
         },
         token
       });
@@ -106,7 +107,14 @@ const loginUser = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
-          avatar: user.avatar
+          avatar: user.avatar,
+          phoneNumber: user.phoneNumber,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          zipCode: user.zipCode,
+          country: user.country,
+          storeName: user.storeName
         },
         token
       });

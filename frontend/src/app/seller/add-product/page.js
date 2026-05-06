@@ -8,13 +8,13 @@ import CustomSelect from '@/components/CustomSelect/CustomSelect';
 export default function AddProductPage() {
   const [formData, setFormData] = useState({
     name: '',
+    categoryId: '',
     price: '',
     originalPrice: '',
     description: '',
-    categoryId: '',
     style: '',
     brand: '',
-    colors: ['Black'],
+    colors: [],
     sizes: [],
     isNewArrival: false,
     isTopSelling: false,
@@ -112,10 +112,9 @@ export default function AddProductPage() {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Product name is required';
-    if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
-    if (!formData.categoryId) newErrors.categoryId = 'Category is required';
-    if (!formData.style) newErrors.style = 'Dress style is required';
+    if (!formData.name) newErrors.name = 'Product name is required';
+    if (!formData.categoryId) newErrors.category = 'Category is required';
+    if (!formData.price) newErrors.price = 'Price is required';
     if (!formData.brand) newErrors.brand = 'Brand is required';
     if (formData.sizes.length === 0) newErrors.sizes = 'Select at least one size';
     if (!formData.description || formData.description.length < 10) {
@@ -172,8 +171,10 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submission started. Data:', formData);
 
     if (!validate()) {
+      console.error('Validation failed', errors);
       setSingleStatus({ type: 'error', message: 'Please fill the required fields' });
       return;
     }
@@ -181,15 +182,21 @@ export default function AddProductPage() {
     setSingleStatus({ type: 'loading', message: 'Adding product...' });
 
     const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key === 'colors') {
-        submitData.append('color', formData.colors.join(','));
-      } else if (key === 'sizes') {
-        submitData.append('size', formData.sizes.join(','));
-      } else {
-        submitData.append(key, formData[key]);
-      }
-    });
+    submitData.append('name', formData.name);
+    submitData.append('categoryId', Number(formData.categoryId));
+    submitData.append('price', formData.price);
+    submitData.append('originalPrice', formData.originalPrice);
+    submitData.append('description', formData.description);
+    submitData.append('style', formData.style);
+    submitData.append('brand', formData.brand);
+    submitData.append('stock', formData.stock);
+    submitData.append('sku', formData.sku);
+    submitData.append('deliveryDays', formData.deliveryDays);
+    submitData.append('color', formData.colors.join(','));
+    submitData.append('size', formData.sizes.join(','));
+    submitData.append('isNewArrival', formData.isNewArrival);
+    submitData.append('isTopSelling', formData.isTopSelling);
+    submitData.append('isFreeDelivery', formData.isFreeDelivery);
 
     const detailsObj = {};
     productDetails.forEach(row => {
@@ -207,9 +214,12 @@ export default function AddProductPage() {
 
     if (videoFile) {
       submitData.append('video', videoFile);
+    } else if (formData.videoUrl) {
+      submitData.append('videoUrl', formData.videoUrl);
     }
 
     try {
+      console.log('Sending data to API...');
       const response = await fetch(`${API_BASE_URL}/api/products`, {
         method: 'POST',
         headers: {
@@ -219,6 +229,7 @@ export default function AddProductPage() {
       });
 
       if (response.ok) {
+        console.log('Product added successfully');
         setSingleStatus({ type: 'success', message: 'Product added successfully!' });
         setFormData({
           name: '',
@@ -228,7 +239,7 @@ export default function AddProductPage() {
           categoryId: '',
           style: '',
           brand: '',
-          colors: ['Black'],
+          colors: [],
           sizes: [],
           isNewArrival: false,
           isTopSelling: false,
@@ -246,23 +257,10 @@ export default function AddProductPage() {
           { label: 'Care', value: 'Machine wash cold, tumble dry low' }
         ]);
         setColorFiles({});
-        e.target.reset();
       } else {
-        let errorMsg = 'Failed to add product.';
-        try {
-          const errorData = await response.json();
-          if (Array.isArray(errorData)) {
-            errorMsg = errorData.map(e => e.message).join(', ');
-          } else {
-            errorMsg = errorData.message || errorMsg;
-            if (errorData.errors && Array.isArray(errorData.errors)) {
-              errorMsg = errorData.errors.map(e => e.message).join(', ');
-            }
-          }
-        } catch (parseErr) {
-          errorMsg = `Server error: ${response.status} ${response.statusText}`;
-        }
-        setSingleStatus({ type: 'error', message: errorMsg });
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        setSingleStatus({ type: 'error', message: errorData.message || 'Failed to add product.' });
       }
     } catch (err) {
       console.error('Product creation error:', err);
@@ -404,18 +402,20 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            <div className={`form-group ${errors.categoryId ? 'has-error' : ''}`}>
+            <div className={`form-group ${errors.category ? 'has-error' : ''}`}>
               <label>Category</label>
               <CustomSelect
                 options={categories}
                 value={formData.categoryId}
                 onChange={(e) => {
                   setFormData(prev => ({ ...prev, categoryId: e.target.value }));
-                  if (errors.categoryId) setErrors(prev => ({ ...prev, categoryId: null }));
+                  if (errors.category) setErrors(prev => ({ ...prev, category: null }));
                 }}
                 placeholder="Select Category"
+                labelKey="name"
+                valueKey="id"
               />
-              {errors.categoryId && <span className="error-text">{errors.categoryId}</span>}
+              {errors.category && <span className="error-text">{errors.category}</span>}
             </div>
 
             <div className={`form-group ${errors.style ? 'has-error' : ''}`}>
