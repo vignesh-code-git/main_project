@@ -41,8 +41,10 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    const isMobileSession = typeof window !== 'undefined' && (window.innerWidth <= 1024 || window.matchMedia('(max-width: 1024px)').matches);
-    const sessionScale = isMobileSession ? 1.25 : 1.28;
+    // --- STABLE DETECTION REFS ---
+    const isMobileRef = { current: typeof window !== 'undefined' && (window.innerWidth <= 1024 || window.matchMedia('(max-width: 1024px)').matches) };
+    const scaleRef = { current: isMobileRef.current ? 1.05 : 1.10 };
+    const hasVerifiedRef = { current: false };
 
     const targetFrameRef = { current: 1 };
     const currentFrameRef = { current: 1 };
@@ -82,19 +84,19 @@ export default function Hero() {
         let drawWidth, drawHeight, offsetX, offsetY;
 
         if (canvasAspect > imgAspect) {
-          drawHeight = visibleHeight * sessionScale;
+          drawHeight = visibleHeight * scaleRef.current;
           drawWidth = drawHeight * imgAspect;
         } else {
-          drawWidth = offscreen.width * sessionScale;
+          drawWidth = offscreen.width * scaleRef.current;
           drawHeight = drawWidth / imgAspect;
         }
 
-        if (isMobileSession) {
-          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.10);
-          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.06);
+        if (isMobileRef.current) {
+          offsetX = ((offscreen.width - drawWidth) / 2) - (offscreen.width * 0.03);
+          offsetY = ((visibleHeight - drawHeight) / 2) + (offscreen.height * 0.18);
         } else {
-          offsetX = ((offscreen.width - drawWidth) / 2);
-          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.10);
+          offsetX = ((offscreen.width - drawWidth) / 2) + (offscreen.width * 0.05);
+          offsetY = (visibleHeight - drawHeight) / 2 + (offscreen.height * 0.22);
         }
 
         offContext.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
@@ -120,6 +122,19 @@ export default function Hero() {
 
     function handleScroll() {
       if (!containerRef.current) return;
+
+      // Verification Check: On the very first scroll, double check if we correctly detected mobile.
+      // This prevents the "large then small" jump if innerWidth was reported wrong at mount.
+      if (!hasVerifiedRef.current) {
+        const actualIsMobile = window.innerWidth <= 1024;
+        if (actualIsMobile !== isMobileRef.current) {
+          isMobileRef.current = actualIsMobile;
+          scaleRef.current = actualIsMobile ? 1.25 : 1.28;
+          handleResize(); // Force re-calculation with correct scale
+        }
+        hasVerifiedRef.current = true;
+      }
+
       const container = containerRef.current;
       const stickyTop = 110;
       const startPoint = container.offsetTop - stickyTop;
@@ -211,6 +226,14 @@ export default function Hero() {
 
     function handleResize() {
       if (!containerRef.current || !canvasRef.current) return;
+
+      // Continuous verification: Update detection on every resize/rotation
+      const actualIsMobile = window.innerWidth <= 1024;
+      if (actualIsMobile !== isMobileRef.current) {
+        isMobileRef.current = actualIsMobile;
+        scaleRef.current = actualIsMobile ? 1.05 : 1.10;
+      }
+
       const dpr = window.devicePixelRatio || 1;
       const container = containerRef.current;
       const canvas = canvasRef.current;
@@ -328,15 +351,27 @@ export default function Hero() {
             </h1>
             <div className="hero-description-container">
               <p className="hero-description animate-text">
-                Browse our diverse range of meticulously crafted garments, designed
-                to bring out your unique individuality and style.
+                <span className="desktop-tablet-only">
+                  Browse through our diverse range of meticulously crafted garments, designed <br className="desktop-tablet-only" />
+                  to bring out your individuality and cater to your sense of style.
+                </span>
+                <span className="phone-only">
+                  Browse our diverse range of meticulously crafted garments, designed
+                  to bring out your unique individuality and style.
+                </span>
               </p>
               <p
                 className="hero-description gradient-overlay animate-text"
                 style={{ clipPath: `polygon(0% 0%, ${descProgress * 105}% 0%, ${descProgress * 105 - 5}% 100%, 0% 100%)` }}
               >
-                Browse our diverse range of meticulously crafted garments, designed
-                to bring out your unique individuality and style.
+                <span className="desktop-tablet-only">
+                  Browse through our diverse range of meticulously crafted garments, designed <br className="desktop-tablet-only" />
+                  to bring out your individuality and cater to your sense of style.
+                </span>
+                <span className="phone-only">
+                  Browse our diverse range of meticulously crafted garments, designed
+                  to bring out your unique individuality and style.
+                </span>
               </p>
             </div>
             <button className="shop-now-btn animate-text">Shop Now</button>

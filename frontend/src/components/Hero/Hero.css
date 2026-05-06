@@ -374,10 +374,18 @@
 
   .hero-description {
     font-size: 13px !important;
-    line-height: 1.5;
+    line-height: 1.4;
     color: rgba(0, 0, 0, 0.6);
     text-align: left;
     width: 100%;
+  }
+
+  /* Extra tight for small phones like iPhone SE / 383px width */
+  @media (max-width: 480px) {
+    .hero-description {
+      font-size: 12px !important;
+      line-height: 1.3;
+    }
   }
 
   .hero-description.gradient-overlay {
@@ -472,6 +480,19 @@
     font-size: 28px;
     left: 10%;
     bottom: 30%;
+  }
+}
+
+.phone-only {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .phone-only {
+    display: inline;
+  }
+  .desktop-tablet-only {
+    display: none;
   }
 }
 
