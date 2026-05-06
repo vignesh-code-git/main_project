@@ -12,6 +12,10 @@ const WebsiteSettings = require('./WebsiteSettings');
 const Payment = require('./Payment');
 const Return = require('./Return');
 const DeliveryFeedback = require('./DeliveryFeedback');
+const Brand = require('./Brand');
+const Style = require('./Style');
+const Size = require('./Size');
+const Color = require('./Color');
 
 // Define associations
 User.hasMany(Product, { foreignKey: 'sellerId' });
@@ -83,5 +87,9 @@ module.exports = {
   WebsiteSettings,
   Payment,
   Return,
-  DeliveryFeedback
+  DeliveryFeedback,
+  Brand,
+  Style,
+  Size,
+  Color
 };

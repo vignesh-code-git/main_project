@@ -1,4 +1,4 @@
-const { Product, ProductImage, Category, User, Review } = require('../models/associations');
+const { Product, ProductImage, Category, User, Review, Brand, Style, Size, Color } = require('../models/associations');
 const fs = require('fs');
 const csv = require('csv-parser');
 
@@ -368,11 +368,35 @@ exports.getCategories = async (req, res) => {
 
 exports.getBrands = async (req, res) => {
   try {
-    const products = await Product.findAll({
-      attributes: [[Product.sequelize.fn('DISTINCT', Product.sequelize.col('brand')), 'brand']],
-      raw: true
-    });
-    res.json(Array.isArray(products) ? products.map(p => p.brand).filter(b => b) : []);
+    const brands = await Brand.findAll({ order: [['name', 'ASC']] });
+    res.json(brands);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getStyles = async (req, res) => {
+  try {
+    const styles = await Style.findAll({ order: [['name', 'ASC']] });
+    res.json(styles);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getSizes = async (req, res) => {
+  try {
+    const sizes = await Size.findAll(); // Order as added or add a position field later
+    res.json(sizes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getColors = async (req, res) => {
+  try {
+    const colors = await Color.findAll({ order: [['name', 'ASC']] });
+    res.json(colors);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -11,6 +11,9 @@ router.get('/new-arrivals', productController.getNewArrivals);
 router.get('/top-selling', productController.getTopSelling);
 router.get('/categories', productController.getCategories);
 router.get('/brands', productController.getBrands);
+router.get('/styles', productController.getStyles);
+router.get('/sizes', productController.getSizes);
+router.get('/colors', productController.getColors);
 router.get('/stats', productController.getStats);
 router.get('/:id', productController.getProductById);
 
