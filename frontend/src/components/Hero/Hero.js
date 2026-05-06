@@ -53,7 +53,18 @@ export default function Hero() {
       );
     };
 
-    const isMobileRef = { current: checkIsMobile() };
+    // --- SESSION STABILITY LOCKS ---
+    // We lock these on the very first mount to prevent jumps when the browser's 
+    // address bar or header resizes the layout.
+    const sessionMetricsRef = { 
+      current: typeof window !== 'undefined' ? {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        isMobile: checkIsMobile()
+      } : { width: 0, height: 0, isMobile: false }
+    };
+    
+    const isMobileRef = { current: sessionMetricsRef.current.isMobile };
     const scaleRef = { current: isMobileRef.current ? 1.25 : 1.28 };
     const hasVerifiedRef = { current: false };
 
