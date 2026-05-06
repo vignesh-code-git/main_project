@@ -29,86 +29,7 @@ export default function Hero() {
       offscreenCanvasRef.current = document.createElement('canvas');
     }
 
-    const preloadImages = async () => {
-      const loadFrame = (i) => {
-        return new Promise((resolve) => {
-          if (imagesRef.current[i]) return resolve();
-          const frameNum = String(i).padStart(3, '0');
-          const img = new Image();
-          img.onload = () => {
-            if (i === 1) updateCanvas(1);
-            resolve();
-          };
-          img.onerror = resolve;
-          img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
-          imagesRef.current[i] = img;
-        });
-      };
-
-      // Phase 1: Instant - First frame only
-      await loadFrame(1);
-
-      // Hide loader early with a smooth reveal
-      setFadeOut(true);
-      setTimeout(() => {
-        setPreloading(false);
-        // Unlock scroll interaction after text animations finish (approx 1.5s after reveal)
-        setTimeout(() => {
-          isLockedRef.current = false;
-        }, 1500);
-      }, 1200);
-
-      // Phase 2: Smooth Start
-      const initialBatch = [];
-      for (let i = 2; i <= Math.min(15, frameCount); i++) {
-        initialBatch.push(loadFrame(i));
-      }
-      await Promise.all(initialBatch);
-
-      // Phase 3: Rough Sequence
-      const roughBatch = [];
-      for (let i = 20; i <= frameCount; i += 5) {
-        roughBatch.push(loadFrame(i));
-      }
-      await Promise.all(roughBatch);
-
-      // Phase 4: Final Polish
-      const remainingFrames = [];
-      for (let i = 1; i <= frameCount; i++) {
-        if (!imagesRef.current[i]) remainingFrames.push(i);
-      }
-
-      for (let i = 0; i < remainingFrames.length; i += 10) {
-        const chunk = remainingFrames.slice(i, i + 10);
-        await Promise.all(chunk.map(frame => loadFrame(frame)));
-      }
-    };
-
-    preloadImages();
-
-    const fetchHeroData = async () => {
-      try {
-        const statsRes = await fetch(`${API_BASE_URL}/api/products/stats`);
-        if (statsRes.ok) {
-          const statsData = await statsRes.json();
-          if (statsData && typeof statsData.products !== 'undefined') {
-            setStats({
-              brands: `${statsData.brands || 0}+`,
-              products: `${(statsData.products || 0).toLocaleString()}+`,
-              customers: `${(statsData.customers || 0).toLocaleString()}+`
-            });
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch hero data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHeroData();
-
-    // Scroll Animation Logic
+    // --- REFS & LOGIC DEFINITIONS ---
     const targetFrameRef = { current: 1 };
     const currentFrameRef = { current: 1 };
     const animationFrameRef = { current: null };
@@ -121,8 +42,6 @@ export default function Hero() {
       const context = canvas.getContext('2d', { alpha: false });
       const offContext = offscreen.getContext('2d', { alpha: false });
 
-      // STICKY FRAME LOGIC: Never show white space. 
-      // If the frame isn't ready, find the closest one that is.
       let img = null;
       for (let i = index; i >= 1; i--) {
         const check = imagesRef.current[i];
@@ -148,7 +67,8 @@ export default function Hero() {
         const imgAspect = img.width / img.height;
         let drawWidth, drawHeight, offsetX, offsetY;
 
-        const isMobile = window.innerWidth <= 1024;
+        // Use matchMedia for more reliable initial mobile detection
+        const isMobile = window.innerWidth <= 1024 || (typeof window !== 'undefined' && window.matchMedia('(max-width: 1024px)').matches);
         const scale = isMobile ? 1.25 : 1.28;
 
         if (canvasAspect > imgAspect) {
@@ -174,8 +94,6 @@ export default function Hero() {
 
     const smoothAnimate = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
-
-      // If we are at the very end or start, snap faster to prevent "lagging" behind the scroll
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
       const lerpFactor = isNearEnd ? 0.4 : 0.15;
 
@@ -192,20 +110,16 @@ export default function Hero() {
 
     const handleScroll = () => {
       if (!containerRef.current) return;
-
       const container = containerRef.current;
       const stickyTop = 110;
-
       const startPoint = container.offsetTop - stickyTop;
       const totalStickySpace = container.offsetHeight - (window.innerHeight - stickyTop);
-
       const currentScroll = window.scrollY;
       const scrolledDistance = Math.max(0, currentScroll - startPoint);
 
       const flipperRatio = 0.22;
       const flipperLimit = totalStickySpace * flipperRatio;
 
-      // --- WORD INDEX LOGIC (Independent of phases to prevent skipping on fast scroll) ---
       let newWordIndex = 0;
       if (scrolledDistance <= flipperLimit) {
         const textProgress = scrolledDistance / flipperLimit;
@@ -213,18 +127,15 @@ export default function Hero() {
         else if (textProgress < 0.55) newWordIndex = 1;
         else newWordIndex = 2;
       } else {
-        newWordIndex = 2; // Lockdown on STYLE after flipper phase
+        newWordIndex = 2;
       }
       setWordIndex(prev => prev !== newWordIndex ? newWordIndex : prev);
 
-      // --- PHASE 1: WORD FLIPPER (0% - 22% of scroll) ---
       if (scrolledDistance <= flipperLimit) {
-        setDescProgress(0); // Reset description wipe
-
+        setDescProgress(0);
         targetFrameRef.current = 1;
         currentFrameRef.current = 1;
         updateCanvas(1);
-
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
@@ -232,32 +143,24 @@ export default function Hero() {
         return;
       }
 
-      // --- STAY ZONE: Pause before description starts (22% - 24% of scroll) ---
       const stayRatio = 0.24;
       const stayLimit = totalStickySpace * stayRatio;
-
       if (scrolledDistance <= stayLimit) {
-        setDescProgress(0); // Hold description at start
-
+        setDescProgress(0);
         targetFrameRef.current = 1;
         currentFrameRef.current = 1;
         updateCanvas(1);
         return;
       }
 
-      // --- PHASE 2: DESCRIPTION GRADIENT WIPE (24% - 50% of scroll) ---
       const descRatio = 0.50;
       const descLimit = totalStickySpace * descRatio;
-
       if (scrolledDistance <= descLimit) {
         const progress = (scrolledDistance - stayLimit) / (descLimit - stayLimit);
         setDescProgress(progress);
-
-        // HARD LOCK: Image stays at Frame 1 during description wipe
         targetFrameRef.current = 1;
         currentFrameRef.current = 1;
         updateCanvas(1);
-
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
@@ -265,13 +168,9 @@ export default function Hero() {
         return;
       }
 
-      // --- PHASE 3: IMAGE REVEAL (50% - 100% of scroll) ---
-      setDescProgress(1); // Full gradient
-
+      setDescProgress(1);
       const imageScrolledDistance = scrolledDistance - descLimit;
       const imageZoneSpace = totalStickySpace - descLimit;
-
-      // Reserve 5% as a hold at the start of Phase 3
       const midBuffer = imageZoneSpace * 0.05;
 
       if (imageScrolledDistance <= midBuffer) {
@@ -282,8 +181,6 @@ export default function Hero() {
 
       const activeImageDistance = imageScrolledDistance - midBuffer;
       const activeImageRange = imageZoneSpace - midBuffer;
-
-      // Last 5% hold for the final frame
       const animationBuffer = activeImageRange * 0.95;
 
       if (activeImageDistance >= animationBuffer) {
@@ -317,7 +214,6 @@ export default function Hero() {
       canvas.width = layoutMetrics.current.canvasWidth;
       canvas.height = layoutMetrics.current.canvasHeight;
 
-      // Fill with theme color immediately to prevent black flash
       const context = canvas.getContext('2d', { alpha: false });
       context.fillStyle = '#F2F0F1';
       context.fillRect(0, 0, canvas.width, canvas.height);
@@ -325,12 +221,77 @@ export default function Hero() {
       updateCanvas(Math.round(currentFrameRef.current));
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleResize);
-
-    // Initial setup
+    // --- INITIALIZATION ---
     handleResize();
     handleScroll();
+
+    const preloadImages = async () => {
+      const loadFrame = (i) => {
+        return new Promise((resolve) => {
+          if (imagesRef.current[i]) return resolve();
+          const frameNum = String(i).padStart(3, '0');
+          const img = new Image();
+          img.onload = () => {
+            if (i === 1) updateCanvas(1);
+            resolve();
+          };
+          img.onerror = resolve;
+          img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
+          imagesRef.current[i] = img;
+        });
+      };
+
+      await loadFrame(1);
+      setFadeOut(true);
+      setTimeout(() => {
+        setPreloading(false);
+        setTimeout(() => {
+          isLockedRef.current = false;
+        }, 1500);
+      }, 1200);
+
+      const initialBatch = [];
+      for (let i = 2; i <= Math.min(15, frameCount); i++) initialBatch.push(loadFrame(i));
+      await Promise.all(initialBatch);
+
+      const roughBatch = [];
+      for (let i = 20; i <= frameCount; i += 5) roughBatch.push(loadFrame(i));
+      await Promise.all(roughBatch);
+
+      const remainingFrames = [];
+      for (let i = 1; i <= frameCount; i++) if (!imagesRef.current[i]) remainingFrames.push(i);
+      for (let i = 0; i < remainingFrames.length; i += 10) {
+        const chunk = remainingFrames.slice(i, i + 10);
+        await Promise.all(chunk.map(frame => loadFrame(frame)));
+      }
+    };
+
+    preloadImages();
+
+    const fetchHeroData = async () => {
+      try {
+        const statsRes = await fetch(`${API_BASE_URL}/api/products/stats`);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          if (statsData && typeof statsData.products !== 'undefined') {
+            setStats({
+              brands: `${statsData.brands || 0}+`,
+              products: `${(statsData.products || 0).toLocaleString()}+`,
+              customers: `${(statsData.customers || 0).toLocaleString()}+`
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch hero data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeroData();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
