@@ -480,6 +480,24 @@ exports.updateProduct = async (req, res) => {
         : videoUrl
     });
 
+    // Handle NEW images uploaded during update
+    if (req.files && Array.isArray(req.files)) {
+      const newImages = req.files
+        .filter(file => file.fieldname.startsWith('images_'))
+        .map(file => {
+          const colorMatch = file.fieldname.match(/^images_(.+)$/);
+          return {
+            url: `/uploads/${file.filename}`,
+            productId: product.id,
+            color: colorMatch ? colorMatch[1] : null
+          };
+        });
+      
+      if (newImages.length > 0) {
+        await ProductImage.bulkCreate(newImages);
+      }
+    }
+
     // Create Notification
     try {
       const { Notification } = require('../models/associations');
