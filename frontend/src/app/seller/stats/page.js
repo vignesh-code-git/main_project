@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import {
   BarChart3,
   TrendingUp,
@@ -24,7 +23,7 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import './stats.css';
 
 export default function PerformancePage() {
@@ -59,12 +58,15 @@ export default function PerformancePage() {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/seller/stats`, {
-        withCredentials: true
+      const response = await fetch(`${API_BASE_URL}/api/seller/stats`, {
+        headers: getAuthHeaders()
       });
-      setStatsData(response.data.stats);
-      setActivityFeed(response.data.activity);
-      setChartData(response.data.chartData || []);
+      if (response.ok) {
+        const data = await response.json();
+        setStatsData(data.stats);
+        setActivityFeed(data.activity || []);
+        setChartData(data.chartData || []);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching stats:', error);

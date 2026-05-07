@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { fetchCart } from '@/lib/redux/slices/cartSlice';
-import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell, Info } from 'lucide-react';
+import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell, Info, Store } from 'lucide-react';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import './Navbar.css';
 
@@ -247,7 +247,7 @@ export default function Navbar() {
 
   // Prevent hydration mismatch by returning null for auth-dependent parts during SSR
   const renderAuthLinks = () => {
-    if (!mounted) return <Link href="/seller/auth" className="become-seller-link">Become a Seller</Link>;
+    if (!mounted) return <Link href="/seller/auth" className="become-seller-link"><Store size={14} /> Become a Seller</Link>;
 
     if (user && user.role === 'admin') {
       return (
@@ -266,7 +266,7 @@ export default function Navbar() {
     }
 
     if (!isAuthenticated || (user && user.role !== 'admin')) {
-      return <Link href="/seller/auth" className="become-seller-link">Become a Seller</Link>;
+      return <Link href="/seller/auth" className="become-seller-link"><Store size={14} /> Become a Seller</Link>;
     }
 
     return null;
@@ -320,7 +320,7 @@ export default function Navbar() {
                   </Link>
                 ) : (
                   <Link href="/seller/auth" className="mobile-only" onClick={() => setMobileMenuOpen(false)}>
-                    Become a Seller
+                    <Store size={16} /> Become a Seller
                   </Link>
                 )}
               </li>

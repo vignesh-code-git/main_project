@@ -234,10 +234,21 @@ export default function StoreProfilePage() {
           </div>
 
           <div className="location-map-preview">
-            <div className="map-placeholder">
-              <Globe size={32} />
-              <span>Real-time location mapping coming soon</span>
-            </div>
+            {formData.address ? (
+              <iframe
+                width="100%"
+                height="300"
+                style={{ border: 0, borderRadius: '12px' }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(`${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipCode}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+              ></iframe>
+            ) : (
+              <div className="map-placeholder">
+                <Globe size={32} />
+                <span>Add your business address to see the map</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

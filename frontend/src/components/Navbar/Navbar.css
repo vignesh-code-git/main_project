@@ -273,6 +273,9 @@
   transition: opacity 0.3s;
   white-space: nowrap;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .dashboard-link {
