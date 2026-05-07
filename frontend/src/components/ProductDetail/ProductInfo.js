@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { addItemToCart, fetchCart } from '@/lib/redux/slices/cartSlice';
 import { Loader2, MapPin } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import RazorpayDemo from '../Payment/RazorpayDemo';
 import AlertModal from '../AlertModal/AlertModal';
 import './ProductInfo.css';

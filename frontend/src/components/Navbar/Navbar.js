@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '@/lib/redux/slices/authSlice';
 import { fetchCart } from '@/lib/redux/slices/cartSlice';
 import { Search, ShoppingCart, UserCircle, ChevronDown, LogOut, LayoutDashboard, Menu, X, User, Package, Settings, Loader2, Bell, Info } from 'lucide-react';
-import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -372,7 +372,7 @@ export default function Navbar() {
                     >
                       <div className="result-img">
                         <img
-                          src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'}
+                          src={product.images && product.images[0] ? resolveImageUrl(product.images[0].url) : '/placeholder.png'}
                           alt={product.name}
                         />
                       </div>
@@ -487,7 +487,7 @@ export default function Navbar() {
                                   <div className="notif-avatar-wrapper">
                                     {notif.metadata?.imageUrl ? (
                                       <img
-                                        src={notif.metadata.imageUrl.startsWith('http') ? notif.metadata.imageUrl : `${API_BASE_URL}${notif.metadata.imageUrl}`}
+                                        src={resolveImageUrl(notif.metadata.imageUrl)}
                                         alt="Notification"
                                         className="notif-image"
                                       />
@@ -548,7 +548,7 @@ export default function Navbar() {
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   >
                     {mounted && user?.avatar ? (
-                      <img src={`${API_BASE_URL}${user.avatar}`} alt="Avatar" className="nav-avatar-img" />
+                      <img src={resolveImageUrl(user.avatar)} alt="Avatar" className="nav-avatar-img" />
                     ) : (
                       <UserCircle size={24} />
                     )}
@@ -632,7 +632,7 @@ export default function Navbar() {
                       >
                         <div className="result-img">
                           <img
-                            src={product.images && product.images[0] ? product.images[0].url : '/placeholder.png'}
+                            src={product.images && product.images[0] ? resolveImageUrl(product.images[0].url) : '/placeholder.png'}
                             alt={product.name}
                           />
                         </div>
