@@ -113,10 +113,34 @@ export default function AdminDashboard() {
       '#808000': 'Olive',
       '#000080': 'Navy',
       '#87ceeb': 'Sky Blue',
-      '#32cd32': 'Lime'
+      '#32cd32': 'Lime',
+      '#dc143c': 'Crimson',
+      '#ff4500': 'Orange Red',
+      '#2f4f4f': 'Dark Slate Gray',
+      '#00ced1': 'Dark Turquoise',
+      '#9400d3': 'Dark Violet',
+      '#ff1493': 'Deep Pink',
+      '#b22222': 'Fire Brick',
+      '#228b22': 'Forest Green',
+      '#f08080': 'Light Coral',
+      '#20b2aa': 'Light Sea Green',
+      '#778899': 'Light Slate Gray',
+      '#ba55d3': 'Medium Orchid',
+      '#4169e1': 'Royal Blue',
+      '#6b8e23': 'Olive Drab',
+      '#8b4513': 'Saddle Brown',
+      '#4682b4': 'Steel Blue',
+      '#d2b48c': 'Tan'
     };
     return colorMap[hex.toLowerCase()] || '';
   };
+
+  const presetColors = [
+    '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ffa500', '#800080', 
+    '#ffc0cb', '#a52a2a', '#808080', '#008080', '#00ffff', '#ff00ff', '#4b0082', '#ee82ee',
+    '#ffd700', '#c0c0c0', '#f5f5dc', '#808000', '#000080', '#87ceeb', '#32cd32', '#dc143c',
+    '#ff4500', '#2f4f4f', '#00ced1', '#9400d3', '#ff1493', '#b22222', '#228b22', '#f08080'
+  ];
 
   const handleUpload = async (e, key, label) => {
     const file = e.target.files[0];
@@ -438,27 +462,45 @@ export default function AdminDashboard() {
             <div className="admin-card-stylish">
               <div className="asset-header-row">
                 <h2>{assetTab.toUpperCase()} LIST</h2>
-                <div className="admin-inline-form">
+                <div className="admin-inline-form" style={{flexDirection: 'column', alignItems: 'flex-start', gap: '20px'}}>
                   {assetTab === 'colors' ? (
                     <>
-                      <input 
-                        type="color" 
-                        value={newColor.hexCode} 
-                        onChange={(e) => {
-                          const hex = e.target.value;
-                          const name = detectColorName(hex);
-                          setNewColor({ hexCode: hex, name: name || newColor.name });
-                        }} 
-                        style={{height: '48px', width: '60px', padding: '4px', cursor: 'pointer'}} 
-                      />
-                      <input 
-                        type="text" 
-                        placeholder="Color Name" 
-                        value={newColor.name} 
-                        onChange={(e) => setNewColor({...newColor, name: e.target.value})} 
-                        className="admin-input-stylish" 
-                      />
-                      <button onClick={() => handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: '#000000'}))} className="btn-upload-premium">ADD</button>
+                      <div className="color-presets-grid-admin">
+                        {presetColors.map(hex => (
+                          <div 
+                            key={hex} 
+                            className={`preset-box-admin ${newColor.hexCode.toLowerCase() === hex.toLowerCase() ? 'active' : ''}`}
+                            style={{backgroundColor: hex}}
+                            onClick={() => {
+                              const name = detectColorName(hex);
+                              setNewColor({ hexCode: hex, name: name || newColor.name });
+                            }}
+                            title={detectColorName(hex)}
+                          />
+                        ))}
+                      </div>
+                      
+                      <div style={{display: 'flex', gap: '10px', width: '100%', alignItems: 'center'}}>
+                        <input 
+                          type="color" 
+                          value={newColor.hexCode} 
+                          onChange={(e) => {
+                            const hex = e.target.value;
+                            const name = detectColorName(hex);
+                            setNewColor({ hexCode: hex, name: name || newColor.name });
+                          }} 
+                          style={{height: '48px', width: '60px', padding: '4px', cursor: 'pointer', border: '1px solid #ddd', borderRadius: '8px'}} 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Color Name" 
+                          value={newColor.name} 
+                          onChange={(e) => setNewColor({...newColor, name: e.target.value})} 
+                          className="admin-input-stylish" 
+                          style={{flex: 1}}
+                        />
+                        <button onClick={() => handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: '#000000'}))} className="btn-upload-premium">ADD COLOR</button>
+                      </div>
                     </>
                   ) : (
                     <>

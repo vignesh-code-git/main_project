@@ -640,3 +640,43 @@ tr:hover td {
   align-items: center;
   margin-bottom: 40px;
 }
+
+/* Color Asset Management Styles */
+.color-presets-grid-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  background: #F9F9F9;
+  border-radius: 12px;
+  border: 1px solid #EEE;
+}
+
+.preset-box-admin {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.preset-box-admin:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.preset-box-admin.active {
+  border-color: #000;
+  transform: scale(1.1);
+}
+
+.loading-text {
+  padding: 20px;
+  color: var(--admin-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}

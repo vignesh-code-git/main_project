@@ -14,7 +14,12 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
   });
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialFilters.categoryId || '');
   const [selectedStyle, setSelectedStyle] = useState(initialFilters.style || '');
+  
   const [categories, setCategories] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [styles, setStyles] = useState([]);
+  
   const isFirstRender = useRef(true);
   
   // Accordion states
@@ -24,10 +29,33 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
   const [isStyleOpen, setIsStyleOpen] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/products/categories`, { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error('Error fetching categories:', err));
+    // Fetch all filters from database
+    const fetchFilters = async () => {
+      try {
+        const [catRes, colorRes, sizeRes, styleRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/products/categories`),
+          fetch(`${API_BASE_URL}/api/products/colors`),
+          fetch(`${API_BASE_URL}/api/products/sizes`),
+          fetch(`${API_BASE_URL}/api/products/styles`)
+        ]);
+
+        const [catData, colorData, sizeData, styleData] = await Promise.all([
+          catRes.json(),
+          colorRes.json(),
+          sizeRes.json(),
+          styleRes.json()
+        ]);
+
+        setCategories(catData);
+        setColors(colorData);
+        setSizes(sizeData);
+        setStyles(styleData);
+      } catch (err) {
+        console.error('Error fetching sidebar filters:', err);
+      }
+    };
+
+    fetchFilters();
   }, []);
 
   // Instant update: trigger filter when any state changes (skipping first render)
@@ -57,29 +85,6 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
     setSelectedCategoryId('');
     onApplyFilter({});
   };
-
-  const colors = [
-    { name: 'Green', value: '#00C12B' },
-    { name: 'Red', value: '#F50606' },
-    { name: 'Yellow', value: '#F5DD06' },
-    { name: 'Orange', value: '#F57906' },
-    { name: 'Cyan', value: '#06CAF5' },
-    { name: 'Blue', value: '#063AF5' },
-    { name: 'Purple', value: '#7D06F5' },
-    { name: 'Pink', value: '#F506A4' },
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Black', value: '#000000' },
-    { name: 'Olive', value: '#4F4F31' },
-    { name: 'Navy', value: '#1A237E' },
-    { name: 'Gray', value: '#808080' }
-  ];
-  
-  const sizes = [
-    'XX-Small', 'X-Small', 'Small', 'Medium', 'Large',
-    'X-Large', 'XX-Large', '3X-Large', '4X-Large'
-  ];
-  
-  const dressStyles = ['Casual', 'Formal', 'Party', 'Gym'];
 
   return (
     <aside className="sidebar">
@@ -160,16 +165,21 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
         </div>
         {isColorsOpen && (
           <div className="color-grid figma-colors">
-            {colors.map((color, index) => (
-              <div
-                key={index}
-                className={`color-item ${selectedColor === color.name ? 'active' : ''}`}
-                style={{ backgroundColor: color.value, border: color.name === 'White' ? '1px solid #ddd' : 'none' }}
-                onClick={() => setSelectedColor(prev => prev === color.name ? '' : color.name)}
-              >
-                {selectedColor === color.name && <span className="check">✓</span>}
-              </div>
-            ))}
+            {colors.length > 0 ? (
+              colors.map((color, index) => (
+                <div
+                  key={index}
+                  className={`color-item ${selectedColor === color.name ? 'active' : ''}`}
+                  style={{ backgroundColor: color.hex || color.name.toLowerCase(), border: color.name.toLowerCase() === 'white' ? '1px solid #ddd' : 'none' }}
+                  onClick={() => setSelectedColor(prev => prev === color.name ? '' : color.name)}
+                  title={color.name}
+                >
+                  {selectedColor === color.name && <span className="check">✓</span>}
+                </div>
+              ))
+            ) : (
+               <p className="loading-text">Loading colors...</p>
+            )}
           </div>
         )}
       </div>
@@ -181,15 +191,19 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
         </div>
         {isSizeOpen && (
           <div className="size-grid">
-            {sizes.map(size => (
-              <button
-                key={size}
-                className={`size-item ${selectedSize === size ? 'active' : ''}`}
-                onClick={() => setSelectedSize(prev => prev === size ? '' : size)}
-              >
-                {size}
-              </button>
-            ))}
+            {sizes.length > 0 ? (
+              sizes.map(size => (
+                <button
+                  key={size.id}
+                  className={`size-item ${selectedSize === size.name ? 'active' : ''}`}
+                  onClick={() => setSelectedSize(prev => prev === size.name ? '' : size.name)}
+                >
+                  {size.name}
+                </button>
+              ))
+            ) : (
+              <p className="loading-text">Loading sizes...</p>
+            )}
           </div>
         )}
       </div>
@@ -201,15 +215,19 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
         </div>
         {isStyleOpen && (
           <ul className="category-list">
-            {dressStyles.map(style => (
-              <li
-                key={style}
-                className={selectedStyle === style ? 'active-style' : ''}
-                onClick={() => setSelectedStyle(prev => prev === style ? '' : style)}
-              >
-                {style} <ChevronRight size={16} />
-              </li>
-            ))}
+            {styles.length > 0 ? (
+              styles.map(style => (
+                <li
+                  key={style.id}
+                  className={selectedStyle === style.name ? 'active-style' : ''}
+                  onClick={() => setSelectedStyle(prev => prev === style.name ? '' : style.name)}
+                >
+                  {style.name} <ChevronRight size={16} />
+                </li>
+              ))
+            ) : (
+              <li className="loading-text">Loading styles...</li>
+            )}
           </ul>
         )}
       </div>
