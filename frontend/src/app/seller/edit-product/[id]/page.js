@@ -333,6 +333,7 @@ export default function EditProductPage() {
                       .map((img, idx) => (
                         <div key={idx} className="preview-item existing-file">
                           <img src={resolveImageUrl(img.url)} alt="existing" />
+                          <span className="existing-tag">EXISTING</span>
                         </div>
                       ))
                     }

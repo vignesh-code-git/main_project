@@ -39,7 +39,7 @@ export const resolveImageUrl = (url) => {
 // Helper for authenticated requests
 export const getAuthHeaders = () => {
   if (typeof window === 'undefined') return { 'Content-Type': 'application/json' };
-  
+
   const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',

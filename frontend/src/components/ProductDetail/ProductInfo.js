@@ -231,16 +231,25 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
         <h4>Select Colors</h4>
         <div className="color-swatches">
           {productColors.length > 0 ? (
-            productColors.map(colorName => (
-              <div
-                key={colorName}
-                className={`color-swatch ${selectedColor === colorName ? 'active' : ''}`}
-                style={{ backgroundColor: colorMap[colorName.toLowerCase()] || colorName }}
-                onClick={() => setSelectedColor(colorName)}
-              >
-                {selectedColor === colorName && <span className="check">✓</span>}
-              </div>
-            ))
+            productColors.map((colorName, index) => {
+              const isSelected = selectedColor?.trim().toLowerCase() === colorName.trim().toLowerCase();
+              return (
+                <div
+                  key={`${colorName}-${index}`}
+                  className={`color-swatch ${isSelected ? 'active' : ''}`}
+                  style={{ 
+                    backgroundColor: colorMap[colorName.toLowerCase().trim()] || colorName,
+                    transform: isSelected ? 'scale(1.1)' : 'scale(1)'
+                  }}
+                  onClick={() => {
+                    console.log('Selecting color:', colorName.trim());
+                    setSelectedColor(colorName.trim());
+                  }}
+                >
+                  {isSelected && <span className="check">✓</span>}
+                </div>
+              );
+            })
           ) : (
             <p>No colors specified</p>
           )}
