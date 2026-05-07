@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { X } from 'lucide-react';
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -24,17 +25,26 @@ export default function AdminDashboard() {
   const [newBrandName, setNewBrandName] = useState('');
   const [newStyleName, setNewStyleName] = useState('');
   const [newSizeName, setNewSizeName] = useState('');
-  const [newColor, setNewColor] = useState({ name: '', hexCode: '#000000' });
+  const [newColor, setNewColor] = useState({ name: '', hexCode: '' });
   const [assetTab, setAssetTab] = useState('categories');
   const [toast, setToast] = useState({ show: false, message: '' });
   const router = useRouter();
 
   useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
     if (!isAuthenticated || (authUser && authUser.role !== 'admin')) {
-      // Small delay to allow auth rehydration if needed
+      // If we have a token but state hasn't caught up yet, wait a bit longer
       const timer = setTimeout(() => {
-        if (!isAuthenticated) router.push('/auth/login');
-      }, 500);
+        if (!isAuthenticated && !localStorage.getItem('token')) {
+          router.push('/auth/login');
+        }
+      }, 2000);
       return () => clearTimeout(timer);
     }
 
@@ -462,9 +472,9 @@ export default function AdminDashboard() {
             <div className="admin-card-stylish">
               <div className="asset-header-row">
                 <h2>{assetTab.toUpperCase()} LIST</h2>
-                <div className="admin-inline-form" style={{flexDirection: 'column', alignItems: 'flex-start', gap: '20px'}}>
+                <div className="admin-inline-form">
                   {assetTab === 'colors' ? (
-                    <>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '20px', width: '100%'}}>
                       <div className="color-presets-grid-admin">
                         {presetColors.map(hex => (
                           <div 
@@ -481,16 +491,25 @@ export default function AdminDashboard() {
                       </div>
                       
                       <div style={{display: 'flex', gap: '10px', width: '100%', alignItems: 'center'}}>
-                        <input 
-                          type="color" 
-                          value={newColor.hexCode} 
-                          onChange={(e) => {
-                            const hex = e.target.value;
-                            const name = detectColorName(hex);
-                            setNewColor({ hexCode: hex, name: name || newColor.name });
-                          }} 
-                          style={{height: '48px', width: '60px', padding: '4px', cursor: 'pointer', border: '1px solid #ddd', borderRadius: '8px'}} 
-                        />
+                        <div className="color-preview-wrapper-admin">
+                          {newColor.hexCode ? (
+                            <div className="color-preview-box-active" style={{backgroundColor: newColor.hexCode}} />
+                          ) : (
+                            <div className="color-preview-box-empty">
+                              <X size={16} color="#FF3333" />
+                            </div>
+                          )}
+                          <input 
+                            type="color" 
+                            value={newColor.hexCode || '#ffffff'} 
+                            onChange={(e) => {
+                              const hex = e.target.value;
+                              const name = detectColorName(hex);
+                              setNewColor({ hexCode: hex, name: name || newColor.name });
+                            }} 
+                            className="color-picker-hidden-admin"
+                          />
+                        </div>
                         <input 
                           type="text" 
                           placeholder="Color Name" 
@@ -499,14 +518,20 @@ export default function AdminDashboard() {
                           className="admin-input-stylish" 
                           style={{flex: 1}}
                         />
-                        <button onClick={() => handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: '#000000'}))} className="btn-upload-premium">ADD COLOR</button>
+                        <button 
+                          onClick={() => {
+                            if(!newColor.hexCode || !newColor.name) return showToast('PICK A COLOR AND NAME');
+                            handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: ''}));
+                          }} 
+                          className="btn-upload-premium"
+                        >ADD COLOR</button>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <>
                       <input 
                         type="text" 
-                        placeholder={`New ${assetTab.slice(0,-1)} name`} 
+                        placeholder={`New ${assetTab === 'categories' ? 'category' : assetTab.slice(0,-1)} name`} 
                         value={assetTab === 'categories' ? newCategoryName : assetTab === 'brands' ? newBrandName : assetTab === 'styles' ? newStyleName : newSizeName} 
                         onChange={(e) => {
                           const val = e.target.value;
@@ -516,6 +541,7 @@ export default function AdminDashboard() {
                           else setNewSizeName(val);
                         }} 
                         className="admin-input-stylish" 
+                        style={{maxWidth: '400px'}}
                       />
                       <button 
                         onClick={() => {
@@ -525,7 +551,7 @@ export default function AdminDashboard() {
                           else handleAddAsset('sizes', {name: newSizeName}, setSizes, setNewSizeName);
                         }} 
                         className="btn-upload-premium"
-                      >ADD</button>
+                      >ADD {assetTab.slice(0,-1).toUpperCase()}</button>
                     </>
                   )}
                 </div>

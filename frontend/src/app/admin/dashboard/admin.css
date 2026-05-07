@@ -641,6 +641,42 @@ tr:hover td {
   margin-bottom: 40px;
 }
 
+.color-preview-wrapper-admin {
+  position: relative;
+  width: 60px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  cursor: pointer;
+  background-image: conic-gradient(#EEE 0.25turn, #FFF 0.25turn 0.5turn, #EEE 0.5turn 0.75turn, #FFF 0.75turn);
+  background-size: 8px 8px;
+}
+
+.color-preview-box-active {
+  width: 100%;
+  height: 100%;
+}
+
+.color-preview-box-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.color-picker-hidden-admin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* Color Asset Management Styles */
 .color-presets-grid-admin {
   display: grid;
