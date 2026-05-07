@@ -172,8 +172,8 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submission started. Data:', formData);
-
+    // Temporary: Bypassing frontend validation as requested
+    /*
     const validationErrors = validate();
     const errorList = Object.values(validationErrors);
     
@@ -183,6 +183,7 @@ export default function AddProductPage() {
       setSingleStatus({ type: 'error', message: `MISSING FIELDS: ${errorMsg}` });
       return;
     }
+    */
 
     setSingleStatus({ type: 'loading', message: 'Adding product...' });
 
