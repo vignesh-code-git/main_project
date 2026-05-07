@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react';
 import axios from 'axios';
-import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import { useDispatch } from 'react-redux';
 import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
@@ -205,7 +205,7 @@ export default function OrdersPage() {
                           <div className="item-image-col">
                             <div className="order-item-thumb">
                               <img
-                                src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
+                                src={resolveImageUrl(imgUrl)}
                                 alt={item.Product?.name}
                               />
                             </div>

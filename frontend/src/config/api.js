@@ -18,9 +18,12 @@ export const API_ENDPOINTS = {
 export const resolveImageUrl = (url) => {
   if (!url) return '/images/placeholder.png';
 
-  // 1. Handle relative URLs (e.g., /uploads/...)
+  // 1. Handle relative URLs (e.g., /uploads/... or uploads/...)
   if (url.startsWith('/uploads')) {
     return `${API_BASE_URL}${url}`;
+  }
+  if (url.startsWith('uploads/')) {
+    return `${API_BASE_URL}/${url}`;
   }
 
   // 2. Handle legacy hardcoded localhost URLs from old DB entries
