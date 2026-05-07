@@ -421,9 +421,10 @@ exports.createReturn = async (req, res) => {
       comment
     });
 
+    const order = await Order.findByPk(orderId, { include: [OrderItem] });
+
     // Update Order Status (Wrapped in try-catch to prevent failure if ENUM is still syncing)
     try {
-      const order = await Order.findByPk(orderId);
       if (order) {
         order.status = 'Return Requested';
         await order.save();
@@ -435,9 +436,11 @@ exports.createReturn = async (req, res) => {
 
     // Notify Seller
     const sellerIds = new Set();
-    for (const item of order.OrderItems) {
-      const product = await Product.findByPk(item.productId);
-      if (product && product.sellerId) sellerIds.add(product.sellerId);
+    if (order && order.OrderItems) {
+      for (const item of order.OrderItems) {
+        const product = await Product.findByPk(item.productId);
+        if (product && product.sellerId) sellerIds.add(product.sellerId);
+      }
     }
 
     for (const sId of sellerIds) {
