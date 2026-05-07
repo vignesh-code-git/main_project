@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown, Package, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
-import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import './OrderActionModal.css';
@@ -103,7 +103,8 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
     } catch (err) {
       console.error(`Error submitting ${type}:`, err);
       const errorMsg = err.response?.data?.message || err.message || 'Please try again.';
-      alert(`Failed to submit ${type.toLowerCase()}. ${errorMsg}`);
+      const errorDetails = err.response?.data?.details ? `\nDetails: ${err.response.data.details}` : '';
+      alert(`Failed to submit ${type.toLowerCase()}. ${errorMsg}${errorDetails}`);
     } finally {
       setLoading(false);
     }
@@ -277,7 +278,6 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
             </div>
           );
         } else {
-          // Fallback if we accidentally hit step 2 without a product
           setStep(1);
           return null;
         }
@@ -361,5 +361,3 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
     </div>
   );
 }
-
-
