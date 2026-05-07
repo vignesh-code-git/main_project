@@ -15,6 +15,19 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab) setActiveTab(tab);
+  }, []);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', tab);
+    router.push(`${window.location.pathname}?${params.toString()}`, { scroll: false });
+  };
   const [allOrders, setAllOrders] = useState([]);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -311,7 +324,7 @@ export default function AdminDashboard() {
             <div
               key={item.id}
               className={`nav-tab-item ${activeTab === item.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleTabChange(item.id)}
             >
               {item.label}
             </div>
@@ -495,20 +508,8 @@ export default function AdminDashboard() {
                           {newColor.hexCode ? (
                             <div className="color-preview-box-active" style={{backgroundColor: newColor.hexCode}} />
                           ) : (
-                            <div className="color-preview-box-empty">
-                              <X size={16} color="#FF3333" />
-                            </div>
+                            <div className="color-preview-box-empty" />
                           )}
-                          <input 
-                            type="color" 
-                            value={newColor.hexCode || '#ffffff'} 
-                            onChange={(e) => {
-                              const hex = e.target.value;
-                              const name = detectColorName(hex);
-                              setNewColor({ hexCode: hex, name: name || newColor.name });
-                            }} 
-                            className="color-picker-hidden-admin"
-                          />
                         </div>
                         <input 
                           type="text" 
@@ -520,7 +521,7 @@ export default function AdminDashboard() {
                         />
                         <button 
                           onClick={() => {
-                            if(!newColor.hexCode || !newColor.name) return showToast('PICK A COLOR AND NAME');
+                            if(!newColor.hexCode || !newColor.name) return showToast('PICK A COLOR FROM THE GRID');
                             handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: ''}));
                           }} 
                           className="btn-upload-premium"
