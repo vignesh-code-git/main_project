@@ -421,11 +421,16 @@ exports.createReturn = async (req, res) => {
       comment
     });
 
-    // Update Order Status
-    const order = await Order.findByPk(orderId, { include: [OrderItem] });
-    if (order) {
-      order.status = 'Return Requested';
-      await order.save();
+    // Update Order Status (Wrapped in try-catch to prevent failure if ENUM is still syncing)
+    try {
+      const order = await Order.findByPk(orderId);
+      if (order) {
+        order.status = 'Return Requested';
+        await order.save();
+      }
+    } catch (statusError) {
+      console.error('Non-critical: Failed to update order status to Return Requested:', statusError.message);
+      // We don't throw here so the returnRequest still gets sent to the user
     }
 
     // Notify Seller
