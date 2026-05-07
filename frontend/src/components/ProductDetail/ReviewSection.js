@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { CheckCircle2, Settings2, Star, X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import './ReviewSection.css';
 
 export default function ReviewSection({ productId }) {
@@ -76,9 +76,8 @@ export default function ReviewSection({ productId }) {
       const res = await fetch(`${API_BASE_URL}/api/reviews`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          ...getAuthHeaders()
         },
-        credentials: 'include',
         body: JSON.stringify({
           rating,
           content,

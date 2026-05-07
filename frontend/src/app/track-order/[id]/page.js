@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronLeft, Phone, ShieldCheck, Box } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './track-order.css';
 
@@ -21,7 +21,7 @@ export default function TrackOrder() {
     const fetchOrder = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
-          credentials: 'include'
+          headers: getAuthHeaders()
         });
         const data = await res.json();
         setOrder(data);
@@ -44,7 +44,7 @@ export default function TrackOrder() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/${order.id}/cancel`, {
         method: 'PUT',
-        credentials: 'include'
+        headers: getAuthHeaders()
       });
 
       if (res.ok) {
@@ -178,7 +178,7 @@ export default function TrackOrder() {
                         const imgUrl = colorImage ? colorImage.url : (allImages[0]?.url || '/placeholder.png');
                         return (
                           <img
-                            src={imgUrl.startsWith('http') ? imgUrl : `${API_BASE_URL}${imgUrl}`}
+                            src={resolveImageUrl(imgUrl)}
                             alt={item.Product?.name}
                           />
                         );

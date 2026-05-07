@@ -91,19 +91,19 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
 
       <div className="filter-section category-links">
         <ul className="category-list">
-          {['T-shirts', 'Shorts', 'Shirts', 'Hoodie', 'Jeans'].map(cat => (
-            <li
-              key={cat}
-              className={selectedCategoryId === categories.find(c => c.name.toLowerCase().includes(cat.toLowerCase().replace('s', '')))?.id ? 'active-category' : ''}
-              onClick={() => {
-                const category = categories.find(c => c.name.toLowerCase().includes(cat.toLowerCase().replace('s', '')));
-                const newCatId = category ? category.id : '';
-                setSelectedCategoryId(newCatId);
-              }}
-            >
-              {cat} <ChevronRight size={16} />
-            </li>
-          ))}
+          {categories.length > 0 ? (
+            categories.map(cat => (
+              <li
+                key={cat.id}
+                className={selectedCategoryId === cat.id ? 'active-category' : ''}
+                onClick={() => setSelectedCategoryId(prev => prev === cat.id ? '' : cat.id)}
+              >
+                {cat.name} <ChevronRight size={16} />
+              </li>
+            ))
+          ) : (
+            <li className="loading-text">Loading categories...</li>
+          )}
         </ul>
       </div>
 

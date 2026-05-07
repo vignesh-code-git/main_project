@@ -104,8 +104,29 @@ export default function OrdersPage() {
     }
   };
 
-  const handleInvoice = (order) => {
-    window.open(`${API_BASE_URL}/api/orders/${order.id}/invoice`, '_blank');
+  const handleInvoice = async (order) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/orders/${order.id}/invoice`, {
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error('Unauthorized or failed to generate invoice');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Invoice-${order.id.toString().slice(-8).toUpperCase()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Invoice error:', err);
+      alert('Could not download invoice. Please try again.');
+    }
   };
 
   const handleAction = (type, order) => {
@@ -237,9 +258,13 @@ export default function OrdersPage() {
                     {['Pending', 'Processing', 'Placed'].includes(order.status) && (
                       <button className="secondary-action-btn cancel-btn-red" onClick={() => handleCancelOrder(order.id)}>Cancel order</button>
                     )}
-                    <button className="secondary-action-btn" onClick={() => handleAction('Return', order)}>Return or replace items</button>
-                    <button className="secondary-action-btn" onClick={() => handleAction('Feedback', order)}>Leave delivery feedback</button>
-                    <button className="secondary-action-btn" onClick={() => handleAction('Reviews', order)}>Write a product review</button>
+                    {order.status === 'Delivered' && (
+                      <>
+                        <button className="secondary-action-btn" onClick={() => handleAction('Return', order)}>Return or replace items</button>
+                        <button className="secondary-action-btn" onClick={() => handleAction('Feedback', order)}>Leave delivery feedback</button>
+                        <button className="secondary-action-btn" onClick={() => handleAction('Reviews', order)}>Write a product review</button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

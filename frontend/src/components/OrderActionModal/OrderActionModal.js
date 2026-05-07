@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown, Package, Copy } from 'lucide-react';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import './OrderActionModal.css';
@@ -68,14 +68,18 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
           itemIds: selectedItems,
           reason: returnReason,
           comment
-        }, { withCredentials: true });
+        }, { 
+          headers: getAuthHeaders()
+        });
       } else if (type === 'Feedback') {
         await axios.post(`${API_BASE_URL}/api/orders/feedback`, {
           orderId: order.id,
           rating,
           courierBehavior,
           comment
-        }, { withCredentials: true });
+        }, { 
+          headers: getAuthHeaders()
+        });
       }
       
       setSuccess(true);
@@ -89,7 +93,8 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
       }, 2500);
     } catch (err) {
       console.error(`Error submitting ${type}:`, err);
-      alert(`Failed to submit ${type.toLowerCase()}. Please try again.`);
+      const errorMsg = err.response?.data?.message || err.message || 'Please try again.';
+      alert(`Failed to submit ${type.toLowerCase()}. ${errorMsg}`);
     } finally {
       setLoading(false);
     }
