@@ -416,7 +416,7 @@ exports.createReturn = async (req, res) => {
     const returnRequest = await Return.create({
       orderId,
       userId: req.user.id,
-      itemIds: itemIds.join(','),
+      itemIds: Array.isArray(itemIds) ? itemIds.join(',') : (itemIds || ''),
       reason,
       comment
     });
