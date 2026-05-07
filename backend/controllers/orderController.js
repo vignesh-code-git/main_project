@@ -421,8 +421,14 @@ exports.createReturn = async (req, res) => {
       comment
     });
 
-    // Notify Seller
+    // Update Order Status
     const order = await Order.findByPk(orderId, { include: [OrderItem] });
+    if (order) {
+      order.status = 'Return Requested';
+      await order.save();
+    }
+
+    // Notify Seller
     const sellerIds = new Set();
     for (const item of order.OrderItems) {
       const product = await Product.findByPk(item.productId);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronLeft, Phone, ShieldCheck, Box } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, MapPin, ChevronLeft, Phone, ShieldCheck, Box, RefreshCw } from 'lucide-react';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './track-order.css';
@@ -73,8 +73,17 @@ export default function TrackOrder() {
     { label: 'Delivered', status: 'Delivered', icon: <CheckCircle2 size={20} />, date: 'Final destination' }
   ];
 
+  if (order.status === 'Return Requested') {
+    steps.push({
+      label: 'Return Requested',
+      status: 'Return Requested',
+      icon: <RefreshCw size={20} />,
+      date: 'Pending approval'
+    });
+  }
+
   // Logic to determine current step index
-  const statusOrder = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+  const statusOrder = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested'];
   const currentStatusIndex = statusOrder.indexOf(order.status);
   const finalIndex = currentStatusIndex === -1 ? 0 : currentStatusIndex;
 

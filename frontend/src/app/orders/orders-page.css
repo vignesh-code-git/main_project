@@ -163,6 +163,10 @@
   color: #FFB800;
 }
 
+.status-text.return-requested {
+  color: #F59E0B; /* Amber/Orange for Return */
+}
+
 .status-subtext {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.6);

@@ -182,12 +182,16 @@ export default function OrdersPage() {
               <div className="order-card-body">
                 <div className="body-left">
                   <div className="status-container">
-                    <h3 className={`status-text ${order.status.toLowerCase()}`}>
-                      {order.status === 'Delivered' ? 'Delivered' : `Arriving soon`}
+                    <h3 className={`status-text ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {order.status === 'Delivered' ? 'Delivered' : 
+                       order.status === 'Return Requested' ? 'Return Requested' :
+                       `Arriving soon`}
                     </h3>
                     <p className="status-subtext">
                       {order.status === 'Delivered'
                         ? `Package was delivered on ${new Date(order.updatedAt || order.createdAt).toLocaleDateString()}`
+                        : order.status === 'Return Requested'
+                        ? `We have received your return request and it's being processed.`
                         : `Your order is ${order.status.toLowerCase()}`}
                     </p>
                   </div>

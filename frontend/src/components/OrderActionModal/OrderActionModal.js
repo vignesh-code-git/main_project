@@ -239,9 +239,7 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
               </div>
               <div className="product-to-review-header">
                 <img 
-                  src={selectedProductForReview?.images?.[0]?.url?.startsWith('http') 
-                    ? selectedProductForReview.images[0].url 
-                    : `${API_BASE_URL}${selectedProductForReview?.images?.[0]?.url || '/placeholder.png'}`} 
+                  src={resolveImageUrl(selectedProductForReview?.images?.[0]?.url)} 
                   alt={selectedProductForReview?.name} 
                 />
                 <div>
@@ -269,7 +267,11 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
                   onChange={(e) => setComment(e.target.value)} 
                 />
               </div>
-              <button className="modal-submit-btn" disabled={loading || rating === 0} onClick={handleSubmit}>
+              <button 
+                className="modal-submit-btn" 
+                disabled={loading || rating === 0 || !comment.trim()} 
+                onClick={handleSubmit}
+              >
                 {loading ? 'Posting...' : 'Submit Review'}
               </button>
             </div>

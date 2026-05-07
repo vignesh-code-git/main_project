@@ -2,15 +2,17 @@ const { Review, User, Product, ProductImage, Notification } = require('../models
 
 exports.createReview = async (req, res) => {
     try {
-        const { rating, content, productId, userId } = req.body;
+        const { rating, content, comment, productId } = req.body;
+        const reviewContent = content || comment;
+        const userId = req.user.id;
         
-        if (!rating || !content || !productId || !userId) {
-            return res.status(400).json({ message: 'All fields are required' });
+        if (!rating || !reviewContent || !productId) {
+            return res.status(400).json({ message: 'All fields are required (rating, content, productId)' });
         }
 
         const review = await Review.create({
             rating,
-            content,
+            content: reviewContent,
             productId: productId,
             userId: userId
         });
