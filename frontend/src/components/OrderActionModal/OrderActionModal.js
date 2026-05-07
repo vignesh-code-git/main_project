@@ -343,7 +343,19 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
           <button className="close-modal-v2" onClick={onClose}><X size={20} /></button>
         </div>
         <div className="modal-body-v2">
-          {renderContent()}
+          {(() => {
+            try {
+              return renderContent();
+            } catch (err) {
+              console.error('Modal Render Error:', err);
+              return (
+                <div style={{ padding: '20px', textAlign: 'center', color: '#ff3333' }}>
+                  <h3>Something went wrong while loading this modal</h3>
+                  <p style={{ fontSize: '12px' }}>{err.message}</p>
+                </div>
+              );
+            }
+          })()}
         </div>
       </div>
     </div>

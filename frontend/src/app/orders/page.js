@@ -183,7 +183,7 @@ export default function OrdersPage() {
                 <div className="body-left">
                   <div className="status-container">
                     <div className="status-header-row">
-                      <h3 className={`status-text ${order.status.toLowerCase()}`}>
+                      <h3 className={`status-text ${(order.status || '').toLowerCase()}`}>
                         {order.status === 'Delivered' ? 'Delivered' : `Arriving soon`}
                       </h3>
                       {order.status === 'Return Requested' && (
