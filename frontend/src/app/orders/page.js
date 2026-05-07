@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { Package, Clock, CheckCircle, Truck, ChevronRight } from 'lucide-react';
 import axios from 'axios';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import { useDispatch } from 'react-redux';
 import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
@@ -43,7 +43,7 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/orders/user/${user.id}`, {
-        withCredentials: true
+        headers: getAuthHeaders()
       });
       setOrders(response.data);
     } catch (error) {
@@ -90,7 +90,7 @@ export default function OrdersPage() {
   const executeCancel = async () => {
     try {
       const res = await axios.put(`${API_BASE_URL}/api/orders/${selectedOrderId}/cancel`, {}, {
-        withCredentials: true
+        headers: getAuthHeaders()
       });
 
       if (res.status === 200) {

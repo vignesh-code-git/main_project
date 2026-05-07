@@ -27,7 +27,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
       const fetchAddresses = async () => {
         try {
           const res = await fetch(`${API_BASE_URL}/api/addresses`, {
-            credentials: 'include'
+            headers: getAuthHeaders()
           });
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
@@ -149,9 +149,11 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
 
       const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-        credentials: 'include'
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(orderData)
       });
 
       if (res.ok) {
