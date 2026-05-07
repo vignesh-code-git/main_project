@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown, Package, Copy, ChevronLeft } from 'lucide-react';
+import { X, Star, RefreshCw, MessageSquare, Truck, Check, ChevronDown, Package, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
@@ -225,13 +225,13 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
                       <strong>{item.Product?.name}</strong>
                       <p>Size: {item.size} | Color: {item.color}</p>
                     </div>
-                    <ChevronLeft size={18} className="rotate-180" />
+                    <ChevronRight size={18} />
                   </div>
                 ))}
               </div>
             </div>
           );
-        } else {
+        } else if (selectedProductForReview) {
           return (
             <div className="modal-form-content">
               <div className="review-back-btn" onClick={() => setStep(1)}>
@@ -276,6 +276,10 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
               </button>
             </div>
           );
+        } else {
+          // Fallback if we accidentally hit step 2 without a product
+          setStep(1);
+          return null;
         }
 
       case 'Order Details':

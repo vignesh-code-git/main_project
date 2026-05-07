@@ -449,8 +449,11 @@ exports.createReturn = async (req, res) => {
 
     res.status(201).json({ message: 'Return request submitted successfully', returnRequest });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error submitting return request' });
+    console.error('Error in createReturn:', error);
+    res.status(500).json({ 
+      message: 'Error submitting return request', 
+      details: error.message 
+    });
   }
 };
 
