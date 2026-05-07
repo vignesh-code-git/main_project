@@ -71,7 +71,6 @@
 .form-group input {
   width: 100%;
   padding: 14px 20px;
-  padding-left: 52px; /* Space for icon */
   border-radius: 62px;
   border: 1px solid rgba(0,0,0,0.1);
   background: #F0F0F0;
@@ -101,20 +100,11 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s;
 }
 
 .login-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-
-.login-btn svg {
-  transition: transform 0.3s;
-}
-
-.login-btn:hover svg {
-  transform: translateX(5px);
+  background: #333;
 }
 
 .register-link {

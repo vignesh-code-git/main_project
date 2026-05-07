@@ -78,9 +78,6 @@ export default function UnifiedAuth() {
     <>
       <div className="login-container">
         <div className="login-card">
-          <div className="login-icon-box">
-            <ShoppingBag size={32} />
-          </div>
           <h2>{isLogin ? 'Log In' : 'Create Account'}</h2>
           <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
           
@@ -105,7 +102,6 @@ export default function UnifiedAuth() {
             <div className="form-group">
               <label>Email Address</label>
               <div className="input-wrapper">
-                <Mail className="input-icon" size={18} />
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
@@ -119,7 +115,6 @@ export default function UnifiedAuth() {
             <div className="form-group">
               <label>Password</label>
               <div className="input-wrapper">
-                <Lock className="input-icon" size={18} />
                 <input 
                   type="password" 
                   placeholder="Enter password" 
@@ -132,7 +127,6 @@ export default function UnifiedAuth() {
 
             <button type="submit" className="login-btn">
               {isLogin ? 'Log In' : 'Sign Up'}
-              <ArrowRight size={18} />
             </button>
           </form>
 
