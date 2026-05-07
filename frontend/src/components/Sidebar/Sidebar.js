@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { SlidersHorizontal, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { SlidersHorizontal, ChevronRight, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import './Sidebar.css';
 
@@ -170,11 +170,11 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
                 <div
                   key={index}
                   className={`color-item ${selectedColor === color.name ? 'active' : ''}`}
-                  style={{ backgroundColor: color.hex || color.name.toLowerCase(), border: color.name.toLowerCase() === 'white' ? '1px solid #ddd' : 'none' }}
+                  style={{ backgroundColor: color.hexCode || color.name.toLowerCase(), border: color.name?.toLowerCase() === 'white' ? '1px solid #ddd' : 'none' }}
                   onClick={() => setSelectedColor(prev => prev === color.name ? '' : color.name)}
                   title={color.name}
                 >
-                  {selectedColor === color.name && <span className="check">✓</span>}
+                  {selectedColor === color.name && <Check size={16} strokeWidth={3} />}
                 </div>
               ))
             ) : (
