@@ -9,13 +9,17 @@ import './seller-auth.css';
 
 export default function SellerAuth() {
   const dispatch = useDispatch();
-  const [isLogin, setIsLogin] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search).get('signup') !== 'true';
+  const [isLogin, setIsLogin] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('signup') === 'true') {
+      setIsLogin(false);
     }
-    return true;
-  });
-  
+    setMounted(true);
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,10 +30,10 @@ export default function SellerAuth() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLogin) {
+    if (mounted && isLogin) {
       router.push('/auth/login?type=seller');
     }
-  }, [isLogin, router]);
+  }, [isLogin, router, mounted]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -18,19 +18,23 @@ export const API_ENDPOINTS = {
 export const resolveImageUrl = (url) => {
   if (!url) return '/images/placeholder.png';
 
+  // Normalize backslashes to forward slashes
+  const normalizedUrl = url.replace(/\\/g, '/');
+
   // 1. Handle relative URLs (e.g., /uploads/...)
-  if (url.startsWith('/uploads')) {
-    return `${API_BASE_URL}${url}`;
+  if (normalizedUrl.startsWith('/uploads') || normalizedUrl.startsWith('uploads')) {
+    const path = normalizedUrl.startsWith('/') ? normalizedUrl : `/${normalizedUrl}`;
+    return `${API_BASE_URL}${path}`;
   }
 
-  // 2. Handle legacy hardcoded localhost URLs from old DB entries
-  if (url.includes('localhost:5000/uploads')) {
-    const pathOnly = url.substring(url.indexOf('/uploads'));
+  // 2. Handle legacy hardcoded localhost URLs
+  if (normalizedUrl.includes('localhost:5000/uploads')) {
+    const pathOnly = normalizedUrl.substring(normalizedUrl.indexOf('/uploads'));
     return `${API_BASE_URL}${pathOnly}`;
   }
 
-  // 3. Return as is (already absolute or external)
-  return url;
+  // 3. Return as is
+  return normalizedUrl;
 };
 
 // Helper for authenticated requests
