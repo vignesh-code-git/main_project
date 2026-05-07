@@ -3,13 +3,14 @@
 import { useDispatch } from 'react-redux';
 import { updateCartItem, removeCartItem } from '@/lib/redux/slices/cartSlice';
 import { Trash2, Minus, Plus } from 'lucide-react';
+import { resolveImageUrl } from '@/config/api';
 import './CartItem.css';
 
 export default function CartItem({ item }) {
   const dispatch = useDispatch();
 
   // Prioritize the color-specific image from the cart slice
-  const imageUrl = item.image || (item.imageUrl || '');
+  const imageUrl = resolveImageUrl(item.image || item.imageUrl);
 
   return (
     <div className="cart-item">

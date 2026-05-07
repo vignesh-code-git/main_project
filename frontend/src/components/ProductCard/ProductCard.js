@@ -11,7 +11,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
   const dispatch = useDispatch();
 
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { API_BASE_URL } = require('@/config/api');
+  const { API_BASE_URL, resolveImageUrl } = require('@/config/api');
 
   // Find the first image that matches the filtered colors
   const getDisplayImage = () => {
@@ -26,14 +26,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
       rawUrl = (matchingImage?.url) || product.imageUrl || (product.images?.[0]?.url);
     }
 
-    const fallback = '/images/placeholder.png';
-    if (!rawUrl) return fallback;
-
-    // Handle relative URLs from bulk upload
-    if (rawUrl.startsWith('/uploads')) {
-      return `${API_BASE_URL}${rawUrl}`;
-    }
-    return rawUrl;
+    return resolveImageUrl(rawUrl);
   };
 
   const handleAddToCart = async (e) => {

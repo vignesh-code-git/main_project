@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { resolveImageUrl } from '@/config/api';
 import './ProductGallery.css';
 
 export default function ProductGallery({ images, selectedColor }) {
@@ -25,7 +26,7 @@ export default function ProductGallery({ images, selectedColor }) {
             className={`thumb-item ${currentActive === img ? 'active' : ''}`}
             onClick={() => setActiveImage(img)}
           >
-            <img src={img.url} alt={`Thumbnail ${index + 1}`} />
+            <img src={resolveImageUrl(img.url)} alt={`Thumbnail ${index + 1}`} />
           </div>
         ))}
         {/* Fallback if no images */}
@@ -38,7 +39,7 @@ export default function ProductGallery({ images, selectedColor }) {
       <div className="main-image">
         {currentActive ? (
           <Image 
-            src={currentActive.url} 
+            src={resolveImageUrl(currentActive.url)} 
             alt="Product" 
             className="main-img" 
             fill

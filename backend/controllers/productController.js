@@ -208,7 +208,7 @@ exports.createProduct = async (req, res) => {
       sku,
       deliveryDays,
       videoUrl: req.files && req.files.find(f => f.fieldname === 'video')
-        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
+        ? `/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
         : videoUrl,
       sellerId: req.user.id
     });
@@ -219,7 +219,7 @@ exports.createProduct = async (req, res) => {
         .map(file => {
           const colorMatch = file.fieldname.match(/^images_(.+)$/);
           return {
-            url: `http://localhost:5000/uploads/${file.filename}`,
+            url: `/uploads/${file.filename}`,
             productId: product.id,
             color: colorMatch ? colorMatch[1] : null
           };
@@ -231,7 +231,7 @@ exports.createProduct = async (req, res) => {
     try {
       // Get the image url for notification (first uploaded image)
       const firstImageUrl = req.files && req.files.find(f => f.fieldname.startsWith('images_'))
-        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname.startsWith('images_')).filename}`
+        ? `/uploads/${req.files.find(f => f.fieldname.startsWith('images_')).filename}`
         : null;
 
       await Notification.create({
@@ -473,7 +473,7 @@ exports.updateProduct = async (req, res) => {
       sku,
       deliveryDays,
       videoUrl: req.files && req.files.find(f => f.fieldname === 'video')
-        ? `http://localhost:5000/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
+        ? `/uploads/${req.files.find(f => f.fieldname === 'video').filename}`
         : videoUrl
     });
 
