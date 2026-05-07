@@ -307,9 +307,9 @@ export default function Navbar() {
               <Link href="/brands" onClick={() => setMobileMenuOpen(false)}>Brands</Link>
             </li>
 
-            {/* Mobile-only: Become a Seller / Dashboard link */}
+            {/* Mobile-only: Dashboard links */}
             {mounted && (
-              <li className="mobile-link-item">
+              <li className="mobile-link-item mobile-only">
                 {user && user.role === 'admin' ? (
                   <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     Admin Panel
@@ -319,7 +319,7 @@ export default function Navbar() {
                     Seller Panel
                   </Link>
                 ) : (
-                  <Link href="/seller/auth?signup=true" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/seller/auth?signup=true" className="mobile-only" onClick={() => setMobileMenuOpen(false)}>
                     Become a Seller
                   </Link>
                 )}

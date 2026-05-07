@@ -9,7 +9,12 @@ import './seller-auth.css';
 
 export default function SellerAuth() {
   const dispatch = useDispatch();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('signup') !== 'true';
+    }
+    return true;
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,13 +23,6 @@ export default function SellerAuth() {
   });
   const [error, setError] = useState('');
   const router = useRouter();
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('signup') === 'true') {
-      setIsLogin(false);
-    }
-  }, []);
 
   useEffect(() => {
     if (isLogin) {
@@ -63,8 +61,8 @@ export default function SellerAuth() {
     <>
       <div className="seller-auth-container">
         <div className="auth-card">
-          <h2>{isLogin ? 'Seller Login' : 'Seller Signup'}</h2>
-          <p>{isLogin ? 'Welcome back! Manage your store.' : 'Join SHOP.CO and start selling today.'}</p>
+          <h2>{isLogin ? 'LOG IN' : 'CREATE SELLER ACCOUNT'}</h2>
+          <p>{isLogin ? 'Welcome back! Manage your store.' : 'Join and start selling today.'}</p>
           
           {error && <div className="error-msg">{error}</div>}
 
@@ -122,9 +120,9 @@ export default function SellerAuth() {
           </form>
 
           <div className="toggle-auth">
-            {isLogin ? "Don't have a seller account?" : "Already a seller?"} {' '}
+            {isLogin ? "Don't have a seller account?" : "Already have an account?"} {' '}
             <span onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? 'Sign Up' : 'Log In'}
+              {isLogin ? 'CREATE ACCOUNT' : 'LOG IN'}
             </span>
           </div>
         </div>
