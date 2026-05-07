@@ -9,7 +9,7 @@ import { Mail, Lock, ArrowRight, Loader2, CheckCircle, AlertCircle, ShoppingBag,
 import { API_BASE_URL } from '@/config/api';
 import './login.css';
 
-export default function CustomerAuth() {
+export default function UnifiedAuth() {
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -30,7 +30,10 @@ export default function CustomerAuth() {
         const { checkAuth } = require('@/lib/redux/slices/authSlice');
         dispatch(checkAuth()).then((res) => {
           if (res.meta.requestStatus === 'fulfilled') {
-            router.push('/');
+            const user = res.payload.user;
+            if (user.role === 'admin') router.push('/admin/dashboard');
+            else if (user.role === 'seller') router.push('/seller/dashboard');
+            else router.push('/');
           }
         });
       }
@@ -50,18 +53,15 @@ export default function CustomerAuth() {
       const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include' // This is the professional way to handle cookies
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
       
-      if (!res.ok) throw new Error(data.message || 'Something went wrong');
+      if (!res.ok) throw new Error(data.message || 'Authentication failed');
 
-      // Dispatch login with user data and token
       dispatch(login(data));
 
-      // Redirect based on role
       if (data.user.role === 'admin') {
         router.push('/admin/dashboard');
       } else if (data.user.role === 'seller') {
@@ -78,8 +78,11 @@ export default function CustomerAuth() {
     <>
       <div className="login-container">
         <div className="login-card">
-          <h2>{isLogin ? 'Log In' : 'Create Account'}</h2>
-          <p>{isLogin ? 'Enter your details to access your account.' : 'Join the SHOP.CO community today.'}</p>
+          <div className="login-icon-box">
+            <ShoppingBag size={32} />
+          </div>
+          <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+          <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
           
           {error && <div className="error-msg">{error}</div>}
 
@@ -87,47 +90,56 @@ export default function CustomerAuth() {
             {!isLogin && (
               <div className="form-group">
                 <label>Full Name</label>
-                <input 
-                  type="text" 
-                  placeholder="Enter your name" 
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
+                <div className="input-wrapper">
+                  <input 
+                    type="text" 
+                    placeholder="Enter your name" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required
+                  />
+                </div>
               </div>
             )}
 
             <div className="form-group">
               <label>Email Address</label>
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-              />
+              <div className="input-wrapper">
+                <Mail className="input-icon" size={18} />
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-group">
               <label>Password</label>
-              <input 
-                type="password" 
-                placeholder="Enter password" 
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
-                required
-              />
+              <div className="input-wrapper">
+                <Lock className="input-icon" size={18} />
+                <input 
+                  type="password" 
+                  placeholder="Enter password" 
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  required
+                />
+              </div>
             </div>
 
             <button type="submit" className="login-btn">
               {isLogin ? 'Log In' : 'Sign Up'}
+              <ArrowRight size={18} />
             </button>
           </form>
 
           <div className="register-link">
             {isLogin ? "Don't have an account?" : "Already have an account?"} {' '}
             <span onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? 'Sign Up' : 'Log In'}
+              {isLogin ? 'Sign Up Free' : 'Log In Now'}
             </span>
           </div>
         </div>

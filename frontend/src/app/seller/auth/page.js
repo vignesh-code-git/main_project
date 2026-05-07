@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { login } from '@/lib/redux/slices/authSlice';
@@ -19,35 +19,34 @@ export default function SellerAuth() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    if (isLogin) {
+      router.push('/auth/login');
+    }
+  }, [isLogin, router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLogin) {
+      router.push('/auth/login');
+      return;
+    }
     setError('');
     
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    const payload = isLogin 
-      ? { email: formData.email, password: formData.password }
-      : { ...formData, role: 'seller' };
+    const payload = { ...formData, role: 'seller' };
 
     try {
-      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'include'
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.message || 'Something went wrong');
+      if (!res.ok) throw new Error(data.message || 'Signup failed');
 
-      // Dispatch login with user data (cookie is handled by browser)
-      dispatch(login(data.user));
-
-      if (data.user.role === 'seller') {
-        router.push('/seller/dashboard');
-      } else {
-        setError('Unauthorized: You are not a registered seller.');
-      }
+      dispatch(login(data));
+      router.push('/seller/dashboard');
     } catch (err) {
       setError(err.message);
     }
