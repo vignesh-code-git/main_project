@@ -1,20 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { resolveImageUrl } from '@/config/api';
 import './ProductGallery.css';
 
 export default function ProductGallery({ images, selectedColor }) {
   // Filter and sort images: exact color matches FIRST, then generic images
-  const colorMatches = images.filter(img => img.color && selectedColor && img.color.toLowerCase() === selectedColor.toLowerCase());
+  const colorMatches = images.filter(img => 
+    img.color && selectedColor && 
+    img.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()
+  );
   const genericImages = images.filter(img => !img.color);
   
   const displayImages = colorMatches.length > 0 ? [...colorMatches, ...genericImages] : images.slice(0, 5);
   
   const [activeImage, setActiveImage] = useState(null);
+  
+  // Use useEffect to reset active image when color changes
+  useEffect(() => {
+    setActiveImage(displayImages[0]);
+  }, [selectedColor, images.length]); // Re-run when color or total images change
 
-  // Update active image when filtered list or selected color changes
   const currentActive = activeImage && displayImages.includes(activeImage) ? activeImage : displayImages[0];
 
   return (

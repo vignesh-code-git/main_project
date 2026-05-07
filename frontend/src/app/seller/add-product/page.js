@@ -456,6 +456,31 @@ export default function AddProductPage() {
               {errors.brand && <span className="error-text">{errors.brand}</span>}
             </div>
 
+            <div className={`form-group ${errors.sizes ? 'has-error' : ''}`}>
+              <label>Available Sizes</label>
+              <div className="size-selector-chips">
+                {sizes.map(size => (
+                  <div
+                    key={size.id}
+                    className={`size-chip ${formData.sizes.includes(size.name) ? 'active' : ''}`}
+                    onClick={() => {
+                      setFormData(prev => {
+                        const isSelected = prev.sizes.includes(size.name);
+                        const newSizes = isSelected
+                          ? prev.sizes.filter(s => s !== size.name)
+                          : [...prev.sizes, size.name];
+                        if (newSizes.length > 0 && errors.sizes) setErrors(prevErr => ({ ...prevErr, sizes: null }));
+                        return { ...prev, sizes: newSizes };
+                      });
+                    }}
+                  >
+                    {size.name}
+                  </div>
+                ))}
+              </div>
+              {errors.sizes && <span className="error-text">{errors.sizes}</span>}
+            </div>
+
             <div className="form-group color-chooser-group">
               <label>Product Colors</label>
               <div className="color-presets">
@@ -481,31 +506,6 @@ export default function AddProductPage() {
                 ))}
               </div>
               {errors.colors && <span className="error-text">{errors.colors}</span>}
-            </div>
-
-            <div className={`form-group ${errors.sizes ? 'has-error' : ''}`}>
-              <label>Available Sizes</label>
-              <div className="size-selector-chips">
-                {sizes.map(size => (
-                  <div
-                    key={size.id}
-                    className={`size-chip ${formData.sizes.includes(size.name) ? 'active' : ''}`}
-                    onClick={() => {
-                      setFormData(prev => {
-                        const isSelected = prev.sizes.includes(size.name);
-                        const newSizes = isSelected
-                          ? prev.sizes.filter(s => s !== size.name)
-                          : [...prev.sizes, size.name];
-                        if (newSizes.length > 0 && errors.sizes) setErrors(prevErr => ({ ...prevErr, sizes: null }));
-                        return { ...prev, sizes: newSizes };
-                      });
-                    }}
-                  >
-                    {size.name}
-                  </div>
-                ))}
-              </div>
-              {errors.sizes && <span className="error-text">{errors.sizes}</span>}
             </div>
 
             <div className="form-group color-assets-section">

@@ -104,29 +104,10 @@ export default function OrdersPage() {
     }
   };
 
-  const handleInvoice = async (order) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/orders/${order.id}/invoice`, {
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        throw new Error('Unauthorized or failed to generate invoice');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Invoice-${order.id.toString().slice(-8).toUpperCase()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (err) {
-      console.error('Invoice error:', err);
-      alert('Could not download invoice. Please try again.');
-    }
+  const handleInvoice = (order) => {
+    const token = localStorage.getItem('token');
+    const invoiceUrl = `${API_BASE_URL}/api/orders/${order.id}/invoice?token=${token}`;
+    window.open(invoiceUrl, '_blank');
   };
 
   const handleAction = (type, order) => {

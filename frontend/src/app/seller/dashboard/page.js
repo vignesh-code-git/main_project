@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
 import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check, Star } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
-import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
 import './seller-dashboard.css';
 
@@ -328,11 +328,11 @@ export default function SellerDashboard() {
                           <td>
                             <Link href={`/product/${product.id}`} className="product-cell-link">
                               <div className="product-cell">
-                                <img
-                                  src={product.images?.[0]?.url || '/placeholder.png'}
-                                  alt={product.name}
-                                  className="product-img-small"
-                                />
+                                  <img
+                                    src={product.images?.[0] ? resolveImageUrl(product.images[0].url) : '/placeholder.png'}
+                                    alt={product.name}
+                                    className="product-img-small"
+                                  />
                                 <span>{product.name}</span>
                               </div>
                             </Link>

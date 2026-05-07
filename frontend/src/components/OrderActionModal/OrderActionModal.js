@@ -16,6 +16,7 @@ export default function OrderActionModal({ isOpen, onClose, type, order, onActio
   const [comment, setComment] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
   const [isCopied, setIsCopied] = useState(false);
+  const [selectedProductForReview, setSelectedProductForReview] = useState(null);
   
   const handleCopyFullDetails = () => {
     if (!order) return;
@@ -76,6 +77,14 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
           orderId: order.id,
           rating,
           courierBehavior,
+          comment
+        }, { 
+          headers: getAuthHeaders()
+        });
+      } else if (type === 'Reviews') {
+        await axios.post(`${API_BASE_URL}/api/reviews`, {
+          productId: selectedProductForReview.id,
+          rating,
           comment
         }, { 
           headers: getAuthHeaders()
@@ -202,22 +211,70 @@ ${user?.phoneNumber ? user.phoneNumber + '\n' : ''}${user?.email ? user.email + 
         );
 
       case 'Reviews':
-        return (
-          <div className="modal-form-content">
-            <h3>Which product would you like to review?</h3>
-            <div className="item-review-list">
-              {order.OrderItems?.map((item, idx) => (
-                <div key={idx} className="reviewable-item" onClick={() => window.location.href = `/product/${item.Product?.id}?review=true`}>
-                  <div className="item-info">
-                    <strong>{item.Product?.name}</strong>
-                    <p>Size: {item.size} | Color: {item.color}</p>
+        if (step === 1) {
+          return (
+            <div className="modal-form-content">
+              <h3>Which product would you like to review?</h3>
+              <div className="item-review-list">
+                {order.OrderItems?.map((item, idx) => (
+                  <div key={idx} className="reviewable-item" onClick={() => {
+                    setSelectedProductForReview(item.Product);
+                    setStep(2);
+                  }}>
+                    <div className="item-info">
+                      <strong>{item.Product?.name}</strong>
+                      <p>Size: {item.size} | Color: {item.color}</p>
+                    </div>
+                    <ChevronLeft size={18} className="rotate-180" />
                   </div>
-                  <ChevronLeft size={18} className="rotate-180" />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        );
+          );
+        } else {
+          return (
+            <div className="modal-form-content">
+              <div className="review-back-btn" onClick={() => setStep(1)}>
+                <ChevronLeft size={16} /> <span>Back to selection</span>
+              </div>
+              <div className="product-to-review-header">
+                <img 
+                  src={selectedProductForReview?.images?.[0]?.url?.startsWith('http') 
+                    ? selectedProductForReview.images[0].url 
+                    : `${API_BASE_URL}${selectedProductForReview?.images?.[0]?.url || '/placeholder.png'}`} 
+                  alt={selectedProductForReview?.name} 
+                />
+                <div>
+                  <strong>{selectedProductForReview?.name}</strong>
+                  <p>Rating this product</p>
+                </div>
+              </div>
+              <div className="delivery-rating-stars" style={{ margin: '20px 0' }}>
+                {[1, 2, 3, 4, 5].map(star => (
+                  <Star 
+                    key={star} 
+                    size={32} 
+                    fill={star <= rating ? "#FFC107" : "transparent"} 
+                    color={star <= rating ? "#FFC107" : "#DDD"}
+                    onClick={() => handleRating(star)}
+                    className="star-icon"
+                  />
+                ))}
+              </div>
+              <div className="form-group-v2">
+                <label>Share your thoughts</label>
+                <textarea 
+                  placeholder="What did you like or dislike? How was the quality?" 
+                  value={comment} 
+                  onChange={(e) => setComment(e.target.value)} 
+                />
+              </div>
+              <button className="modal-submit-btn" disabled={loading || rating === 0} onClick={handleSubmit}>
+                {loading ? 'Posting...' : 'Submit Review'}
+              </button>
+            </div>
+          );
+        }
 
       case 'Order Details':
         return (

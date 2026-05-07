@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { API_BASE_URL, getAuthHeaders } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import '../../add-product/seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
 
@@ -236,6 +236,29 @@ export default function EditProductPage() {
             />
           </div>
 
+          <div className="form-group">
+            <label>Available Sizes</label>
+            <div className="size-selector-chips">
+              {['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'].map(size => (
+                <div
+                  key={size}
+                  className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}
+                  onClick={() => {
+                    setFormData(prev => {
+                      const isSelected = prev.sizes.includes(size);
+                      const newSizes = isSelected
+                        ? prev.sizes.filter(s => s !== size)
+                        : [...prev.sizes, size];
+                      return { ...prev, sizes: newSizes };
+                    });
+                  }}
+                >
+                  {size}
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="form-group color-chooser-group">
             <label>Product Colors</label>
             <div className="color-presets">
@@ -257,29 +280,6 @@ export default function EditProductPage() {
                 >
                   <div className="color-swatch-circle" style={{ backgroundColor: color.value }}></div>
                   <span>{color.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Available Sizes</label>
-            <div className="size-selector-chips">
-              {['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'].map(size => (
-                <div
-                  key={size}
-                  className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}
-                  onClick={() => {
-                    setFormData(prev => {
-                      const isSelected = prev.sizes.includes(size);
-                      const newSizes = isSelected
-                        ? prev.sizes.filter(s => s !== size)
-                        : [...prev.sizes, size];
-                      return { ...prev, sizes: newSizes };
-                    });
-                  }}
-                >
-                  {size}
                 </div>
               ))}
             </div>
@@ -332,7 +332,7 @@ export default function EditProductPage() {
                       .filter(img => img.color === color || (!img.color && color === 'Black' && existingImages.length === 1))
                       .map((img, idx) => (
                         <div key={idx} className="preview-item existing-file">
-                          <img src={img.url} alt="existing" />
+                          <img src={resolveImageUrl(img.url)} alt="existing" />
                         </div>
                       ))
                     }
