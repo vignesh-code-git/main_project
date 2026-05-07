@@ -266,7 +266,7 @@ export default function Navbar() {
     }
 
     if (!isAuthenticated || (user && user.role !== 'admin')) {
-      return <Link href="/seller/auth" className="become-seller-link">Become a Seller</Link>;
+      return <Link href="/seller/auth?signup=true" className="become-seller-link">Become a Seller</Link>;
     }
 
     return null;
@@ -319,7 +319,7 @@ export default function Navbar() {
                     Seller Panel
                   </Link>
                 ) : (
-                  <Link href="/seller/auth" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/seller/auth?signup=true" onClick={() => setMobileMenuOpen(false)}>
                     Become a Seller
                   </Link>
                 )}

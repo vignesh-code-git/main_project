@@ -81,7 +81,7 @@ export default function UnifiedAuth() {
           <div className="login-icon-box">
             <ShoppingBag size={32} />
           </div>
-          <h2>{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
+          <h2>{isLogin ? 'Log In' : 'Create Account'}</h2>
           <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
           
           {error && <div className="error-msg">{error}</div>}

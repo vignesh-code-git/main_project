@@ -20,6 +20,13 @@ export default function SellerAuth() {
   const router = useRouter();
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('signup') === 'true') {
+      setIsLogin(false);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isLogin) {
       router.push('/auth/login');
     }
