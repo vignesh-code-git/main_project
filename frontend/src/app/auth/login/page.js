@@ -81,7 +81,7 @@ export default function UnifiedAuth() {
           <h2>
             {isLogin 
               ? (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller' ? 'SELLER LOGIN' : 'LOG IN') 
-              : 'CREATE ACCOUNT'
+              : (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller' ? 'CREATE SELLER ACCOUNT' : 'CREATE ACCOUNT')
             }
           </h2>
           <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
@@ -136,10 +136,25 @@ export default function UnifiedAuth() {
           </form>
 
           <div className="register-link">
-            {isLogin ? "Don't have an account?" : "Already have an account?"} {' '}
-            <span onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? 'Sign Up Free' : 'Log In Now'}
-            </span>
+            {isLogin ? (
+              <>
+                Don't have an account? {' '}
+                <span onClick={() => {
+                  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller') {
+                    router.push('/seller/auth?signup=true');
+                  } else {
+                    setIsLogin(false);
+                  }
+                }}>
+                  Sign Up
+                </span>
+              </>
+            ) : (
+              <>
+                Already have an account? {' '}
+                <span onClick={() => setIsLogin(true)}>Log In</span>
+              </>
+            )}
           </div>
         </div>
       </div>

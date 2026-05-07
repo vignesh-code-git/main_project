@@ -159,7 +159,7 @@ export default function Navbar() {
 
     // 2. Route based on type
     setNotificationOpen(false);
-    
+
     if (notif.type === 'order') {
       router.push('/orders');
     } else if (notif.type === 'inventory') {
