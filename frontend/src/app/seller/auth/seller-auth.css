@@ -91,6 +91,86 @@
   text-decoration: underline;
 }
 
+.choice-card {
+  max-width: 550px;
+}
+
+.choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.choice-btn {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  padding: 24px !important;
+  background: #F8F8F8 !important;
+  color: #000 !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-btn:hover {
+  background: #FFF !important;
+  border-color: #000 !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
+}
+
+.choice-icon {
+  width: 48px;
+  height: 48px;
+  background: #000;
+  color: #FFF;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.choice-text {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.choice-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.choice-desc {
+  font-size: 13px;
+  color: rgba(0,0,0,0.5);
+  font-weight: 400;
+}
+
+.arrow-hint {
+  opacity: 0.2;
+  transition: all 0.3s;
+}
+
+.choice-btn:hover .arrow-hint {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+.signup-choice .choice-icon {
+  background: #000;
+}
+
+.login-choice .choice-icon {
+  background: #444;
+}
+
 .error-msg {
   background: #ffebee;
   color: #c62828;

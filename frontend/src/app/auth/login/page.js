@@ -78,7 +78,12 @@ export default function UnifiedAuth() {
     <>
       <div className="login-container">
         <div className="login-card">
-          <h2>{isLogin ? 'Log In' : 'Create Account'}</h2>
+          <h2>
+            {isLogin 
+              ? (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller' ? 'SELLER LOGIN' : 'LOG IN') 
+              : 'CREATE ACCOUNT'
+            }
+          </h2>
           <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
           
           {error && <div className="error-msg">{error}</div>}
