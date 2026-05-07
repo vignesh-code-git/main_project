@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { login } from '@/lib/redux/slices/authSlice';
 import Link from 'next/link';
@@ -19,6 +19,8 @@ export default function UnifiedAuth() {
   });
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const type = searchParams.get('type');
 
   // Handle Token from URL (For Google Auth)
   useEffect(() => {
@@ -80,8 +82,8 @@ export default function UnifiedAuth() {
         <div className="login-card">
           <h2>
             {isLogin 
-              ? (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller' ? 'SELLER LOGIN' : 'LOG IN') 
-              : (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller' ? 'CREATE SELLER ACCOUNT' : 'CREATE ACCOUNT')
+              ? (type === 'seller' ? 'SELLER LOGIN' : 'LOG IN') 
+              : (type === 'seller' ? 'CREATE SELLER ACCOUNT' : 'CREATE ACCOUNT')
             }
           </h2>
           <p>{isLogin ? 'Log in to access your dashboard and orders.' : 'Join our premium marketplace today.'}</p>
@@ -140,7 +142,7 @@ export default function UnifiedAuth() {
               <>
                 Don't have an account? {' '}
                 <span onClick={() => {
-                  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('type') === 'seller') {
+                  if (type === 'seller') {
                     router.push('/seller/auth?signup=true');
                   } else {
                     setIsLogin(false);
