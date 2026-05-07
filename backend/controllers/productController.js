@@ -252,7 +252,10 @@ exports.createProduct = async (req, res) => {
 
     res.status(201).json(product);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('CREATE PRODUCT ERROR:', err);
+    // Send detailed sequelize errors if they exist
+    const errorMessage = err.errors ? err.errors.map(e => e.message).join(', ') : err.message;
+    res.status(500).json({ message: errorMessage });
   }
 };
 
