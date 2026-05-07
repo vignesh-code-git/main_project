@@ -4,7 +4,7 @@ import { clearUserCart } from '@/lib/redux/slices/cartSlice';
 import { Tag, ArrowRight, Loader2, MapPin } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import RazorpayDemo from '../Payment/RazorpayDemo';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import AlertModal from '../AlertModal/AlertModal';
 import './OrderSummary.css';
 
@@ -28,7 +28,7 @@ export default function OrderSummary() {
       const fetchAddresses = async () => {
         try {
           const res = await fetch(`${API_BASE_URL}/api/addresses`, {
-            credentials: 'include'
+            headers: getAuthHeaders()
           });
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
@@ -106,9 +106,11 @@ export default function OrderSummary() {
 
       const res = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
-        credentials: 'include'
+        headers: { 
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify(orderData)
       });
 
       if (res.ok) {
