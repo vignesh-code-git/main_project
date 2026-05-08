@@ -130,7 +130,7 @@ export default function Hero() {
     function smoothAnimate() {
       const diff = targetFrameRef.current - currentFrameRef.current;
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
-      const lerpFactor = isNearEnd ? 0.4 : 0.12;
+      const lerpFactor = isNearEnd ? 0.7 : 0.45;
 
       if (Math.abs(diff) > 0.15) {
         currentFrameRef.current += diff * lerpFactor;
