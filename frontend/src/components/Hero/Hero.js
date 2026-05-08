@@ -127,11 +127,13 @@ export default function Hero() {
       }
     }
 
-    const smoothAnimate = () => {
+    function smoothAnimate() {
       const diff = targetFrameRef.current - currentFrameRef.current;
+      const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
+      const lerpFactor = isNearEnd ? 0.6 : 0.25;
 
-      if (Math.abs(diff) > 0.05) {
-        currentFrameRef.current += diff * 0.15;
+      if (Math.abs(diff) > 0.001) {
+        currentFrameRef.current += diff * lerpFactor;
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
       } else {
@@ -139,7 +141,7 @@ export default function Hero() {
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = null;
       }
-    };
+    }
 
     function handleScroll() {
       if (!containerRef.current) return;
@@ -225,7 +227,7 @@ export default function Hero() {
       }
 
       const scrollFraction = Math.max(0, Math.min(activeImageDistance / animationBuffer, 1));
-      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
+      const frameIndex = Math.max(1, Math.min(frameCount, (scrollFraction * (frameCount - 1)) + 1));
 
       targetFrameRef.current = frameIndex;
       if (!animationFrameRef.current) {
