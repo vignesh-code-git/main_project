@@ -87,7 +87,7 @@ const loginUser = async (req, res) => {
         userId: user.id,
         role: user.role,
         title: 'Successful Login',
-        message: `You logged in successfully at ${new Date().toLocaleTimeString()}.`,
+        message: 'You logged in successfully.',
         type: 'system',
         actorId: user.id
       });

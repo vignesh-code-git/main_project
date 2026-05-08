@@ -502,7 +502,11 @@ export default function Navbar() {
                                       <h4 className="notif-title">{notif.title}</h4>
                                       {!notif.isRead && <div className="unread-indicator"></div>}
                                     </div>
-                                    <p className="notif-message">{notif.message}</p>
+                                    <p className="notif-message">
+                                      {notif.title === 'Successful Login' 
+                                        ? `You logged in successfully at ${new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}.`
+                                        : notif.message}
+                                    </p>
                                     <div className="notif-bottom">
                                       <span className="notif-time">
                                         {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
