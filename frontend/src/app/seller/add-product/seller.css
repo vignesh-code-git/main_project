@@ -1249,3 +1249,49 @@ input:checked+.slider:before {
 .preview-item.existing-file:hover {
   opacity: 1;
 }
+
+.action-buttons-row {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 32px !important;
+  margin-top: 40px !important;
+  width: 100% !important;
+}
+
+.preview-btn {
+  background: #f0f0f0 !important;
+  color: #000 !important;
+  padding: 16px 24px !important;
+  border-radius: 62px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.preview-btn:hover {
+  background: #e8e8e8 !important;
+}
+
+.final-create-btn {
+  width: 100% !important;
+  padding: 16px 28px !important;
+  background: #000 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 62px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.final-create-btn:hover {
+  background: #222 !important;
+}
