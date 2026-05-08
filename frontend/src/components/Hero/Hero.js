@@ -132,7 +132,7 @@ export default function Hero() {
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
       const lerpFactor = isNearEnd ? 0.8 : 0.4;
 
-      if (Math.abs(diff) > 0.05) {
+      if (Math.abs(diff) > 0.15) {
         currentFrameRef.current += diff * lerpFactor;
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
