@@ -12,7 +12,6 @@ export default function Hero() {
   const [fadeOut, setFadeOut] = useState(false);
   const [wordIndex, setWordIndex] = useState(0); // 0: VIBE, 1: LOOK, 2: STYLE
   const [descProgress, setDescProgress] = useState(0); // 0 to 1 for gradient wipe
-  const [loadProgress, setLoadProgress] = useState(0); // 0 to 100 percentage
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
@@ -286,58 +285,34 @@ export default function Hero() {
     handleScroll();
 
     const preloadImages = async () => {
-      let loadedCount = 0;
-      const totalInitial = 15; // We wait for first 15 for the "Exit"
-
-      const updateProgress = () => {
-        loadedCount++;
-        // Calculate progress based on the initial critical batch
-        const progress = Math.min(100, Math.round((loadedCount / totalInitial) * 100));
-        setLoadProgress(progress);
-      };
-
       const loadFrame = (i) => {
         return new Promise((resolve) => {
-          if (imagesRef.current[i]) {
-            if (i <= totalInitial) updateProgress();
-            return resolve();
-          }
+          if (imagesRef.current[i]) return resolve();
           const frameNum = String(i).padStart(3, '0');
           const img = new Image();
           img.onload = () => {
             if (i === 1) updateCanvas(1);
-            if (i <= totalInitial) updateProgress();
             resolve();
           };
-          img.onerror = () => {
-            if (i <= totalInitial) updateProgress();
-            resolve();
-          };
+          img.onerror = () => resolve();
           img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
           imagesRef.current[i] = img;
         });
       };
 
-      // 1. Initial critical frame
       await loadFrame(1);
+
+      // Kickstart canvas with first frame
       updateCanvas(1);
       handleScroll();
 
-      // 2. Load the rest of the initial batch (up to 15)
+      setFadeOut(true);
+      setTimeout(() => setPreloading(false), 800);
+
       const initialBatch = [];
-      for (let i = 2; i <= totalInitial; i++) initialBatch.push(loadFrame(i));
+      for (let i = 2; i <= Math.min(15, frameCount); i++) initialBatch.push(loadFrame(i));
       await Promise.all(initialBatch);
 
-      // ZIP to 100 if we haven't reached it through precision
-      setLoadProgress(100);
-      
-      // Delay slightly for visual satisfaction of seeing "100%"
-      setTimeout(() => {
-        setFadeOut(true);
-        setTimeout(() => setPreloading(false), 800);
-      }, 300);
-
-      // 3. Background loading continues
       const roughBatch = [];
       for (let i = 20; i <= frameCount; i += 5) roughBatch.push(loadFrame(i));
       await Promise.all(roughBatch);
@@ -388,13 +363,6 @@ export default function Hero() {
     <div className="hero-sticky-wrapper" ref={containerRef}>
       {preloading && (
         <div className={`hero-loading-overlay ${fadeOut ? 'fade-out' : ''}`}>
-          <div className="exact-loader-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <style>{`.spinner_qMZZ{transform-origin:center;animation:spinner_lv7y 1s infinite linear}@keyframes spinner_lv7y{100%{transform:rotate(360deg)}}`}</style>
-              <path className="spinner_qMZZ" d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" opacity=".25"/>
-              <path className="spinner_qMZZ" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z"/>
-            </svg>
-          </div>
         </div>
       )}
       <section className="hero">
