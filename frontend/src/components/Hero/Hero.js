@@ -12,6 +12,7 @@ export default function Hero() {
   const [fadeOut, setFadeOut] = useState(false);
   const [wordIndex, setWordIndex] = useState(0); // 0: VIBE, 1: LOOK, 2: STYLE
   const [descProgress, setDescProgress] = useState(0); // 0 to 1 for gradient wipe
+  const [loadProgress, setLoadProgress] = useState(0); // 0 to 100 percentage
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
@@ -285,34 +286,58 @@ export default function Hero() {
     handleScroll();
 
     const preloadImages = async () => {
+      let loadedCount = 0;
+      const totalInitial = 15; // We wait for first 15 for the "Exit"
+
+      const updateProgress = () => {
+        loadedCount++;
+        // Calculate progress based on the initial critical batch
+        const progress = Math.min(100, Math.round((loadedCount / totalInitial) * 100));
+        setLoadProgress(progress);
+      };
+
       const loadFrame = (i) => {
         return new Promise((resolve) => {
-          if (imagesRef.current[i]) return resolve();
+          if (imagesRef.current[i]) {
+            if (i <= totalInitial) updateProgress();
+            return resolve();
+          }
           const frameNum = String(i).padStart(3, '0');
           const img = new Image();
           img.onload = () => {
             if (i === 1) updateCanvas(1);
+            if (i <= totalInitial) updateProgress();
             resolve();
           };
-          img.onerror = () => resolve();
+          img.onerror = () => {
+            if (i <= totalInitial) updateProgress();
+            resolve();
+          };
           img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
           imagesRef.current[i] = img;
         });
       };
 
+      // 1. Initial critical frame
       await loadFrame(1);
-
-      // Kickstart canvas with first frame
       updateCanvas(1);
       handleScroll();
 
-      setFadeOut(true);
-      setTimeout(() => setPreloading(false), 800);
-
+      // 2. Load the rest of the initial batch (up to 15)
       const initialBatch = [];
-      for (let i = 2; i <= Math.min(15, frameCount); i++) initialBatch.push(loadFrame(i));
+      for (let i = 2; i <= totalInitial; i++) initialBatch.push(loadFrame(i));
       await Promise.all(initialBatch);
 
+      // ZIP to 100 if we haven't reached it through precision
+      setLoadProgress(100);
+      
+      // Delay slightly for visual satisfaction of seeing "100%"
+      setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => setPreloading(false), 800);
+      }, 300);
+
+      // 3. Background loading continues
       const roughBatch = [];
       for (let i = 20; i <= frameCount; i += 5) roughBatch.push(loadFrame(i));
       await Promise.all(roughBatch);
@@ -363,6 +388,12 @@ export default function Hero() {
     <div className="hero-sticky-wrapper" ref={containerRef}>
       {preloading && (
         <div className={`hero-loading-overlay ${fadeOut ? 'fade-out' : ''}`}>
+          <div className="loader-content">
+            <div className="loader-percentage">{loadProgress}%</div>
+            <div className="loader-bar-container">
+              <div className="loader-bar" style={{ width: `${loadProgress}%` }}></div>
+            </div>
+          </div>
         </div>
       )}
       <section className="hero">
