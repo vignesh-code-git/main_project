@@ -29,36 +29,35 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [deletedImageIds, setDeletedImageIds] = useState([]);
 
-  const colorPresets = [
-    { name: 'Green', value: '#00C12B' },
-    { name: 'Red', value: '#F50606' },
-    { name: 'Yellow', value: '#F5DD06' },
-    { name: 'Orange', value: '#F57906' },
-    { name: 'Cyan', value: '#06CAF5' },
-    { name: 'Blue', value: '#063AF5' },
-    { name: 'Purple', value: '#7D06F5' },
-    { name: 'Pink', value: '#F506A4' },
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Black', value: '#000000' },
-    { name: 'Olive', value: '#4F4F31' },
-    { name: 'Navy', value: '#1A237E' },
-    { name: 'Gray', value: '#808080' }
-  ];
+  const [brands, setBrands] = useState([]);
+  const [styles, setStyles] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colorsList, setColorsList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, prodRes, brandRes, styleRes, sizeRes, colorRes] = await Promise.all([
           fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/products/${id}`, { headers: getAuthHeaders() })
+          fetch(`${API_BASE_URL}/api/products/${id}`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products/brands`),
+          fetch(`${API_BASE_URL}/api/products/styles`),
+          fetch(`${API_BASE_URL}/api/products/sizes`),
+          fetch(`${API_BASE_URL}/api/products/colors`)
         ]);
 
         const categoriesData = await catRes.json();
         const productData = await prodRes.json();
+        const brandData = await brandRes.json();
+        const styleData = await styleRes.json();
+        const sizeData = await sizeRes.json();
+        const colorData = await colorRes.json();
 
-        if (Array.isArray(categoriesData)) {
-          setCategories(categoriesData);
-        }
+        if (catRes.ok) setCategories(categoriesData);
+        if (brandRes.ok) setBrands(brandData);
+        if (styleRes.ok) setStyles(styleData);
+        if (sizeRes.ok) setSizes(sizeData);
+        if (colorRes.ok) setColorsList(colorData);
 
         setFormData({
           name: productData.name,
@@ -242,41 +241,45 @@ export default function EditProductPage() {
           <div className="form-group">
             <label>Dress Style</label>
             <CustomSelect 
-              options={['Casual', 'Formal', 'Party', 'Gym']}
+              options={styles}
               value={formData.style}
               onChange={(e) => setFormData(prev => ({ ...prev, style: e.target.value }))}
               placeholder="Select Style"
+              labelKey="name"
+              valueKey="name"
             />
           </div>
 
           <div className="form-group">
             <label>Brand</label>
             <CustomSelect 
-              options={['ZARA', 'GUCCI', 'PRADA', 'VERSACE', 'Calvin Klein']}
+              options={brands}
               value={formData.brand}
               onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
               placeholder="Select Brand"
+              labelKey="name"
+              valueKey="name"
             />
           </div>
 
           <div className="form-group">
             <label>Available Sizes</label>
             <div className="size-selector-chips">
-              {['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'].map(size => (
+              {sizes.map(size => (
                 <div
-                  key={size}
-                  className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}
+                  key={size.id}
+                  className={`size-chip ${formData.sizes.includes(size.name) ? 'active' : ''}`}
                   onClick={() => {
                     setFormData(prev => {
-                      const isSelected = prev.sizes.includes(size);
+                      const isSelected = prev.sizes.includes(size.name);
                       const newSizes = isSelected
-                        ? prev.sizes.filter(s => s !== size)
-                        : [...prev.sizes, size];
+                        ? prev.sizes.filter(s => s !== size.name)
+                        : [...prev.sizes, size.name];
                       return { ...prev, sizes: newSizes };
                     });
                   }}
                 >
-                  {size}
+                  {size.name}
                 </div>
               ))}
             </div>
@@ -285,9 +288,9 @@ export default function EditProductPage() {
           <div className="form-group color-chooser-group">
             <label>Product Colors</label>
             <div className="color-presets">
-              {colorPresets.map(color => (
+              {colorsList.map(color => (
                 <div 
-                  key={color.name}
+                  key={color.id}
                   className={`color-preset-item ${formData.colors.includes(color.name) ? 'selected' : ''}`}
                   onClick={() => {
                     setFormData(prev => {
@@ -301,7 +304,7 @@ export default function EditProductPage() {
                   }}
                   title={color.name}
                 >
-                  <div className="color-swatch-circle" style={{ backgroundColor: color.value }}></div>
+                  <div className="color-swatch-circle" style={{ backgroundColor: color.hexCode }}></div>
                   <span>{color.name}</span>
                 </div>
               ))}
@@ -316,7 +319,7 @@ export default function EditProductPage() {
                   <div 
                     className="color-indicator" 
                     style={{ 
-                      backgroundColor: colorPresets.find(p => p.name === color)?.value || '#808080' 
+                      backgroundColor: colorsList.find(p => p.name === color)?.hexCode || '#808080' 
                     }}
                   ></div>
                   <span>{color} Gallery</span>

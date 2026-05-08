@@ -21,6 +21,7 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [colorsList, setColorsList] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -45,6 +46,19 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
     }
   }, [isAuthenticated, user]);
 
+  useEffect(() => {
+    const fetchColors = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/products/colors`);
+        const data = await res.json();
+        if (Array.isArray(data)) setColorsList(data);
+      } catch (err) {
+        console.error('Error fetching colors:', err);
+      }
+    };
+    fetchColors();
+  }, []);
+
   const handleSelectAddress = async (addr) => {
     setSelectedAddress(addr);
     setIsAddressModalOpen(false);
@@ -56,21 +70,10 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   const [quantity, setQuantity] = useState(1);
   const [successMsg, setSuccessMsg] = useState('');
 
-  const colorMap = {
-    'green': '#00C12B',
-    'red': '#F50606',
-    'yellow': '#F5DD06',
-    'orange': '#F57906',
-    'cyan': '#06CAF5',
-    'blue': '#063AF5',
-    'purple': '#7D06F5',
-    'pink': '#F506A4',
-    'white': '#FFFFFF',
-    'black': '#000000',
-    'olive': '#4F4F31',
-    'navy': '#1A237E',
-    'gray': '#808080'
-  };
+  const colorMap = {};
+  colorsList.forEach(c => {
+    colorMap[c.name.toLowerCase()] = c.hexCode;
+  });
 
   const productColors = product.color ? product.color.split(',').map(c => c.trim()) : [];
 
