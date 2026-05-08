@@ -174,9 +174,16 @@ export default function ProductInfo({ product, selectedColor, setSelectedColor }
   return (
     <div className="product-info-detail">
       <h1 className="product-title">{product.name}</h1>
-      <div className="product-rating">
-        <span className="stars">{"★".repeat(Math.floor(product.rating))}</span>
-        <span className="rating-text">{product.rating}/5</span>
+      <div 
+        className="product-rating reviews-summary-link" 
+        onClick={() => {
+          const element = document.getElementById('reviews-section');
+          if (element) element.scrollIntoView({ behavior: 'smooth' });
+        }}
+        style={{ cursor: 'pointer' }}
+      >
+        <span className="stars">{"★".repeat(Math.floor(product.rating || 0))}</span>
+        <span className="rating-text">{product.rating || 0}/5 <span className="review-count-small">(View Reviews)</span></span>
       </div>
       <div className="product-price">
         <span className="current-price">₹{product.price}</span>

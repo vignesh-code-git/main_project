@@ -77,3 +77,79 @@ exports.getProductReviews = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.getUserReviews = async (req, res) => {
+    try {
+        const reviews = await Review.findAll({
+            where: { userId: req.user.id },
+            include: [{ 
+                model: Product, 
+                attributes: ['id', 'name'],
+                include: [{ model: ProductImage, as: 'images', limit: 1 }]
+            }],
+            order: [['createdAt', 'DESC']]
+        });
+        res.json(reviews);
+    } catch (error) {
+        console.error('Error fetching user reviews:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.updateReview = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rating, content } = req.body;
+        const review = await Review.findByPk(id);
+
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+        if (review.userId !== req.user.id) return res.status(403).json({ message: 'Not authorized' });
+
+        await review.update({ rating, content });
+
+        // Recalculate average rating
+        const allReviews = await Review.findAll({ where: { productId: review.productId } });
+        const avgRating = allReviews.length > 0 
+            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length 
+            : 0;
+        
+        await Product.update(
+            { rating: parseFloat(avgRating.toFixed(1)) },
+            { where: { id: review.productId } }
+        );
+
+        res.json(review);
+    } catch (error) {
+        console.error('Error updating review:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.deleteReview = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const review = await Review.findByPk(id);
+
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+        if (review.userId !== req.user.id) return res.status(403).json({ message: 'Not authorized' });
+
+        const productId = review.productId;
+        await review.destroy();
+
+        // Recalculate average rating
+        const allReviews = await Review.findAll({ where: { productId } });
+        const avgRating = allReviews.length > 0 
+            ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length 
+            : 0;
+        
+        await Product.update(
+            { rating: parseFloat(avgRating.toFixed(1)) },
+            { where: { id: productId } }
+        );
+
+        res.json({ message: 'Review deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

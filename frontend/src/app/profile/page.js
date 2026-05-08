@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { Package, MapPin, User, Settings, ShoppingBag, Truck, ChevronRight, X, Plus, Trash2, Edit3, Loader2, FileText } from 'lucide-react';
+import { Package, MapPin, User, Settings, ShoppingBag, Truck, ChevronRight, X, Plus, Trash2, Edit3, Loader2, FileText, Star } from 'lucide-react';
 import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './profile.css';
@@ -21,6 +21,15 @@ export default function UserProfile() {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentAddressId, setCurrentAddressId] = useState(null);
+ 
+  // Review State
+  const [userReviews, setUserReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [isReviewEditModalOpen, setIsReviewEditModalOpen] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, content: '' });
+  const [isReviewDeleteModalOpen, setIsReviewDeleteModalOpen] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
 
   // Modal State
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -63,6 +72,7 @@ export default function UserProfile() {
     if (mounted && user) {
       fetchOrders();
       fetchAddresses();
+      fetchUserReviews();
       setProfileForm({
         name: user.name || '',
         phoneNumber: user.phoneNumber || '',
@@ -96,6 +106,64 @@ export default function UserProfile() {
       console.error('Error fetching addresses:', err);
     } finally {
       setLoadingAddresses(false);
+    }
+  };
+
+  const fetchUserReviews = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/reviews/user`, {
+        headers: getAuthHeaders()
+      });
+      const data = await res.json();
+      setUserReviews(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleReviewDelete = (id) => {
+    setReviewToDelete(id);
+    setIsReviewDeleteModalOpen(true);
+  };
+
+  const confirmDeleteReview = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/reviews/${reviewToDelete}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        fetchUserReviews();
+        setIsReviewDeleteModalOpen(false);
+        setReviewToDelete(null);
+      }
+    } catch (err) {
+      console.error('Error deleting review:', err);
+    }
+  };
+
+  const openEditReviewModal = (rev) => {
+    setEditingReview(rev);
+    setReviewForm({ rating: rev.rating, content: rev.content });
+    setIsReviewEditModalOpen(true);
+  };
+
+  const handleReviewUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/reviews/${editingReview.id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(reviewForm)
+      });
+      if (res.ok) {
+        fetchUserReviews();
+        setIsReviewEditModalOpen(false);
+      }
+    } catch (err) {
+      console.error('Error updating review:', err);
     }
   };
 
@@ -245,6 +313,12 @@ export default function UserProfile() {
               <MapPin size={20} /> Addresses
             </button>
             <button
+              className={activeTab === 'reviews' ? 'active' : ''}
+              onClick={() => setActiveTab('reviews')}
+            >
+              <Star size={20} /> My Reviews & Privacy
+            </button>
+            <button
               className={activeTab === 'settings' ? 'active' : ''}
               onClick={() => setActiveTab('settings')}
             >
@@ -318,6 +392,69 @@ export default function UserProfile() {
                 </div>
                 <button type="submit" className="save-btn">Save Changes</button>
               </form>
+            </div>
+          )}
+
+          {activeTab === 'reviews' && (
+            <div className="reviews-view">
+              <header className="view-header">
+                <h2>My Reviews & Privacy</h2>
+                <p>Manage the feedback you've shared with the community.</p>
+              </header>
+
+              <div className="user-reviews-list">
+                {loadingReviews ? (
+                  <div className="loading-state-box" style={{ padding: '40px', textAlign: 'center' }}>
+                    <Loader2 className="animate-spin" style={{ margin: '0 auto 12px' }} /> 
+                    <p>Loading your reviews...</p>
+                  </div>
+                ) : userReviews.length > 0 ? (
+                  userReviews.map((rev) => (
+                    <div key={rev.id} className="user-review-card">
+                      <div className="review-card-top">
+                        <div className="product-info-mini">
+                          <img 
+                            src={rev.Product?.images?.[0]?.url || '/placeholder.png'} 
+                            alt={rev.Product?.name} 
+                            className="mini-p-img"
+                          />
+                          <div className="p-text-meta">
+                            <h4>{rev.Product?.name}</h4>
+                            <div className="user-stars">
+                              {[...Array(5)].map((_, i) => (
+                                <Star 
+                                  key={i} 
+                                  size={14} 
+                                  fill={i < rev.rating ? "#FFC633" : "transparent"} 
+                                  color="#FFC633" 
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="review-actions">
+                          <button className="edit-rev-btn" title="Edit Review" onClick={() => openEditReviewModal(rev)}>
+                            <Edit3 size={18} />
+                          </button>
+                          <button className="delete-rev-btn" title="Delete Review" onClick={() => handleReviewDelete(rev.id)}>
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                      <p className="review-body">"{rev.content}"</p>
+                      <span className="review-date-stamp">
+                        Published on {new Date(rev.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-reviews">
+                    <ShoppingBag size={48} />
+                    <p>You haven't reviewed any products yet.</p>
+                    <button onClick={() => router.push('/shop')} className="go-shop-btn">Go Shopping</button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </main>
@@ -450,6 +587,56 @@ export default function UserProfile() {
         confirmText="Yes, Remove"
         cancelText="Cancel"
       />
+
+      {/* Review Delete Modal */}
+      <ConfirmModal
+        isOpen={isReviewDeleteModalOpen}
+        onClose={() => setIsReviewDeleteModalOpen(false)}
+        onConfirm={confirmDeleteReview}
+        title="Delete Review?"
+        message="Are you sure you want to delete this review? This will also remove your rating from the product's average score."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+      />
+
+      {/* Edit Review Modal */}
+      {isReviewEditModalOpen && (
+        <div className="modal-overlay">
+          <div className="review-modal">
+            <div className="modal-header">
+              <h2>Edit Your Review</h2>
+              <button className="modal-close-btn" onClick={() => setIsReviewEditModalOpen(false)}><X size={24} /></button>
+            </div>
+            <form onSubmit={handleReviewUpdate}>
+              <div className="form-group">
+                <label>Rating</label>
+                <div className="rating-stars-input">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star 
+                      key={s}
+                      size={32}
+                      onClick={() => setReviewForm({ ...reviewForm, rating: s })}
+                      fill={s <= reviewForm.rating ? "#FFC633" : "transparent"}
+                      color="#FFC633"
+                      style={{ cursor: 'pointer' }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Your Feedback</label>
+                <textarea 
+                  value={reviewForm.content}
+                  onChange={(e) => setReviewForm({ ...reviewForm, content: e.target.value })}
+                  rows={5}
+                  required
+                />
+              </div>
+              <button type="submit" className="save-btn">Update Review</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
