@@ -66,7 +66,7 @@ exports.getAllProducts = async (req, res) => {
       where,
       order,
       include: [
-        { model: ProductImage, as: 'images' },
+        { model: ProductImage, as: 'images', order: [['id', 'ASC']] },
         { model: Category }
       ],
       distinct: true // To get accurate count with includes
@@ -82,7 +82,7 @@ exports.getSellerProducts = async (req, res) => {
     const { count, rows: products } = await Product.findAndCountAll({
       where: { sellerId: req.user.id },
       include: [
-        { model: ProductImage, as: 'images' },
+        { model: ProductImage, as: 'images', order: [['id', 'ASC']] },
         { model: Category }
       ],
       order: [['createdAt', 'DESC']],
@@ -126,7 +126,7 @@ exports.getNewArrivals = async (req, res) => {
       where,
       order: [['createdAt', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }],
+      include: [{ model: ProductImage, as: 'images', order: [['id', 'ASC']] }],
       distinct: true
     });
     console.log(`Found ${products.length} new arrivals.`);
@@ -168,7 +168,7 @@ exports.getTopSelling = async (req, res) => {
       where,
       order: [['rating', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }],
+      include: [{ model: ProductImage, as: 'images', order: [['id', 'ASC']] }],
       distinct: true
     });
     console.log(`Found ${products.length} top selling products.`);
@@ -409,7 +409,7 @@ exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
       include: [
-        { model: ProductImage, as: 'images' },
+        { model: ProductImage, as: 'images', order: [['id', 'ASC']] },
         { model: Category },
         {
           model: Review,
