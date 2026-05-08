@@ -127,13 +127,11 @@ export default function Hero() {
       }
     }
 
-    function smoothAnimate() {
+    const smoothAnimate = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
-      const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
-      const lerpFactor = isNearEnd ? 0.6 : 0.5;
 
       if (Math.abs(diff) > 0.05) {
-        currentFrameRef.current += diff * lerpFactor;
+        currentFrameRef.current += diff * 0.15;
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = requestAnimationFrame(smoothAnimate);
       } else {
@@ -141,7 +139,7 @@ export default function Hero() {
         updateCanvas(Math.round(currentFrameRef.current));
         animationFrameRef.current = null;
       }
-    }
+    };
 
     function handleScroll() {
       if (!containerRef.current) return;
