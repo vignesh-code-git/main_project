@@ -11,6 +11,7 @@ async function getCategoryData(id, searchParams) {
 
     if (id === 'new-arrivals') {
       params.append('onSale', 'true');
+      params.append('sortBy', 'oldest');
       categoryName = 'New Arrivals';
     } else if (id === 'top-selling') {
       endpoint = `${API_BASE_URL}/api/products/top-selling`;

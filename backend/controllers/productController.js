@@ -59,6 +59,7 @@ exports.getAllProducts = async (req, res) => {
     if (sortBy === 'price-asc') order = [['price', 'ASC']];
     if (sortBy === 'price-desc') order = [['price', 'DESC']];
     if (sortBy === 'newest') order = [['createdAt', 'DESC']];
+    if (sortBy === 'oldest') order = [['createdAt', 'ASC']];
     if (sortBy === 'rating') order = [['rating', 'DESC'], ['numReviews', 'DESC']];
     if (sortBy === 'popular') order = [['rating', 'DESC'], ['numReviews', 'DESC']];
 
