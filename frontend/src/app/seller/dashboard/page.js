@@ -40,9 +40,21 @@ export default function SellerDashboard() {
   const [savingOnboarding, setSavingOnboarding] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
       router.push('/seller/auth');
       return;
+    }
+
+    if (!isAuthenticated || (user && user.role !== 'seller')) {
+      // If we have a token but state hasn't caught up yet, wait a bit longer
+      const timer = setTimeout(() => {
+        if (!isAuthenticated && !localStorage.getItem('token')) {
+          router.push('/seller/auth');
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
     }
 
     if (user) {
@@ -63,7 +75,7 @@ export default function SellerDashboard() {
         fetchSellerFeedback(user.id);
       }
     }
-  }, [isAuthenticated, user, activeTab]);
+  }, [isAuthenticated, user, activeTab, router]);
 
   const fetchDashboardStats = async () => {
     try {
