@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import { X } from 'lucide-react';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -41,6 +42,16 @@ export default function AdminDashboard() {
   const [newColor, setNewColor] = useState({ name: '', hexCode: '' });
   const [assetTab, setAssetTab] = useState('categories');
   const [toast, setToast] = useState({ show: false, message: '' });
+
+  // Delete Confirmation State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfig, setDeleteConfig] = useState({
+    id: null,
+    type: '',
+    listSetter: null,
+    title: '',
+    message: ''
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -250,26 +261,15 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (!confirm('Are you sure you want to delete this category?')) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/admin/categories/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-
-      if (res.ok) {
-        setCategories(prev => prev.filter(c => c.id !== id));
-        showToast('CATEGORY DELETED');
-      } else {
-        const err = await res.json();
-        showToast(err.message || 'FAILED TO DELETE');
-      }
-    } catch (err) {
-      console.error('Error deleting category:', err);
-      showToast('CONNECTION ERROR');
-    }
+  const handleDeleteCategory = (id) => {
+    setDeleteConfig({
+      id,
+      type: 'categories',
+      listSetter: setCategories,
+      title: 'Delete Category?',
+      message: 'Are you sure you want to remove this category? This will affect all products currently linked to it.'
+    });
+    setIsDeleteModalOpen(true);
   };
 
   const handleAddAsset = async (type, payload, setList, setInput) => {
@@ -282,24 +282,46 @@ export default function AdminDashboard() {
       if (res.ok) {
         const data = await res.json();
         setList(prev => [...prev, data]);
-        setInput('');
+        if (typeof setInput === 'function') setInput('');
+        else setInput(''); // Fallback
         showToast(`${type.toUpperCase()} ADDED`);
       }
     } catch (err) { console.error(err); }
   };
 
-  const handleDeleteAsset = async (type, id, setList) => {
-    if (!confirm(`Delete this ${type}?`)) return;
+  const handleDeleteAsset = (type, id, setList) => {
+    setDeleteConfig({
+      id,
+      type,
+      listSetter: setList,
+      title: `Delete ${type.slice(0, -1).toUpperCase()}?`,
+      message: `Are you sure you want to permanently remove this ${type.slice(0, -1)}? This action cannot be undone.`
+    });
+    setIsDeleteModalOpen(true);
+  };
+
+  const executeDelete = async () => {
+    const { id, type, listSetter } = deleteConfig;
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/${type}/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
+
       if (res.ok) {
-        setList(prev => prev.filter(item => item.id !== id));
+        listSetter(prev => prev.filter(item => item.id !== id));
         showToast('DELETED SUCCESSFULLY');
+        setIsDeleteModalOpen(false);
+      } else {
+        const err = await res.json();
+        showToast(err.message || 'FAILED TO DELETE');
+        setIsDeleteModalOpen(false);
       }
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error('Error deleting asset:', err);
+      showToast('CONNECTION ERROR');
+      setIsDeleteModalOpen(false);
+    }
   };
 
   if (!authUser || loading) return <div className="admin-dashboard"><div style={{ padding: '80px', textAlign: 'center', fontWeight: '900', fontSize: '24px' }}>INITIALIZING CORE...</div></div>;
@@ -726,6 +748,16 @@ export default function AdminDashboard() {
           {toast.message}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={executeDelete}
+        title={deleteConfig.title}
+        message={deleteConfig.message}
+        confirmText="Yes, Delete"
+        cancelText="No, Keep it"
+      />
     </div>
   );
 }
