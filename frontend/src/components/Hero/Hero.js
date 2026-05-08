@@ -15,7 +15,7 @@ export default function Hero() {
   const canvasRef = useRef(null);
   const offscreenCanvasRef = useRef(null);
   const imagesRef = useRef([]);
-  const frameCount = 140;
+  const frameCount = 240;
 
   const containerRef = useRef(null);
   const heroContentRef = useRef(null);
@@ -295,7 +295,7 @@ export default function Hero() {
             resolve();
           };
           img.onerror = () => resolve();
-          img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed.webp`;
+          img.src = `/images/hero-animation/ezgif-frame-${frameNum}_Compressed_converted.avif`;
           imagesRef.current[i] = img;
         });
       };
