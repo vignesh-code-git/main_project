@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import '../../add-product/seller.css';
 import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import { X } from 'lucide-react';
 
 export default function EditProductPage() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ export default function EditProductPage() {
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState({ type: '', message: '' });
   const [loading, setLoading] = useState(true);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
 
   const colorPresets = [
     { name: 'Green', value: '#00C12B' },
@@ -107,6 +109,22 @@ export default function EditProductPage() {
     }));
   };
 
+  const handleRemoveExistingImage = (imageId) => {
+    setDeletedImageIds(prev => [...prev, imageId]);
+    setExistingImages(prev => prev.filter(img => img.id !== imageId));
+  };
+
+  const handleRemoveNewImage = (color, index) => {
+    setColorFiles(prev => {
+      const files = [...prev[color]];
+      files.splice(index, 1);
+      return {
+        ...prev,
+        [color]: files
+      };
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ type: 'loading', message: 'Updating product...' });
@@ -128,6 +146,11 @@ export default function EditProductPage() {
         submitData.append(`images_${color}`, file);
       });
     });
+
+    // Append deleted image IDs
+    if (deletedImageIds.length > 0) {
+      submitData.append('deletedImageIds', deletedImageIds.join(','));
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
@@ -320,6 +343,13 @@ export default function EditProductPage() {
                       {Array.from(colorFiles[color] || []).map((file, idx) => (
                         <div key={idx} className="preview-item new-file">
                           <img src={URL.createObjectURL(file)} alt="preview" />
+                          <button 
+                            type="button" 
+                            className="remove-img-btn"
+                            onClick={() => handleRemoveNewImage(color, idx)}
+                          >
+                            <X size={14} />
+                          </button>
                           <span className="new-tag">NEW</span>
                         </div>
                       ))}
@@ -333,6 +363,13 @@ export default function EditProductPage() {
                       .map((img, idx) => (
                         <div key={idx} className="preview-item existing-file">
                           <img src={resolveImageUrl(img.url)} alt="existing" />
+                          <button 
+                            type="button" 
+                            className="remove-img-btn"
+                            onClick={() => handleRemoveExistingImage(img.id)}
+                          >
+                            <X size={14} />
+                          </button>
                           <span className="existing-tag">EXISTING</span>
                         </div>
                       ))

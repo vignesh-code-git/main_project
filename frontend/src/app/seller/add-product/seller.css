@@ -791,11 +791,45 @@ input:checked+.slider:before {
 
 
 
-.action-buttons-row {
+.preview-item {
+  position: relative;
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 51, 51, 0.9);
+  color: white;
+  border: none;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin-top: 30px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-img-btn:hover {
+  background: #FF3333;
+  transform: scale(1.1);
+}
+
+.remove-img-btn svg {
+  stroke-width: 3px;
+}
+
+.preview-item.existing-file {
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.preview-item.existing-file:hover {
+  opacity: 1;
 }
 
 .preview-btn {
@@ -1173,4 +1207,45 @@ input:checked+.slider:before {
 .csv-action-btn {
   font-size: 14px !important;
   padding: 8px 16px !important;
+}
+
+.preview-item {
+  position: relative;
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 51, 51, 0.9);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-img-btn:hover {
+  background: #FF3333;
+  transform: scale(1.1);
+}
+
+.remove-img-btn svg {
+  stroke-width: 3px;
+}
+
+.preview-item.existing-file {
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.preview-item.existing-file:hover {
+  opacity: 1;
 }

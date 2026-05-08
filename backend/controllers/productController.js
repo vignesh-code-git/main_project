@@ -480,6 +480,23 @@ exports.updateProduct = async (req, res) => {
         : videoUrl
     });
 
+    // Handle Image Deletions
+    const { deletedImageIds } = req.body;
+    if (deletedImageIds) {
+      const idsToDelete = Array.isArray(deletedImageIds) 
+        ? deletedImageIds 
+        : deletedImageIds.split(',').filter(id => id.trim() !== '');
+      
+      if (idsToDelete.length > 0) {
+        await ProductImage.destroy({
+          where: {
+            id: idsToDelete,
+            productId: product.id
+          }
+        });
+      }
+    }
+
     // Handle NEW images uploaded during update
     if (req.files && Array.isArray(req.files)) {
       const newImages = req.files
