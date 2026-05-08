@@ -130,7 +130,7 @@ export default function Hero() {
     function smoothAnimate() {
       const diff = targetFrameRef.current - currentFrameRef.current;
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
-      const lerpFactor = isNearEnd ? 0.4 : 0.15;
+      const lerpFactor = isNearEnd ? 0.6 : 0.25;
 
       if (Math.abs(diff) > 0.05) {
         currentFrameRef.current += diff * lerpFactor;
@@ -265,8 +265,8 @@ export default function Hero() {
       layoutMetrics.current = {
         totalScrollHeight: container.offsetHeight - window.innerHeight,
         canvasWidth: newCanvasWidth,
-        canvasHeight: (isMobileRef.current && initialCanvasHeightRef.current) 
-          ? initialCanvasHeightRef.current 
+        canvasHeight: (isMobileRef.current && initialCanvasHeightRef.current)
+          ? initialCanvasHeightRef.current
           : newCanvasHeight
       };
 
