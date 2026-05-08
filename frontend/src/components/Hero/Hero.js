@@ -130,7 +130,8 @@ export default function Hero() {
     function smoothAnimate() {
       const diff = targetFrameRef.current - currentFrameRef.current;
       const isNearEnd = targetFrameRef.current > frameCount * 0.98 || targetFrameRef.current < 2;
-      const lerpFactor = isNearEnd ? 0.6 : 0.25;
+      // Increased lerpFactor for more responsive 240-frame tracking
+      const lerpFactor = isNearEnd ? 0.6 : 0.35;
 
       if (Math.abs(diff) > 0.001) {
         currentFrameRef.current += diff * lerpFactor;
@@ -227,7 +228,8 @@ export default function Hero() {
       }
 
       const scrollFraction = Math.max(0, Math.min(activeImageDistance / animationBuffer, 1));
-      const frameIndex = Math.max(1, Math.min(frameCount, (scrollFraction * (frameCount - 1)) + 1));
+      // Precise 240-frame mapping
+      const frameIndex = Math.max(1, Math.min(frameCount, Math.floor(scrollFraction * (frameCount - 1)) + 1));
 
       targetFrameRef.current = frameIndex;
       if (!animationFrameRef.current) {
@@ -310,11 +312,12 @@ export default function Hero() {
       setTimeout(() => setPreloading(false), 800);
 
       const initialBatch = [];
-      for (let i = 2; i <= Math.min(15, frameCount); i++) initialBatch.push(loadFrame(i));
+      for (let i = 2; i <= Math.min(25, frameCount); i++) initialBatch.push(loadFrame(i));
       await Promise.all(initialBatch);
 
       const roughBatch = [];
-      for (let i = 20; i <= frameCount; i += 5) roughBatch.push(loadFrame(i));
+      // Jump every 8 frames to build a full-sequence skeleton faster
+      for (let i = 30; i <= frameCount; i += 8) roughBatch.push(loadFrame(i));
       await Promise.all(roughBatch);
 
       const remainingFrames = [];
