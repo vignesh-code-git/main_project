@@ -316,7 +316,7 @@ export default function UserProfile() {
               className={activeTab === 'reviews' ? 'active' : ''}
               onClick={() => setActiveTab('reviews')}
             >
-              <Star size={20} /> My Reviews & Privacy
+              <Star size={20} /> My Reviews
             </button>
             <button
               className={activeTab === 'settings' ? 'active' : ''}
@@ -398,7 +398,7 @@ export default function UserProfile() {
           {activeTab === 'reviews' && (
             <div className="reviews-view">
               <header className="view-header">
-                <h2>My Reviews & Privacy</h2>
+                <h2>My Reviews</h2>
                 <p>Manage the feedback you've shared with the community.</p>
               </header>
 
