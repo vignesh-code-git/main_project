@@ -247,7 +247,7 @@ export default function Navbar() {
 
   // Prevent hydration mismatch by returning null for auth-dependent parts during SSR
   const renderAuthLinks = () => {
-    if (!mounted) return <Link href="/seller/auth" className="become-seller-link"><Store size={14} /> Become a Seller</Link>;
+    if (!mounted) return <Link href="/seller/auth" className="become-seller-link"><Store size={18} /> Become a Seller</Link>;
 
     if (user && user.role === 'admin') {
       return (
@@ -266,7 +266,7 @@ export default function Navbar() {
     }
 
     if (!isAuthenticated || (user && user.role !== 'admin')) {
-      return <Link href="/seller/auth" className="become-seller-link"><Store size={14} /> Become a Seller</Link>;
+      return <Link href="/seller/auth" className="become-seller-link"><Store size={18} /> Become a Seller</Link>;
     }
 
     return null;
@@ -320,7 +320,7 @@ export default function Navbar() {
                   </Link>
                 ) : (
                   <Link href="/seller/auth" className="mobile-only" onClick={() => setMobileMenuOpen(false)}>
-                    <Store size={16} /> Become a Seller
+                    <Store size={20} /> Become a Seller
                   </Link>
                 )}
               </li>
