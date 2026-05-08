@@ -22,7 +22,10 @@ exports.createReview = async (req, res) => {
         const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
         
         await Product.update(
-            { rating: parseFloat(avgRating.toFixed(1)) },
+            { 
+                rating: parseFloat(avgRating.toFixed(1)),
+                numReviews: allReviews.length
+            },
             { where: { id: productId } }
         );
 
@@ -114,7 +117,10 @@ exports.updateReview = async (req, res) => {
             : 0;
         
         await Product.update(
-            { rating: parseFloat(avgRating.toFixed(1)) },
+            { 
+                rating: parseFloat(avgRating.toFixed(1)),
+                numReviews: allReviews.length
+            },
             { where: { id: review.productId } }
         );
 
@@ -143,7 +149,10 @@ exports.deleteReview = async (req, res) => {
             : 0;
         
         await Product.update(
-            { rating: parseFloat(avgRating.toFixed(1)) },
+            { 
+                rating: parseFloat(avgRating.toFixed(1)),
+                numReviews: allReviews.length
+            },
             { where: { id: productId } }
         );
 

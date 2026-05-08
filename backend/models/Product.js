@@ -20,6 +20,10 @@ const Product = sequelize.define('Product', {
     type: DataTypes.FLOAT,
     defaultValue: 0,
   },
+  numReviews: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
   imageUrl: {
     type: DataTypes.STRING,
   },

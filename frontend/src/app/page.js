@@ -8,7 +8,7 @@ import { API_BASE_URL } from '@/config/api';
 async function getHomeData() {
   try {
     const [newRes, topRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/products/new-arrivals`, { cache: 'no-store' }),
+      fetch(`${API_BASE_URL}/api/products?onSale=true`, { cache: 'no-store' }),
       fetch(`${API_BASE_URL}/api/products/top-selling`, { cache: 'no-store' })
     ]);
 
@@ -35,7 +35,7 @@ export default async function Home() {
       <ProductSection 
         title="NEW ARRIVALS" 
         products={newArrivals} 
-        viewAllHref="/shop?newest=true" 
+        viewAllHref="/category/new-arrivals" 
         loading={false} 
       />
       <ProductSection 

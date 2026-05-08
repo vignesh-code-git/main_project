@@ -59,8 +59,8 @@ exports.getAllProducts = async (req, res) => {
     if (sortBy === 'price-asc') order = [['price', 'ASC']];
     if (sortBy === 'price-desc') order = [['price', 'DESC']];
     if (sortBy === 'newest') order = [['createdAt', 'DESC']];
-    if (sortBy === 'rating') order = [['rating', 'DESC']];
-    if (sortBy === 'popular') order = [['rating', 'DESC']];
+    if (sortBy === 'rating') order = [['rating', 'DESC'], ['numReviews', 'DESC']];
+    if (sortBy === 'popular') order = [['rating', 'DESC'], ['numReviews', 'DESC']];
 
     const { count, rows: products } = await Product.findAndCountAll({
       where,

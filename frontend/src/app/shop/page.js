@@ -15,7 +15,7 @@ async function getShopData(searchParams) {
     if (searchParams.brand) params.append('brand', searchParams.brand);
     
     const sortMap = {
-      'Most Popular': 'rating',
+      'Most Popular': 'popular',
       'Newest': 'newest',
       'Price: Low to High': 'price-asc',
       'Price: High to Low': 'price-desc'

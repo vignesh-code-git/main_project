@@ -10,7 +10,7 @@ async function getCategoryData(id, searchParams) {
     let categoryName = 'Category';
 
     if (id === 'new-arrivals') {
-      endpoint = `${API_BASE_URL}/api/products/new-arrivals`;
+      params.append('onSale', 'true');
       categoryName = 'New Arrivals';
     } else if (id === 'top-selling') {
       endpoint = `${API_BASE_URL}/api/products/top-selling`;
@@ -40,7 +40,7 @@ async function getCategoryData(id, searchParams) {
     if (searchParams.brand) params.append('brand', searchParams.brand);
     
     const sortMap = {
-      'Most Popular': 'rating',
+      'Most Popular': 'popular',
       'Newest': 'newest',
       'Price: Low to High': 'price-asc',
       'Price: High to Low': 'price-desc'
