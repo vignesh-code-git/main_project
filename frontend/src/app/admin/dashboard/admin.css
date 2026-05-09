@@ -609,8 +609,11 @@ tr:hover td {
     width: 100%;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0px; /* Closed gap as requested */
+    margin-bottom: 0px;
+    flex-direction: row; /* Ensure they stay side-by-side */
+    flex-wrap: nowrap;
   }
+
 
 
   .nav-tabs {
