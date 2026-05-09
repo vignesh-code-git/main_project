@@ -1382,8 +1382,8 @@ input:checked+.slider:before {
 }
 
 .final-create-btn {
+  flex: 1 !important; /* Fill the remaining right-side gap on desktop */
   width: auto !important;
-  min-width: 300px !important; /* Increased width for desktop */
   padding: 12px 32px !important;
   background: #000 !important;
   color: #fff !important;
@@ -1397,6 +1397,7 @@ input:checked+.slider:before {
   border: none !important;
   cursor: pointer !important;
 }
+
 
 @media (max-width: 768px) {
   .action-buttons-row {
