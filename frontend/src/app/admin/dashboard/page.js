@@ -329,8 +329,20 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <header className="admin-header-nav">
-        <div className="nav-brand">
-          <h2>ADMIN PANEL</h2>
+        <div className="admin-header-top">
+          <div className="nav-brand">
+            <h2>ADMIN PANEL</h2>
+          </div>
+
+          <div className="nav-actions">
+            <div className="user-badge">
+              <div className="badge-avatar">{authUser.name.charAt(0).toUpperCase()}</div>
+              <div className="user-details-mini">
+                <span className="role-label">Super Admin</span>
+                <span className="user-name-small">{authUser.name}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <nav className="nav-tabs">
@@ -352,14 +364,8 @@ export default function AdminDashboard() {
             </div>
           ))}
         </nav>
-
-        <div className="nav-actions">
-          <div className="user-badge">
-            <div className="badge-avatar">{authUser.name.charAt(0).toUpperCase()}</div>
-            <span style={{ fontSize: '13px', fontWeight: '700' }}>{authUser.name}</span>
-          </div>
-        </div>
       </header>
+
 
       <main className="admin-main-full">
         {activeTab === 'dashboard' && (
