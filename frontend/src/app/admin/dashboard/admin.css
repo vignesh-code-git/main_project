@@ -38,7 +38,8 @@
 
 @media (max-width: 768px) {
   .admin-main-full {
-    padding: 32px 20px; /* Standard breathing room */
+    padding: 32px 20px;
+    /* Standard breathing room */
   }
 }
 
@@ -561,16 +562,19 @@ tr:hover td {
 /* Responsive */
 @media (max-width: 768px) {
   .user-badge {
-    padding: 6px 12px; /* Thinner button */
+    padding: 6px 12px;
+    /* Thinner button */
     gap: 8px;
   }
 
   .user-name-small {
-    font-size: 11px; /* Smaller text */
+    font-size: 11px;
+    /* Smaller text */
   }
 
   .badge-avatar {
-    width: 22px; /* Smaller icon */
+    width: 22px;
+    /* Smaller icon */
     height: 22px;
     font-size: 10px;
   }
@@ -596,7 +600,8 @@ tr:hover td {
     display: flex;
     flex-direction: column;
     height: auto;
-    padding: 32px 20px 0 20px; /* Winning padding value */
+    padding: 32px 20px 0 20px;
+    /* Winning padding value */
     gap: 12px;
     align-items: flex-start;
     background: #FFF;
@@ -610,8 +615,8 @@ tr:hover td {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0px;
-    flex-direction: row; /* Ensure they stay side-by-side */
-    flex-wrap: nowrap;
+    flex-direction: row; /* Force side-by-side */
+    flex-wrap: nowrap; /* Prevent stacking */
   }
 
 
@@ -623,7 +628,8 @@ tr:hover td {
     scrollbar-width: none;
     -ms-overflow-style: none;
     gap: 24px;
-    padding-right: 60px; /* Larger gap for the cut-off */
+    padding-right: 60px;
+    /* Larger gap for the cut-off */
     width: 100%;
     /* Create a professional fade-out effect on the right */
     mask-image: linear-gradient(to right, black 80%, transparent 100%);
