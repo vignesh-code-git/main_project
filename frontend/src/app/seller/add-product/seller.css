@@ -1362,13 +1362,6 @@ input:checked+.slider:before {
   width: 100% !important;
 }
 
-@media (max-width: 768px) {
-  .action-buttons-row {
-    flex-direction: column !important;
-    gap: 16px !important;
-  }
-}
-
 .preview-btn {
   background: #f0f0f0 !important;
   color: #000 !important;
@@ -1380,7 +1373,7 @@ input:checked+.slider:before {
   cursor: pointer !important;
   transition: all 0.2s !important;
   width: auto !important;
-  min-width: 160px !important;
+  min-width: 180px !important;
   text-align: center !important;
 }
 
@@ -1390,7 +1383,7 @@ input:checked+.slider:before {
 
 .final-create-btn {
   width: auto !important;
-  min-width: 200px !important;
+  min-width: 300px !important; /* Increased width for desktop */
   padding: 12px 32px !important;
   background: #000 !important;
   color: #fff !important;
@@ -1404,6 +1397,19 @@ input:checked+.slider:before {
   border: none !important;
   cursor: pointer !important;
 }
+
+@media (max-width: 768px) {
+  .action-buttons-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .preview-btn, .final-create-btn {
+    width: 100% !important; /* Uniform full width on mobile */
+    min-width: unset !important;
+  }
+}
+
 
 .final-create-btn:hover {
   background: #222 !important;
