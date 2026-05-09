@@ -39,10 +39,21 @@
   }
 
   .admin-header-top {
+    display: flex;
+    width: 100%;
+    justify-content: space-between; /* Force items to opposite ends */
+    align-items: center;
     flex-wrap: nowrap;
     gap: 10px;
+    margin-bottom: 12px;
+  }
+
+
+  .nav-tab-item {
+    padding: 8px 4px; /* More compact tabs for mobile */
   }
 }
+
 
 
 
