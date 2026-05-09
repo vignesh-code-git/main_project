@@ -18,9 +18,9 @@
 
 @media (max-width: 768px) {
   .breadcrumbs {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 40px 20px 20px 20px; /* Increased top gap for mobile */
     font-size: 14px;
   }
 }
+
 
