@@ -696,7 +696,37 @@
 .detail-row {
   display: flex;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .detail-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .detail-row input:first-of-type {
+    flex: 1; /* Label input */
+    order: 1;
+  }
+
+  .remove-detail-btn {
+    order: 2; /* Close button next to label */
+    padding: 0;
+    min-width: 32px;
+  }
+
+  .detail-row input:last-of-type {
+    width: 100% !important; /* Value input on second line */
+    max-width: 100% !important;
+    order: 3;
+    margin-top: 4px;
+  }
 }
 
 .detail-row input {
@@ -704,7 +734,10 @@
   background: #fff !important;
   font-size: 14px !important;
   padding: 10px 14px !important;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
 }
+
 
 
 .remove-detail-btn {
@@ -757,28 +790,30 @@
 
 @media (max-width: 600px) {
   .status-toggles {
-    flex-wrap: nowrap;
-    gap: 15px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex-wrap: wrap;
+    overflow-x: visible;
   }
 
-  .status-toggles::-webkit-scrollbar {
-    display: none;
+  .status-toggle-group:last-child {
+    grid-column: span 2;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
   }
 
   .toggle-label {
-    font-size: 13px;
-    white-space: nowrap;
+    font-size: 14px;
+    white-space: normal;
   }
 
   .status-toggle-group {
-    gap: 8px;
-    flex-shrink: 0;
+    gap: 10px;
+    flex-shrink: 1;
   }
 }
+
 
 
 .status-toggle-group {

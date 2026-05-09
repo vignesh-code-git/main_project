@@ -122,3 +122,35 @@
   min-width: 20px;
   text-align: center;
 }
+@media (max-width: 500px) {
+  .cart-item {
+    gap: 12px;
+    padding: 16px 0;
+  }
+
+  .cart-item-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .item-name {
+    font-size: 16px;
+  }
+
+  .details-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .item-price {
+    font-size: 18px;
+  }
+
+  .quantity-control {
+    padding: 8px 16px;
+    gap: 16px;
+    width: fit-content;
+  }
+}
