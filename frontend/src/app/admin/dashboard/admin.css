@@ -19,7 +19,7 @@
 /* Top Navigation Header */
 .admin-header-nav {
   position: sticky;
-  top: 80px;
+  top: 100px;
   /* Force below main header */
   width: 100%;
   background: #FFF;
