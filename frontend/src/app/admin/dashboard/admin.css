@@ -35,8 +35,9 @@
   .admin-header-nav {
     position: sticky; /* Standardized with desktop */
     top: 118px; /* Clears TopBanner + Navbar */
-    padding: 15px 20px 0 20px; /* Reduced from 20px for a tighter gap */
+    padding: 20px 20px 0 20px; /* Increased to 20px to match desktop balance */
   }
+
 
   .admin-main-full {
     padding: 32px 20px; /* Standard breathing room */
@@ -49,8 +50,9 @@
     align-items: center;
     flex-wrap: nowrap;
     gap: 15px;
-    margin-bottom: 12px;
+    margin-bottom: 8px; /* Reduced from 12px for a tighter look */
   }
+
 
   .nav-tabs {
     display: flex;
@@ -633,6 +635,9 @@ tr:hover td {
     scrollbar-width: none;
     -ms-overflow-style: none;
     gap: 24px;
+    padding-right: 48px; /* Added gap on the right side */
+    width: calc(100% + 20px); /* Extend to account for side padding */
+    margin-right: -20px;
     /* Removed extra border-bottom */
   }
 
