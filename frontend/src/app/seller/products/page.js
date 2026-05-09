@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import {
   Search,
+  Download,
   Plus,
   MoreVertical,
   Edit,
@@ -21,6 +22,7 @@ import './products.css';
 export default function InventoryManagementPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest'); // newest, price-asc, price-desc, stock-asc, name
   const [filterStatus, setFilterStatus] = useState('all'); // all, active, outofstock
@@ -59,6 +61,32 @@ export default function InventoryManagementPage() {
     }
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/products/seller/export`, {
+        withCredentials: true,
+        responseType: 'blob',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `inventory_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export inventory. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const processedProducts = (products || [])
     .filter(p => {
       if (!p) return false;
@@ -87,6 +115,7 @@ export default function InventoryManagementPage() {
       return 0;
     });
 
+
   return (
     <div className="products-page">
       <div className="container">
@@ -96,11 +125,19 @@ export default function InventoryManagementPage() {
             <p>Manage and track your inventory</p>
           </div>
           <div className="header-actions">
+            <button 
+              onClick={handleExport} 
+              className="export-btn" 
+              disabled={isExporting}
+            >
+              <Download size={20} /> {isExporting ? 'Exporting...' : 'Export CSV'}
+            </button>
             <Link href="/seller/add-product" className="add-btn">
               <Plus size={20} /> Add New Product
             </Link>
           </div>
         </div>
+
 
         <div className="filters-bar">
           <div className="search-wrapper">

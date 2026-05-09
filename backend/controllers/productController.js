@@ -270,6 +270,7 @@ exports.bulkUploadProducts = async (req, res) => {
     .on('end', async () => {
       try {
         const createdProducts = [];
+        const updatedProducts = [];
         const errors = [];
 
         for (const p of products) {
@@ -284,7 +285,7 @@ exports.bulkUploadProducts = async (req, res) => {
               }
             }
 
-            const product = await Product.create({
+            const productData = {
               name: p.name,
               price: p.price,
               originalPrice: p.originalPrice || null,
@@ -303,9 +304,28 @@ exports.bulkUploadProducts = async (req, res) => {
               isTopSelling: String(p.isTopSelling).toLowerCase() === 'true',
               details: details,
               sellerId: req.user.id
-            });
+            };
 
+            // Check if product with same SKU exists for this seller
+            let product = await Product.findOne({ where: { sku: productData.sku, sellerId: req.user.id } });
+
+            if (product) {
+              // Update existing product
+              await product.update(productData);
+              updatedProducts.push(product);
+              console.log(`Successfully updated: ${product.name}`);
+            } else {
+              // Create new product
+              product = await Product.create(productData);
+              createdProducts.push(product);
+              console.log(`Successfully created: ${product.name}`);
+            }
+
+            // Handle images (if provided in CSV, it REPLACES existing images for the product)
             if (p.images) {
+              // Clear existing images for the product first
+              await ProductImage.destroy({ where: { productId: product.id } });
+              
               const imageLinks = p.images.split(',');
               const imageRecords = imageLinks.map(url => ({
                 url: url.trim(),
@@ -314,11 +334,9 @@ exports.bulkUploadProducts = async (req, res) => {
               await ProductImage.bulkCreate(imageRecords);
             }
 
-            console.log(`Successfully uploaded: ${product.name}`);
-            createdProducts.push(product);
           } catch (itemErr) {
-            console.error(`Error uploading product "${p.name}":`, itemErr.message);
-            errors.push({ name: p.name, error: itemErr.message });
+            console.error(`Error processing product "${p.name || 'Unknown'}":`, itemErr.message);
+            errors.push({ name: p.name || 'Unknown', error: itemErr.message });
           }
         }
 
@@ -330,9 +348,9 @@ exports.bulkUploadProducts = async (req, res) => {
           console.error('Failed to delete temp CSV:', fsErr);
         }
 
-        if (createdProducts.length === 0 && products.length > 0) {
+        if (createdProducts.length === 0 && updatedProducts.length === 0 && products.length > 0) {
           return res.status(400).json({
-            message: 'Failed to upload any products. Check server logs for details.',
+            message: 'Failed to process any products. Check errors list.',
             errors
           });
         }
@@ -343,25 +361,91 @@ exports.bulkUploadProducts = async (req, res) => {
           await Notification.create({
             userId: req.user.id,
             role: 'seller',
-            title: 'Bulk Upload Successful',
-            message: `${createdProducts.length} products have been uploaded and are now live.`,
+            title: 'Bulk Upload Complete',
+            message: `${createdProducts.length} created, ${updatedProducts.length} updated.`,
             type: 'inventory',
             actorId: req.user.id,
-            metadata: { count: createdProducts.length }
+            metadata: { 
+              created: createdProducts.length, 
+              updated: updatedProducts.length,
+              errors: errors.length
+            }
           });
         } catch (notifErr) {
           console.error('Failed to create bulk notification:', notifErr);
         }
 
-        res.status(201).json({ message: `${createdProducts.length} products uploaded successfully.` });
+        res.status(201).json({ 
+          message: `Bulk processing complete.`, 
+          summary: {
+            created: createdProducts.length,
+            updated: updatedProducts.length,
+            errors: errors.length
+          },
+          errors: errors.length > 0 ? errors : undefined
+        });
       } catch (err) {
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         res.status(500).json({ message: err.message });
       }
     });
 };
 
+
+exports.exportProductsToCSV = async (req, res) => {
+  try {
+    const products = await Product.findAll({
+      where: { sellerId: req.user.id },
+      include: [{ model: ProductImage, as: 'images' }]
+    });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: 'No products found to export' });
+    }
+
+    const headers = [
+      'name', 'sku', 'price', 'originalPrice', 'stock', 'categoryId', 
+      'brand', 'style', 'color', 'size', 'deliveryDays', 
+      'isFreeDelivery', 'isNewArrival', 'isTopSelling', 
+      'description', 'details', 'images'
+    ];
+
+    let csvContent = headers.join(',') + '\n';
+
+    products.forEach(p => {
+      const row = [
+        `"${(p.name || '').replace(/"/g, '""')}"`,
+        `"${(p.sku || '').replace(/"/g, '""')}"`,
+        p.price || 0,
+        p.originalPrice || '',
+        p.stock || 0,
+        p.categoryId || '',
+        `"${(p.brand || '').replace(/"/g, '""')}"`,
+        `"${(p.style || '').replace(/"/g, '""')}"`,
+        `"${(p.color || '').replace(/"/g, '""')}"`,
+        `"${(p.size || '').replace(/"/g, '""')}"`,
+        `"${(p.deliveryDays || '').replace(/"/g, '""')}"`,
+        p.isFreeDelivery ? 'true' : 'false',
+        p.isNewArrival ? 'true' : 'false',
+        p.isTopSelling ? 'true' : 'false',
+        `"${(p.description || '').replace(/"/g, '""')}"`,
+        `"${JSON.stringify(p.details || {}).replace(/"/g, '""')}"`,
+        `"${(p.images || []).map(img => img.url).join(',')}"`
+      ];
+      csvContent += row.join(',') + '\n';
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=inventory_${Date.now()}.csv`);
+    res.status(200).send(csvContent);
+  } catch (err) {
+    console.error('EXPORT CSV ERROR:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getCategories = async (req, res) => {
+
   try {
     const categories = await Category.findAll();
     res.json(categories);
