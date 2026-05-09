@@ -32,15 +32,18 @@
 
 @media (max-width: 768px) {
   .admin-header-nav {
-    top: 60px; /* Touch the main navbar */
-    padding: 24px 20px 0 20px; /* "Bit down" top gap */
+    position: sticky; /* Explicitly ensure stickiness */
+    top: 75px; /* Added gap between navbar and admin header */
+    padding: 32px 20px 0 20px; /* Increased internal top gap */
+    z-index: 1100; /* Higher priority */
   }
 
   .admin-header-top {
-    flex-wrap: nowrap; /* Keep on one line */
+    flex-wrap: nowrap;
     gap: 10px;
   }
 }
+
 
 
 
