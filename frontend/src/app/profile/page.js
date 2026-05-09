@@ -291,6 +291,44 @@ export default function UserProfile() {
     router.push(`/track-order/${order.id}`);
   };
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (deleteConfirmText !== 'DELETE MY ACCOUNT') {
+      setDeleteError('Please type the confirmation phrase exactly.');
+      return;
+    }
+
+    setIsDeletingAccount(true);
+    setDeleteError('');
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/auth/account`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ password: deletePassword })
+      });
+
+      if (res.ok) {
+        // Clear local storage and redirect to home
+        localStorage.clear();
+        window.location.href = '/';
+      } else {
+        const data = await res.json();
+        setDeleteError(data.message || 'Failed to delete account');
+      }
+    } catch (err) {
+      setDeleteError('An error occurred. Please try again.');
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
+
   if (!mounted || !user) return <div className="loading-screen">Loading Profile...</div>;
 
   return (
@@ -392,6 +430,26 @@ export default function UserProfile() {
                 </div>
                 <button type="submit" className="save-btn">Save Changes</button>
               </form>
+
+              {/* Danger Zone */}
+              <div className="danger-zone-section">
+                <div className="danger-header">
+                  <h3>Danger Zone</h3>
+                  <p>Actions here are permanent and cannot be undone.</p>
+                </div>
+                <div className="danger-card">
+                  <div className="danger-info">
+                    <h4>Delete Account</h4>
+                    <p>Permanently delete your account and all associated data. This action is irreversible.</p>
+                  </div>
+                  <button 
+                    className="delete-account-trigger" 
+                    onClick={() => setIsDeleteModalOpen(true)}
+                  >
+                    Delete My Account
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -459,6 +517,77 @@ export default function UserProfile() {
           )}
         </main>
       </div>
+
+      {/* Account Deletion Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay">
+          <div className="delete-account-modal">
+            <div className="modal-header">
+              <div className="warning-icon-wrapper">!</div>
+              <h2>Delete Your Account?</h2>
+              <button className="modal-close-btn" onClick={() => {
+                setIsDeleteModalOpen(false);
+                setDeleteError('');
+                setDeletePassword('');
+                setDeleteConfirmText('');
+              }}>
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <p className="main-warning">
+                This action is <strong>permanent</strong> and cannot be undone. 
+                All your orders, addresses, and account history will be permanently removed.
+              </p>
+
+              <form onSubmit={handleDeleteAccount}>
+                <div className="form-group">
+                  <label>Confirm your password</label>
+                  <input 
+                    type="password" 
+                    placeholder="Enter your password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>To confirm, type <strong>DELETE MY ACCOUNT</strong> in the box below</label>
+                  <input 
+                    type="text" 
+                    placeholder="DELETE MY ACCOUNT"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    required
+                    className="confirm-type-input"
+                  />
+                </div>
+
+                {deleteError && <div className="delete-error-msg">{deleteError}</div>}
+
+                <div className="modal-footer">
+                  <button 
+                    type="button" 
+                    className="cancel-delete-btn" 
+                    onClick={() => setIsDeleteModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="final-delete-btn"
+                    disabled={isDeletingAccount || !deletePassword || deleteConfirmText !== 'DELETE MY ACCOUNT'}
+                  >
+                    {isDeletingAccount ? <Loader2 className="animate-spin" /> : 'Permanently Delete Account'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Address Modal */}
       {isAddressModalOpen && (
@@ -640,3 +769,4 @@ export default function UserProfile() {
     </div>
   );
 }
+

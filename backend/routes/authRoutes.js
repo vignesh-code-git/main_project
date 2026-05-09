@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, updateProfile, updateAvatar, getMe, logoutUser } = require('../controllers/authController');
+const { registerUser, loginUser, updateProfile, updateAvatar, getMe, logoutUser, deleteAccount } = require('../controllers/authController');
+
 const { protect } = require('../middleware/authMiddleware');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
@@ -12,6 +13,8 @@ router.put('/profile', protect, updateProfile);
 router.post('/avatar', protect, upload.any(), updateAvatar);
 router.get('/me', protect, getMe);
 router.post('/logout', logoutUser);
+router.delete('/account', protect, deleteAccount);
+
 
 // Google Auth Routes
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

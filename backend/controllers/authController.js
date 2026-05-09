@@ -240,6 +240,39 @@ const updateAvatar = async (req, res) => {
   }
 };
 
+// @desc    Delete user account
+// @route   DELETE /api/auth/account
+// @access  Private
+const deleteAccount = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect password. Account deletion aborted.' });
+    }
+
+    // Perform deletion
+    await user.destroy();
+
+    // Clear cookie
+    res.cookie('token', '', {
+      httpOnly: true,
+      expires: new Date(0)
+    });
+
+    res.status(200).json({ message: 'Account permanently deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Generate JWT
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secretkey', {
@@ -253,5 +286,7 @@ module.exports = {
   updateProfile,
   updateAvatar,
   getMe,
-  logoutUser
+  logoutUser,
+  deleteAccount
 };
+
