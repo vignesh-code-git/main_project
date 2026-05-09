@@ -19,16 +19,22 @@
 /* Top Navigation Header */
 .admin-header-nav {
   position: sticky;
-  top: var(--header-total-height);
+  top: 80px; /* Force below main header */
   width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: #FFF;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 40px 48px 0 48px; /* Added gap on top */
-  z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  padding: 32px 48px 0 48px;
+  z-index: 999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 768px) {
+  .admin-header-nav {
+    top: 60px; /* Lower header height on mobile */
+    padding: 16px 20px 0 20px;
+  }
 }
 
 .admin-header-top {
@@ -36,15 +42,23 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  flex-wrap: nowrap; /* Prevent wrapping */
 }
 
 .nav-brand h2 {
-  font-size: 28px; /* Slightly larger for emphasis */
+  font-size: 24px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: -1px;
   margin: 0;
+  white-space: nowrap; /* Keep on one line */
+}
+
+@media (max-width: 480px) {
+  .nav-brand h2 {
+    font-size: 18px;
+  }
 }
 
 .nav-tabs {
@@ -596,10 +610,25 @@ tr:hover td {
   letter-spacing: 0.5px;
 }
 
-.status-pill.pending { background: #FEF3C7; color: #92400E; }
-.status-pill.processing { background: #DBEAFE; color: #1E40AF; }
-.status-pill.shipped { background: #E0E7FF; color: #3730A3; }
-.status-pill.delivered { background: #DCFCE7; color: #166534; }
+.status-pill.pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-pill.processing {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.status-pill.shipped {
+  background: #E0E7FF;
+  color: #3730A3;
+}
+
+.status-pill.delivered {
+  background: #DCFCE7;
+  color: #166534;
+}
 
 .status-dropdown-admin {
   background: #FFF;
@@ -618,6 +647,7 @@ tr:hover td {
   border-color: #000;
   background: #F9F9F9;
 }
+
 /* Category Management Styles */
 .admin-inline-form {
   display: flex;
@@ -678,7 +708,9 @@ tr:hover td {
   padding: 4px 8px;
 }
 
-.asset-tab:hover { color: #000; }
+.asset-tab:hover {
+  color: #000;
+}
 
 .asset-tab.active {
   color: #000;
@@ -709,7 +741,8 @@ tr:hover td {
   border-radius: 8px;
   border: 1px solid #ddd;
   overflow: hidden;
-  background: #F0F0F0; /* Muted gray "disabled" look */
+  background: #F0F0F0;
+  /* Muted gray "disabled" look */
 }
 
 .color-preview-box-active {
@@ -752,12 +785,12 @@ tr:hover td {
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .preset-box-admin:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .preset-box-admin.active {

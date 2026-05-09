@@ -56,7 +56,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    
+
     if (!token) {
       router.push('/auth/login');
       return;
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
           fetch(`${API_BASE_URL}/api/products/sizes`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products/colors`, { headers: getAuthHeaders() })
         ]);
- 
+
         const usersData = await usersRes.json();
         const sellersData = await sellersRes.json();
         const settingsData = await settingsRes.json();
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
         const stylesData = await styleRes.json();
         const sizesData = await sizeRes.json();
         const colorsData = await colorRes.json();
- 
+
         setUsers(Array.isArray(usersData) ? usersData : []);
         setSellers(Array.isArray(sellersData) ? sellersData : []);
         setSettings(Array.isArray(settingsData) ? settingsData : []);
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
   };
 
   const presetColors = [
-    '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ffa500', '#800080', 
+    '#000000', '#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ffa500', '#800080',
     '#ffc0cb', '#a52a2a', '#808080', '#008080', '#00ffff', '#ff00ff', '#4b0082', '#ee82ee',
     '#ffd700', '#c0c0c0', '#f5f5dc', '#808000', '#000080', '#87ceeb', '#32cd32', '#dc143c',
     '#ff4500', '#2f4f4f', '#00ced1', '#9400d3', '#ff1493', '#b22222', '#228b22', '#f08080'
@@ -436,7 +436,7 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td>
-                        <select 
+                        <select
                           className="status-dropdown-admin"
                           value={order.status}
                           onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
@@ -515,13 +515,13 @@ export default function AdminDashboard() {
                 <h2>{assetTab.toUpperCase()} LIST</h2>
                 <div className="admin-inline-form">
                   {assetTab === 'colors' ? (
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '20px', width: '100%'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
                       <div className="color-presets-grid-admin">
                         {presetColors.map(hex => (
-                          <div 
-                            key={hex} 
+                          <div
+                            key={hex}
                             className={`preset-box-admin ${newColor.hexCode.toLowerCase() === hex.toLowerCase() ? 'active' : ''}`}
-                            style={{backgroundColor: hex}}
+                            style={{ backgroundColor: hex }}
                             onClick={() => {
                               const name = detectColorName(hex);
                               setNewColor({ hexCode: hex, name: name || newColor.name });
@@ -530,57 +530,57 @@ export default function AdminDashboard() {
                           />
                         ))}
                       </div>
-                      
-                      <div style={{display: 'flex', gap: '10px', width: '100%', alignItems: 'center'}}>
+
+                      <div style={{ display: 'flex', gap: '10px', width: '100%', alignItems: 'center' }}>
                         <div className="color-preview-wrapper-admin">
                           {newColor.hexCode ? (
-                            <div className="color-preview-box-active" style={{backgroundColor: newColor.hexCode}} />
+                            <div className="color-preview-box-active" style={{ backgroundColor: newColor.hexCode }} />
                           ) : (
                             <div className="color-preview-box-empty" />
                           )}
                         </div>
-                        <input 
-                          type="text" 
-                          placeholder="Color Name" 
-                          value={newColor.name} 
-                          onChange={(e) => setNewColor({...newColor, name: e.target.value})} 
-                          className="admin-input-stylish" 
-                          style={{flex: 1}}
+                        <input
+                          type="text"
+                          placeholder="Color Name"
+                          value={newColor.name}
+                          onChange={(e) => setNewColor({ ...newColor, name: e.target.value })}
+                          className="admin-input-stylish"
+                          style={{ flex: 1 }}
                         />
-                        <button 
+                        <button
                           onClick={() => {
-                            if(!newColor.hexCode || !newColor.name) return showToast('PICK A COLOR FROM THE GRID');
-                            handleAddAsset('colors', newColor, setColors, () => setNewColor({name: '', hexCode: ''}));
-                          }} 
+                            if (!newColor.hexCode || !newColor.name) return showToast('PICK A COLOR FROM THE GRID');
+                            handleAddAsset('colors', newColor, setColors, () => setNewColor({ name: '', hexCode: '' }));
+                          }}
                           className="btn-upload-premium"
                         >ADD COLOR</button>
                       </div>
                     </div>
                   ) : (
                     <>
-                      <input 
-                        type="text" 
-                        placeholder={`New ${assetTab === 'categories' ? 'category' : assetTab.slice(0,-1)} name`} 
-                        value={assetTab === 'categories' ? newCategoryName : assetTab === 'brands' ? newBrandName : assetTab === 'styles' ? newStyleName : newSizeName} 
+                      <input
+                        type="text"
+                        placeholder={`New ${assetTab === 'categories' ? 'category' : assetTab.slice(0, -1)} name`}
+                        value={assetTab === 'categories' ? newCategoryName : assetTab === 'brands' ? newBrandName : assetTab === 'styles' ? newStyleName : newSizeName}
                         onChange={(e) => {
                           const val = e.target.value;
-                          if(assetTab === 'categories') setNewCategoryName(val);
-                          else if(assetTab === 'brands') setNewBrandName(val);
-                          else if(assetTab === 'styles') setNewStyleName(val);
+                          if (assetTab === 'categories') setNewCategoryName(val);
+                          else if (assetTab === 'brands') setNewBrandName(val);
+                          else if (assetTab === 'styles') setNewStyleName(val);
                           else setNewSizeName(val);
-                        }} 
-                        className="admin-input-stylish" 
-                        style={{maxWidth: '400px'}}
+                        }}
+                        className="admin-input-stylish"
+                        style={{ maxWidth: '400px' }}
                       />
-                      <button 
+                      <button
                         onClick={() => {
-                          if(assetTab === 'categories') handleAddAsset('categories', {name: newCategoryName}, setCategories, setNewCategoryName);
-                          else if(assetTab === 'brands') handleAddAsset('brands', {name: newBrandName}, setBrands, setNewBrandName);
-                          else if(assetTab === 'styles') handleAddAsset('styles', {name: newStyleName}, setStyles, setNewStyleName);
-                          else handleAddAsset('sizes', {name: newSizeName}, setSizes, setNewSizeName);
-                        }} 
+                          if (assetTab === 'categories') handleAddAsset('categories', { name: newCategoryName }, setCategories, setNewCategoryName);
+                          else if (assetTab === 'brands') handleAddAsset('brands', { name: newBrandName }, setBrands, setNewBrandName);
+                          else if (assetTab === 'styles') handleAddAsset('styles', { name: newStyleName }, setStyles, setNewStyleName);
+                          else handleAddAsset('sizes', { name: newSizeName }, setSizes, setNewSizeName);
+                        }}
                         className="btn-upload-premium"
-                      >ADD {assetTab.slice(0,-1).toUpperCase()}</button>
+                      >ADD {assetTab.slice(0, -1).toUpperCase()}</button>
                     </>
                   )}
                 </div>
@@ -597,10 +597,10 @@ export default function AdminDashboard() {
                 <tbody>
                   {(assetTab === 'categories' ? categories : assetTab === 'brands' ? brands : assetTab === 'styles' ? styles : assetTab === 'sizes' ? sizes : colors).map(item => (
                     <tr key={item.id}>
-                      <td style={{fontWeight: '800'}}>{item.name}</td>
+                      <td style={{ fontWeight: '800' }}>{item.name}</td>
                       {assetTab === 'colors' && (
                         <td>
-                          <div style={{width: '30px', height: '30px', borderRadius: '50%', background: item.hexCode, border: '1px solid #ddd'}}></div>
+                          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: item.hexCode, border: '1px solid #ddd' }}></div>
                         </td>
                       )}
                       <td>
