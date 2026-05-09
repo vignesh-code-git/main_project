@@ -84,16 +84,7 @@
 .nav-tabs {
   display: flex;
   gap: 32px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  white-space: nowrap;
 }
-
-.nav-tabs::-webkit-scrollbar {
-  display: none;
-}
-
 
 .nav-tab-item {
   display: flex;
@@ -568,77 +559,28 @@ tr:hover td {
   background: #333;
 }
 
-/* Final Consolidated Responsiveness */
-@media (max-width: 1024px) {
-  .admin-header-nav {
-    padding: 20px 24px 0 24px;
-  }
-  
-  .admin-main-full {
-    padding: 24px;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .admin-header-nav {
-    position: sticky;
-    top: 118px;
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    padding: 32px 20px 0 20px;
-    gap: 8px;
-    align-items: flex-start;
-    background: #FFF;
-    border-bottom: 1px solid var(--border-color);
-    z-index: 999;
-  }
-
-  .admin-header-top {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    margin-bottom: 0px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-  }
-
   .user-badge {
-    margin-left: auto;
     padding: 6px 12px;
+    /* Thinner button */
     gap: 8px;
   }
 
   .user-name-small {
     font-size: 11px;
+    /* Smaller text */
   }
 
   .badge-avatar {
     width: 22px;
+    /* Smaller icon */
     height: 22px;
     font-size: 10px;
   }
 
   .nav-tabs {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    gap: 24px;
-    padding-right: 60px;
-    width: 100%;
-    mask-image: linear-gradient(to right, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
-  }
-
-  .nav-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-tab-item {
-    padding-bottom: 12px;
-    font-size: 12px;
+    gap: 20px;
   }
 
   .admin-main-full {
@@ -650,6 +592,70 @@ tr:hover td {
   }
 }
 
+
+@media (max-width: 768px) {
+  .admin-header-nav {
+    position: sticky;
+    top: 118px;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding: 32px 20px 0 20px;
+    /* Winning padding value */
+    gap: 12px;
+    align-items: flex-start;
+    background: #FFF;
+    border-bottom: 1px solid var(--border-color);
+    z-index: 999;
+  }
+
+  .admin-header-top {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 0px;
+  }
+
+  .user-badge {
+    margin-left: auto;
+    /* This forces the button to the right side */
+  }
+
+
+
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 24px;
+    padding-right: 60px;
+    /* Larger gap for the cut-off */
+    width: 100%;
+    /* Create a professional fade-out effect on the right */
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab-item {
+    white-space: nowrap;
+    padding-bottom: 12px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-page-header h1 {
+    font-size: 32px;
+  }
+}
 
 
 /* Order Management Styles */
