@@ -35,8 +35,9 @@
   .admin-header-nav {
     position: sticky; /* Standardized with desktop */
     top: 118px; /* Clears TopBanner + Navbar */
-    padding: 20px 20px 0 20px; /* Increased to 20px to match desktop balance */
+    padding: 40px 20px 0 20px; /* Moved down towards links */
   }
+
 
 
   .admin-main-full {
