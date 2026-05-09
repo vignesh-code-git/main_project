@@ -7,7 +7,6 @@ import {
   Search,
   Download,
   Plus,
-  MoreVertical,
   Edit,
   Trash2,
   ExternalLink,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
+import Pagination from '@/components/Pagination/Pagination';
 import './products.css';
 
 export default function InventoryManagementPage() {
@@ -24,17 +24,37 @@ export default function InventoryManagementPage() {
   const [loading, setLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('newest'); // newest, price-asc, price-desc, stock-asc, name
-  const [filterStatus, setFilterStatus] = useState('all'); // all, active, outofstock
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [sortBy, setSortBy] = useState('newest');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const sortRef = useRef(null);
   const filterRef = useRef(null);
-  const { user } = useSelector((state) => state.auth);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset to first page on new search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Sync products when state changes
   useEffect(() => {
     fetchProducts();
+  }, [currentPage, debouncedSearch, sortBy, filterStatus]);
 
+  // Reset page when filter or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy, filterStatus]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (sortRef.current && !sortRef.current.contains(event.target)) {
         setShowSortDropdown(false);
@@ -49,11 +69,26 @@ export default function InventoryManagementPage() {
   }, []);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}/api/products/seller/my-products`, {
-        withCredentials: true
+        params: {
+          page: currentPage,
+          limit: 10,
+          search: debouncedSearch,
+          sortBy: sortBy,
+          status: filterStatus
+        },
+        withCredentials: true,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
-      setProducts(response.data.products || (Array.isArray(response.data) ? response.data : []));
+      
+      const { products, total, totalPages } = response.data;
+      setProducts(products || []);
+      setTotalItems(total || 0);
+      setTotalPages(totalPages || 1);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -87,34 +122,8 @@ export default function InventoryManagementPage() {
     }
   };
 
-  const processedProducts = (products || [])
-    .filter(p => {
-      if (!p) return false;
-      
-      const searchLower = (searchTerm || '').toLowerCase();
-      const productName = (p.name || '').toLowerCase();
-      const categoryName = (p.Category?.name || '').toLowerCase();
-      
-      const matchesSearch = productName.includes(searchLower) || 
-                           categoryName.includes(searchLower);
-      
-      // Status filter
-      const matchesStatus = filterStatus === 'all' || 
-                           (filterStatus === 'active' && (p.stock || 0) > 0) ||
-                           (filterStatus === 'outofstock' && (p.stock === 0 || !p.stock));
-      
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      // Sorting logic
-      if (sortBy === 'newest') return new Date(b.createdAt) - new Date(a.createdAt);
-      if (sortBy === 'price-asc') return a.price - b.price;
-      if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'stock-asc') return (a.stock || 0) - (b.stock || 0);
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      return 0;
-    });
-
+  // Products are now filtered on the server side
+  const productsToDisplay = products || [];
 
   return (
     <div className="products-page">
@@ -125,9 +134,9 @@ export default function InventoryManagementPage() {
             <p>Manage and track your inventory</p>
           </div>
           <div className="header-actions">
-            <button 
-              onClick={handleExport} 
-              className="export-btn" 
+            <button
+              onClick={handleExport}
+              className="export-btn"
               disabled={isExporting}
             >
               <Download size={20} /> {isExporting ? 'Exporting...' : 'Export CSV'}
@@ -137,7 +146,6 @@ export default function InventoryManagementPage() {
             </Link>
           </div>
         </div>
-
 
         <div className="filters-bar">
           <div className="search-wrapper">
@@ -151,8 +159,8 @@ export default function InventoryManagementPage() {
           </div>
 
           <div className="dropdown-container" ref={filterRef}>
-            <button 
-              className={`action-btn ${showFilterDropdown ? 'active' : ''}`} 
+            <button
+              className={`action-btn ${showFilterDropdown ? 'active' : ''}`}
               title="Filter"
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
             >
@@ -170,8 +178,8 @@ export default function InventoryManagementPage() {
           </div>
 
           <div className="dropdown-container" ref={sortRef}>
-            <button 
-              className={`action-btn ${showSortDropdown ? 'active' : ''}`} 
+            <button
+              className={`action-btn ${showSortDropdown ? 'active' : ''}`}
               title="Sort"
               onClick={() => setShowSortDropdown(!showSortDropdown)}
             >
@@ -196,59 +204,72 @@ export default function InventoryManagementPage() {
               <div className="loading-spinner"></div>
               <p>Loading your products...</p>
             </div>
-          ) : processedProducts.length > 0 ? (
-            <table className="products-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {processedProducts.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <div className="product-info-cell">
-                        <img
-                          src={product.images?.[0]?.url || 'https://via.placeholder.com/48'}
-                          alt=""
-                          className="product-img-mini"
-                        />
-                        <div className="product-name-wrapper">
-                          <span className="product-name">{product.name}</span>
-                          <span className="product-sku">ID: {product.id.toString().slice(-6).toUpperCase()}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{product.Category?.name || 'Uncategorized'}</td>
-                    <td>₹{product.price}</td>
-                    <td>{product.stock || 0} in stock</td>
-                    <td>
-                      <span className={`status-badge status-${product.stock > 0 ? 'active' : 'outofstock'}`}>
-                        {product.stock > 0 ? 'Active' : 'Out of Stock'}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="action-btns">
-                        <Link href={`/product/${product.id}`} className="action-btn" title="View Store">
-                          <ExternalLink size={16} />
-                        </Link>
-                        <Link href={`/seller/edit-product/${product.id}`} className="action-btn" title="Edit">
-                          <Edit size={16} />
-                        </Link>
-                        <button className="action-btn delete" title="Delete">
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
+          ) : productsToDisplay.length > 0 ? (
+            <>
+              <table className="products-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {productsToDisplay.map((product) => (
+                    <tr key={product.id}>
+                      <td>
+                        <div className="product-info-cell">
+                          <img
+                            src={product.images?.[0]?.url || 'https://via.placeholder.com/48'}
+                            alt=""
+                            className="product-img-mini"
+                          />
+                          <div className="product-name-wrapper">
+                            <span className="product-name">{product.name}</span>
+                            <span className="product-sku">ID: {product.id.toString().slice(-6).toUpperCase()}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{product.Category?.name || 'Uncategorized'}</td>
+                      <td>₹{product.price}</td>
+                      <td>{product.stock || 0} in stock</td>
+                      <td>
+                        <span className={`status-badge status-${product.stock > 0 ? 'active' : 'outofstock'}`}>
+                          {product.stock > 0 ? 'Active' : 'Out of Stock'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="action-btns">
+                          <Link href={`/product/${product.id}`} className="action-btn" title="View Store">
+                            <ExternalLink size={16} />
+                          </Link>
+                          <Link href={`/seller/edit-product/${product.id}`} className="action-btn" title="Edit">
+                            <Edit size={16} />
+                          </Link>
+                          <button className="action-btn delete" title="Delete">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="pagination-wrapper">
+                <div className="pagination-info">
+                  Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, totalItems)} of {totalItems} products
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            </>
           ) : (
             <div className="empty-state">
               <div className="empty-state-icon">

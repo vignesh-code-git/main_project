@@ -1,65 +1,83 @@
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 40px 0 60px 0;
-  padding-top: 24px;
-  border-top: 1px solid rgba(0,0,0,0.1);
-  width: 100%;
+.pg-main-container {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 32px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
 }
 
-.nav-btn {
-  background: white;
-  border: 1px solid rgba(0,0,0,0.1);
+.pg-nav-button {
+  background: #fff;
+  border: 1px solid #e0e0e0;
   padding: 10px 20px;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14px;
-  transition: all 0.3s;
+  color: #000;
+  transition: all 0.2s;
   cursor: pointer;
-}
-
-.nav-btn:hover {
-  background: var(--primary-black);
-  color: white;
-  border-color: var(--primary-black);
-}
-
-.page-numbers {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
 }
 
-.page-num {
-  width: 40px;
-  height: 40px;
+.pg-nav-button:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #d0d0d0;
+}
+
+.pg-nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.pg-number-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.pg-number-item {
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   cursor: pointer;
-  color: var(--text-gray);
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
   transition: all 0.2s;
+  background: transparent;
+  border: none;
 }
 
-.page-num:hover {
-  background: var(--secondary-gray);
-  color: var(--primary-black);
+.pg-number-item:hover:not(.pg-active) {
+  background: #f5f5f5;
+  color: #000;
 }
 
-.page-num.active {
-  background: rgba(0,0,0,0.06);
-  color: var(--primary-black);
-  font-weight: 600;
+.pg-number-item.pg-active {
+  background: #f0f0f0 !important;
+  color: #000 !important;
+  font-weight: 600 !important;
 }
 
-.dots {
-  padding: 8px;
-  color: var(--text-gray);
+
+.pg-dots-item {
+  color: #999;
+  font-size: 14px;
+  padding: 0 4px;
 }
 
 @media (max-width: 768px) {
-  .page-numbers .page-num:not(.active) {
+  .pg-nav-button span {
     display: none;
   }
 }

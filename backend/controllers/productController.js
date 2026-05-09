@@ -80,20 +80,56 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getSellerProducts = async (req, res) => {
   try {
+    const { page = 1, limit = 10, search = '', sortBy = 'newest', status = 'all' } = req.query;
+    const offset = (page - 1) * limit;
+    const { Op } = require('sequelize');
+
+    const where = { sellerId: req.user.id };
+
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { sku: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+
+    if (status === 'active') {
+      where.stock = { [Op.gt]: 0 };
+    } else if (status === 'outofstock') {
+      where.stock = 0;
+    }
+
+    let order = [['createdAt', 'DESC']];
+    if (sortBy === 'price-asc') order = [['price', 'ASC']];
+    if (sortBy === 'price-desc') order = [['price', 'DESC']];
+    if (sortBy === 'stock-asc') order = [['stock', 'ASC']];
+    if (sortBy === 'name') order = [['name', 'ASC']];
+
     const { count, rows: products } = await Product.findAndCountAll({
-      where: { sellerId: req.user.id },
+      where,
       include: [
         { model: ProductImage, as: 'images' },
         { model: Category }
       ],
-      order: [['createdAt', 'DESC']],
+      order,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
       distinct: true
     });
-    res.json({ products, total: count });
+
+    res.json({
+      products,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
+
   } catch (err) {
+    console.error('GET SELLER PRODUCTS ERROR:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getNewArrivals = async (req, res) => {
   try {
@@ -326,7 +362,7 @@ exports.bulkUploadProducts = async (req, res) => {
             if (p.images) {
               // Clear existing images for the product first
               await ProductImage.destroy({ where: { productId: product.id } });
-              
+
               const imageLinks = p.images.split(',');
               const imageRecords = imageLinks.map(url => ({
                 url: url.trim(),
@@ -366,8 +402,8 @@ exports.bulkUploadProducts = async (req, res) => {
             message: `${createdProducts.length} created, ${updatedProducts.length} updated.`,
             type: 'inventory',
             actorId: req.user.id,
-            metadata: { 
-              created: createdProducts.length, 
+            metadata: {
+              created: createdProducts.length,
               updated: updatedProducts.length,
               errors: errors.length
             }
@@ -376,8 +412,8 @@ exports.bulkUploadProducts = async (req, res) => {
           console.error('Failed to create bulk notification:', notifErr);
         }
 
-        res.status(201).json({ 
-          message: `Bulk processing complete.`, 
+        res.status(201).json({
+          message: `Bulk processing complete.`,
           summary: {
             created: createdProducts.length,
             updated: updatedProducts.length,
@@ -405,8 +441,8 @@ exports.exportProductsToCSV = async (req, res) => {
     }
 
     const headers = [
-      'name', 'sku', 'price', 'originalPrice', 'stock', 'categoryId', 
-      'brand', 'style', 'color', 'size', 'deliveryDays', 
+      'name', 'sku', 'price', 'originalPrice', 'stock', 'categoryId',
+      'brand', 'style', 'color', 'size', 'deliveryDays',
       'isFreeDelivery', 'isNewArrival', 'isTopSelling', 'videoUrl',
       'description', 'details', 'images'
     ];
