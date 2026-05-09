@@ -32,10 +32,13 @@
 
 @media (max-width: 768px) {
   .admin-header-nav {
-    top: 100px; /* Pushed further down on mobile */
-    padding: 32px 20px 0 20px; /* Added proper top gap */
+    top: 200px; /* Extreme clearance */
+    padding: 64px 20px 0 20px; /* Massive top gap */
+    background: #FFF;
   }
 }
+
+
 
 
 .admin-header-top {
