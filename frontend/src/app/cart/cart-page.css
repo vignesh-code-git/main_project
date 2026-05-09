@@ -34,10 +34,20 @@
 }
 
 @media (max-width: 1024px) {
+  .cart-page-main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .cart-content-layout {
     flex-direction: column;
   }
   .cart-items-container, .cart-summary-container {
     width: 100%;
   }
+
+  .cart-items-container {
+    padding: 0 16px;
+  }
 }
+
