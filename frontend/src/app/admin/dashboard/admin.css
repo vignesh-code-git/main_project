@@ -32,27 +32,51 @@
 
 @media (max-width: 768px) {
   .admin-header-nav {
-    position: sticky; /* Explicitly ensure stickiness */
-    top: 75px; /* Added gap between navbar and admin header */
-    padding: 32px 20px 0 20px; /* Increased internal top gap */
-    z-index: 1100; /* Higher priority */
+    position: fixed; /* Definitive fix: use fixed instead of sticky */
+    top: 60px; 
+    left: 0;
+    right: 0;
+    padding: 40px 48px 0 48px;
+    z-index: 1200; /* Over everything */
+    background: #FFF;
+  }
+
+  .admin-main-full {
+    padding-top: 180px !important; /* Force content below fixed header */
   }
 
   .admin-header-top {
+
     display: flex;
     width: 100%;
-    justify-content: space-between; /* Force items to opposite ends */
+    justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 15px;
+    margin-bottom: 24px;
   }
 
+  .nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 24px;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
+  }
 
   .nav-tab-item {
-    padding: 8px 4px; /* More compact tabs for mobile */
+    padding: 12px 4px;
+    flex-shrink: 0;
   }
 }
+
+
+
 
 
 
