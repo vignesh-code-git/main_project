@@ -302,6 +302,7 @@ exports.bulkUploadProducts = async (req, res) => {
               isFreeDelivery: String(p.isFreeDelivery).toLowerCase() === 'true',
               isNewArrival: String(p.isNewArrival).toLowerCase() === 'true',
               isTopSelling: String(p.isTopSelling).toLowerCase() === 'true',
+              videoUrl: p.videoUrl || null,
               details: details,
               sellerId: req.user.id
             };
@@ -406,7 +407,7 @@ exports.exportProductsToCSV = async (req, res) => {
     const headers = [
       'name', 'sku', 'price', 'originalPrice', 'stock', 'categoryId', 
       'brand', 'style', 'color', 'size', 'deliveryDays', 
-      'isFreeDelivery', 'isNewArrival', 'isTopSelling', 
+      'isFreeDelivery', 'isNewArrival', 'isTopSelling', 'videoUrl',
       'description', 'details', 'images'
     ];
 
@@ -428,6 +429,7 @@ exports.exportProductsToCSV = async (req, res) => {
         p.isFreeDelivery ? 'true' : 'false',
         p.isNewArrival ? 'true' : 'false',
         p.isTopSelling ? 'true' : 'false',
+        `"${(p.videoUrl || '').replace(/"/g, '""')}"`,
         `"${(p.description || '').replace(/"/g, '""')}"`,
         `"${JSON.stringify(p.details || {}).replace(/"/g, '""')}"`,
         `"${(p.images || []).map(img => img.url).join(',')}"`
@@ -443,6 +445,7 @@ exports.exportProductsToCSV = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 exports.getCategories = async (req, res) => {
 

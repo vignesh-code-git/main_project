@@ -74,8 +74,41 @@
 .orders-section h2 {
   font-size: 24px;
   font-weight: 700;
+  margin-bottom: 0;
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
 }
+
+.dashboard-export-btn {
+  background: #F0F0F0;
+  color: #000;
+  padding: 8px 16px;
+  border-radius: 62px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-export-btn:hover {
+  background: #E8E8E8;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 
 .product-table-container {
   width: 100%;

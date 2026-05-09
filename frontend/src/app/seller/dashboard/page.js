@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check, Star } from 'lucide-react';
+import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDown, Check, Star, Download } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
@@ -188,6 +188,8 @@ export default function SellerDashboard() {
     setDeleteModal({ isOpen: true, productId: id });
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
   const executeDelete = async () => {
     const id = deleteModal.productId;
     setDeleteModal({ isOpen: false, productId: null });
@@ -207,7 +209,35 @@ export default function SellerDashboard() {
       console.error("Delete error:", err);
     }
   };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/products/seller/export`, {
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) throw new Error('Export failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `inventory_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export inventory. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+
   // Custom Status Dropdown Component
+
   const StatusDropdown = ({ currentStatus, onUpdate }) => {
     const [isOpen, setIsOpen] = useState(false);
     const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
@@ -318,8 +348,18 @@ export default function SellerDashboard() {
 
           {activeTab === 'inventory' && (
             <div className="inventory-section">
-              <h2>Inventory Management</h2>
+              <div className="section-header-row">
+                <h2>Inventory Management</h2>
+                <button 
+                  onClick={handleExport} 
+                  className="dashboard-export-btn"
+                  disabled={isExporting}
+                >
+                  <Download size={16} /> {isExporting ? 'Exporting...' : 'Export CSV'}
+                </button>
+              </div>
               <div className="product-table-container">
+
                 <table className="product-table">
                   <thead>
                     <tr>
