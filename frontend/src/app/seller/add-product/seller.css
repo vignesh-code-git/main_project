@@ -704,30 +704,32 @@
   .detail-row {
     flex-wrap: wrap;
     gap: 10px;
-    background: #f9f9f9;
-    padding: 12px;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.05);
+    background: transparent;
+    padding: 0;
+    border: none;
   }
 
   .detail-row input:first-of-type {
-    flex: 1; /* Label input */
+    width: calc(100% - 50px) !important; /* Leave room for X button */
+    flex: none;
     order: 1;
   }
 
   .remove-detail-btn {
-    order: 2; /* Close button next to label */
+    width: 40px;
+    order: 2;
     padding: 0;
-    min-width: 32px;
+    justify-content: flex-end;
   }
 
   .detail-row input:last-of-type {
-    width: 100% !important; /* Value input on second line */
+    width: 100% !important;
     max-width: 100% !important;
     order: 3;
     margin-top: 4px;
   }
 }
+
 
 .detail-row input {
   flex: 1;
