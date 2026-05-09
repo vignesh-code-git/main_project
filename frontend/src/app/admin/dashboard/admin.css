@@ -18,15 +18,16 @@
 
 /* Top Navigation Header */
 .admin-header-nav {
-  position: sticky;
-  top: 80px; /* Force below main header */
-  width: 100%;
+  position: fixed; /* Switch to fixed for desktop as well */
+  top: 80px;
+  left: 0;
+  right: 0;
   background: #FFF;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 32px 48px 0 48px;
-  z-index: 999;
+  padding: 40px 48px 0 48px;
+  z-index: 1100;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
@@ -215,8 +216,9 @@
 .admin-main-full {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 64px 48px;
+  padding: 220px 48px 64px 48px; /* Offset for fixed header */
 }
+
 
 .admin-page-header {
   margin-bottom: 56px;
