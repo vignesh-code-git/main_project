@@ -577,16 +577,25 @@ export default function AddProductPage() {
               <div className="details-rows-container">
                 {productDetails.map((detail, index) => (
                   <div key={index} className="detail-row">
-                    <input
-                      type="text"
-                      placeholder="Label (e.g. Material)"
-                      value={detail.label}
-                      onChange={(e) => {
-                        const newDetails = [...productDetails];
-                        newDetails[index].label = e.target.value;
-                        setProductDetails(newDetails);
-                      }}
-                    />
+                    <div className="detail-input-wrapper">
+                      <input
+                        type="text"
+                        placeholder="Label (e.g. Material)"
+                        value={detail.label}
+                        onChange={(e) => {
+                          const newDetails = [...productDetails];
+                          newDetails[index].label = e.target.value;
+                          setProductDetails(newDetails);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="remove-detail-btn"
+                        onClick={() => setProductDetails(productDetails.filter((_, i) => i !== index))}
+                      >
+                        &times;
+                      </button>
+                    </div>
                     <input
                       type="text"
                       placeholder="Value (e.g. 100% Cotton)"
@@ -597,15 +606,9 @@ export default function AddProductPage() {
                         setProductDetails(newDetails);
                       }}
                     />
-                    <button
-                      type="button"
-                      className="remove-detail-btn"
-                      onClick={() => setProductDetails(productDetails.filter((_, i) => i !== index))}
-                    >
-                      &times;
-                    </button>
                   </div>
                 ))}
+
               </div>
               <button
                 type="button"
