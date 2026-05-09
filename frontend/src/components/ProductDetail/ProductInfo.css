@@ -59,11 +59,31 @@
   text-decoration: underline;
 }
 
+.product-price-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
 .product-info-detail .product-price {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+}
+
+.delivery-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .product-price-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .current-price {
@@ -119,6 +139,7 @@
 .delivery-time-badge svg {
   color: #1565C0;
 }
+
 
 .product-description {
   margin-bottom: 20px;
