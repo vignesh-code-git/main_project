@@ -26,7 +26,7 @@
   border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  padding: 32px 48px 0 48px;
+  padding: 20px 48px 0 48px;
   z-index: 999;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -35,7 +35,7 @@
   .admin-header-nav {
     position: sticky; /* Standardized with desktop */
     top: 118px; /* Clears TopBanner + Navbar */
-    padding: 32px 48px 0 48px; /* Identical to desktop padding */
+    padding: 15px 20px 0 20px; /* Reduced from 20px for a tighter gap */
   }
 
   .admin-main-full {
@@ -49,7 +49,7 @@
     align-items: center;
     flex-wrap: nowrap;
     gap: 15px;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .nav-tabs {
@@ -86,7 +86,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   flex-wrap: nowrap;
   /* Prevent wrapping */
 }
@@ -587,10 +587,20 @@ tr:hover td {
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .admin-header-nav {
-    padding: 0 20px;
-    height: 70px;
+@media (max-width: 768px) {
+  .user-badge {
+    padding: 6px 12px; /* Thinner button */
+    gap: 8px;
+  }
+
+  .user-name-small {
+    font-size: 11px; /* Smaller text */
+  }
+
+  .badge-avatar {
+    width: 22px; /* Smaller icon */
+    height: 22px;
+    font-size: 10px;
   }
 
   .nav-tabs {
@@ -606,6 +616,7 @@ tr:hover td {
   }
 }
 
+
 @media (max-width: 768px) {
   .admin-header-nav {
     flex-direction: column;
@@ -617,13 +628,12 @@ tr:hover td {
 
   .nav-tabs {
     display: flex;
-    width: 100%;
     overflow-x: auto;
-    padding-bottom: 8px;
+    white-space: nowrap;
     scrollbar-width: none;
     -ms-overflow-style: none;
     gap: 24px;
-    border-bottom: 1px solid var(--border-color);
+    /* Removed extra border-bottom */
   }
 
   .nav-tabs::-webkit-scrollbar {
