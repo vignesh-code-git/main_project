@@ -596,18 +596,28 @@ export default function AddProductPage() {
                         &times;
                       </button>
                     </div>
-                    <input
-                      type="text"
-                      placeholder="Value (e.g. 100% Cotton)"
-                      value={detail.value}
-                      onChange={(e) => {
-                        const newDetails = [...productDetails];
-                        newDetails[index].value = e.target.value;
-                        setProductDetails(newDetails);
-                      }}
-                    />
+                    <div className="detail-input-wrapper">
+                      <input
+                        type="text"
+                        placeholder="Value (e.g. 100% Cotton)"
+                        value={detail.value}
+                        onChange={(e) => {
+                          const newDetails = [...productDetails];
+                          newDetails[index].value = e.target.value;
+                          setProductDetails(newDetails);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="remove-detail-btn"
+                        onClick={() => setProductDetails(productDetails.filter((_, i) => i !== index))}
+                      >
+                        &times;
+                      </button>
+                    </div>
                   </div>
                 ))}
+
 
               </div>
               <button
