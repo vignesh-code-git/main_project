@@ -4,7 +4,7 @@
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 32px;
 }
 
@@ -13,7 +13,7 @@
   background: transparent;
   padding: 24px;
   font-size: 20px;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   border: none;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
@@ -42,7 +42,7 @@
 
 .review-count span {
   font-size: 16px;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   font-weight: 400;
   margin-left: 8px;
 }
@@ -95,7 +95,7 @@
 }
 
 .review-card-detail {
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   padding: 28px;
 }
@@ -113,7 +113,7 @@
 }
 
 .dots {
-  color: rgba(0,0,0,0.4);
+  color: rgba(0, 0, 0, 0.4);
   font-size: 20px;
   cursor: pointer;
 }
@@ -134,14 +134,14 @@
 }
 
 .review-text {
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   line-height: 1.6;
   font-size: 16px;
   margin-bottom: 24px;
 }
 
 .review-date {
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   font-size: 14px;
   font-weight: 500;
 }
@@ -153,7 +153,7 @@
 
 .load-more-btn {
   background: transparent;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   padding: 16px 54px;
   border-radius: 62px;
   font-size: 16px;
@@ -193,8 +193,15 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-header {
@@ -282,16 +289,19 @@
 }
 
 /* FAQ & Details Styles */
-.faq-container, .product-details-tab {
+.faq-container,
+.product-details-tab {
   padding: 20px 0;
   animation: fadeIn 0.3s ease;
 }
 
-.faq-header, .details-header {
+.faq-header,
+.details-header {
   margin-bottom: 32px;
 }
 
-.faq-header h3, .details-header h3 {
+.faq-header h3,
+.details-header h3 {
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -373,26 +383,58 @@
 }
 
 @media (max-width: 768px) {
+  .review-section {
+    padding: 24px 20px;
+  }
+
   .reviews-grid-detail {
+
     grid-template-columns: 1fr;
   }
+
   .tabs .tab-btn {
     padding: 16px 10px;
     font-size: 14px;
   }
+
   .review-header-controls {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
     gap: 16px;
   }
+
+  .review-count h3 {
+    font-size: 18px;
+  }
+
   .controls {
     width: 100%;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
+
+  .filter-btn {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
   .write-review-btn {
     flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
   }
-  .faq-header h3, .details-header h3 {
+
+
+  .faq-header h3,
+  .details-header h3 {
     font-size: 24px;
   }
 }

@@ -7,8 +7,11 @@
 @media (max-width: 1024px) {
   .product-detail-main {
     flex-direction: column;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
+
 
 .loading, .error {
   padding: 100px;

@@ -354,6 +354,22 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .upload-btn-row {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .stylish-upload-btn, .download-csv-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center;
+    padding: 14px 20px;
+  }
 }
 
 .upload-description {
@@ -414,8 +430,10 @@
   transition: all 0.2s;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
+
 
 .download-csv-btn:hover {
   background: #e0e0e0;

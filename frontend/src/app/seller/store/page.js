@@ -81,8 +81,9 @@ export default function StoreProfilePage() {
             <Store size={48} />
           </div>
           <div className="store-title-meta">
-            <h1>{user?.storeName || 'My Store'}</h1>
+            <h1>{user?.storeName || (user ? 'My Store' : 'Loading Store...')}</h1>
             <div className="verified-badge">
+
               <CheckCircle size={14} />
               <span>Verified Seller</span>
             </div>

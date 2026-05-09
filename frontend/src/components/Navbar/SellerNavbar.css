@@ -314,11 +314,13 @@
   }
 
   .seller-nav-container {
-    padding: 0 12px;
+    padding: 10px 12px 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 10px;
   }
+
 
   .seller-panel-title {
     padding: 5px 12px;
