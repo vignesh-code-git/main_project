@@ -431,12 +431,13 @@ export default function UserProfile() {
                 <button type="submit" className="save-btn">Save Changes</button>
               </form>
 
-              {/* Danger Zone */}
+              {/* DELETE ACCOUNT Section */}
               <div className="danger-zone-section">
                 <div className="danger-header">
-                  <h3>Danger Zone</h3>
+                  <h3>DELETE ACCOUNT</h3>
                   <p>Actions here are permanent and cannot be undone.</p>
                 </div>
+
                 <div className="danger-card">
                   <div className="danger-info">
                     <h4>Delete Account</h4>

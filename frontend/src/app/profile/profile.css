@@ -997,8 +997,9 @@
   background: #FFF !important;
   color: #FF3333 !important;
   font-weight: 700 !important;
-  text-align: center;
+  text-align: left;
 }
+
 
 .confirm-type-input::placeholder {
   color: rgba(255, 51, 51, 0.3);
