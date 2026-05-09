@@ -32,11 +32,16 @@
 
 @media (max-width: 768px) {
   .admin-header-nav {
-    top: 200px; /* Extreme clearance */
-    padding: 64px 20px 0 20px; /* Massive top gap */
-    background: #FFF;
+    top: 60px; /* Touch the main navbar */
+    padding: 24px 20px 0 20px; /* "Bit down" top gap */
+  }
+
+  .admin-header-top {
+    flex-wrap: nowrap; /* Keep on one line */
+    gap: 10px;
   }
 }
+
 
 
 
@@ -61,9 +66,10 @@
 
 @media (max-width: 480px) {
   .nav-brand h2 {
-    font-size: 18px;
+    font-size: 16px;
   }
 }
+
 
 .nav-tabs {
   display: flex;
