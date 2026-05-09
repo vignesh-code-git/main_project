@@ -338,11 +338,11 @@ export default function AdminDashboard() {
             <div className="user-badge">
               <div className="badge-avatar">{authUser.name.charAt(0).toUpperCase()}</div>
               <div className="user-details-mini">
-                <span className="role-label">Super Admin</span>
                 <span className="user-name-small">{authUser.name}</span>
               </div>
             </div>
           </div>
+
         </div>
 
         <nav className="nav-tabs">
