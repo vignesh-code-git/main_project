@@ -31,48 +31,17 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
+
+.admin-main-full {
+  padding: 32px 48px;
+}
+
 @media (max-width: 768px) {
-  .admin-header-nav {
-    position: sticky; /* Standardized with desktop */
-    top: 118px; /* Clears TopBanner + Navbar */
-    padding: 40px 20px 0 20px; /* Moved down towards links */
-  }
-
-
-
   .admin-main-full {
     padding: 32px 20px; /* Standard breathing room */
   }
-
-  .admin-header-top {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 15px;
-    margin-bottom: 8px; /* Reduced from 12px for a tighter look */
-  }
-
-
-  .nav-tabs {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    gap: 24px;
-  }
-
-  .nav-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-tab-item {
-    padding: 12px 4px;
-    flex-shrink: 0;
-  }
 }
+
 
 
 
@@ -622,12 +591,27 @@ tr:hover td {
 
 @media (max-width: 768px) {
   .admin-header-nav {
+    position: sticky;
+    top: 118px;
+    display: flex;
     flex-direction: column;
     height: auto;
-    padding: 16px;
-    gap: 16px;
+    padding: 32px 20px 0 20px; /* Winning padding value */
+    gap: 12px;
     align-items: flex-start;
+    background: #FFF;
+    border-bottom: 1px solid var(--border-color);
+    z-index: 999;
   }
+
+  .admin-header-top {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px; /* Closed gap as requested */
+  }
+
 
   .nav-tabs {
     display: flex;
@@ -636,10 +620,11 @@ tr:hover td {
     scrollbar-width: none;
     -ms-overflow-style: none;
     gap: 24px;
-    padding-right: 48px; /* Added gap on the right side */
-    width: calc(100% + 20px); /* Extend to account for side padding */
-    margin-right: -20px;
-    /* Removed extra border-bottom */
+    padding-right: 60px; /* Larger gap for the cut-off */
+    width: 100%;
+    /* Create a professional fade-out effect on the right */
+    mask-image: linear-gradient(to right, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
   }
 
   .nav-tabs::-webkit-scrollbar {
