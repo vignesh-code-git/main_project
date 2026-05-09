@@ -20,7 +20,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
       rawUrl = product.images?.[0]?.url || product.imageUrl;
     } else {
       const selectedColors = activeColors.split(',').map(c => c.trim().toLowerCase());
-      const matchingImage = product.images.find(img => 
+      const matchingImage = product.images.find(img =>
         img.color && typeof img.color === 'string' && selectedColors.includes(img.color.toLowerCase())
       );
       rawUrl = (matchingImage?.url) || product.imageUrl || (product.images?.[0]?.url);
@@ -55,10 +55,10 @@ export default function ProductCard({ product, priority = false, activeColors = 
     <Link href={`/product/${product.id}`} className="product-card">
       <div className="product-image">
         {product.images && product.images.length > 0 ? (
-          <Image 
-            src={getDisplayImage()} 
-            alt={product.name} 
-            className="real-product-img" 
+          <Image
+            src={getDisplayImage()}
+            alt={product.name}
+            className="real-product-img"
             fill
             priority={priority}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -71,7 +71,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
       </div>
       <div className="product-info">
         <h3>{product.name}</h3>
-        
+
         {/* Color Swatches */}
         {product.color && (
           <div className="product-card-colors">
@@ -79,11 +79,11 @@ export default function ProductCard({ product, priority = false, activeColors = 
               const colorName = c.trim();
               const isSelected = activeColors?.toLowerCase().includes(colorName.toLowerCase());
               return (
-                <span 
-                  key={i} 
+                <span
+                  key={i}
                   className={`card-color-dot ${isSelected ? 'selected' : ''}`}
                   title={colorName}
-                  style={{ 
+                  style={{
                     backgroundColor: colorName.toLowerCase(),
                     border: colorName.toLowerCase() === 'white' ? '1px solid #ddd' : 'none'
                   }}
@@ -102,7 +102,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
           {product.originalPrice && (
             <>
               <span className="original-price">₹{product.originalPrice}</span>
-              <span className="discount-badge">-{Math.round((1 - product.price/product.originalPrice) * 100)}%</span>
+              <span className="discount-badge">-{Math.round((1 - product.price / product.originalPrice) * 100)}%</span>
             </>
           )}
         </div>

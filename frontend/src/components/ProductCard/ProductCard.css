@@ -69,7 +69,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
 }
 
@@ -110,7 +110,7 @@
 .original-price {
   font-size: 24px;
   font-weight: 700;
-  color: rgba(0,0,0,0.4);
+  color: rgba(0, 0, 0, 0.4);
   text-decoration: line-through;
 }
 
@@ -151,7 +151,8 @@
     font-size: 12px;
   }
 
-  .current-price, .original-price {
+  .current-price,
+  .original-price {
     font-size: 18px;
   }
 
@@ -161,11 +162,11 @@
   }
 
   .quick-add-btn {
-    display: none !important; /* Hide on mobile to match design */
+    display: none !important;
+    /* Hide on mobile to match design */
   }
 }
 
 @media (max-width: 480px) {
   /* No overrides needed for product-image here */
 }
-
