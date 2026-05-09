@@ -19,7 +19,7 @@
 /* Top Navigation Header */
 .admin-header-nav {
   position: fixed; /* Switch to fixed for desktop as well */
-  top: 120px; /* Increased to clear main navbar links */
+  top: 95px; /* Adjusted to touch navbar bottom precisely */
   left: 0;
   right: 0;
   background: #FFF;
@@ -30,6 +30,7 @@
   z-index: 1100;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
+
 
 
 @media (max-width: 768px) {
@@ -217,8 +218,9 @@
 .admin-main-full {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 260px 48px 64px 48px; /* Offset for fixed header at top: 120px */
+  padding: 230px 48px 64px 48px; /* Offset for fixed header at top: 95px */
 }
+
 
 
 
