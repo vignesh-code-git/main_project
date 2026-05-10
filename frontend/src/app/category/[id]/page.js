@@ -18,7 +18,7 @@ async function getCategoryData(id, searchParams) {
       categoryName = 'Top Selling';
     } else if (id === 'on-sale') {
       params.append('onSale', 'true');
-      params.append('sortBy', 'oldest');
+      params.append('sortBy', 'newest');
       categoryName = 'On Sale';
     } else if (styles.includes(id.toLowerCase())) {
       params.append('style', id.charAt(0).toUpperCase() + id.slice(1));
