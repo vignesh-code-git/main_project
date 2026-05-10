@@ -15,11 +15,13 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
   const [products, setProducts] = useState(initialProducts || []);
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.sortBy || 'Most Popular');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Update products when initialProducts change (from server)
   useEffect(() => {
     setProducts(initialProducts);
     setLoading(false);
+    setIsFilterOpen(false); // Close filter on apply/navigation
   }, [initialProducts]);
 
   const handleApplyFilter = (newFilters) => {
@@ -36,7 +38,6 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
 
     let hasFilters = false;
     Object.entries(newFilters).forEach(([key, value]) => {
-      // Don't append categoryId if it's already in the path or we are on a special page where it will be handled as a query param
       if (key === 'categoryId') {
         if (['on-sale', 'new-arrivals', 'top-selling'].includes(id)) {
            if (value) {
@@ -45,7 +46,6 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
            }
         }
       } else if (value !== undefined && value !== null && value !== '') {
-        // For price, only append if it deviates from the 0-500 range
         if (key === 'minPrice' && parseInt(value) === 0) return;
         if (key === 'maxPrice' && parseInt(value) === 10000) return;
 
@@ -90,10 +90,14 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
         <Breadcrumbs paths={breadcrumbPaths} />
 
         <div className="category-layout">
-          <aside className="category-sidebar">
+          {/* Mobile Filter Overlay */}
+          {isFilterOpen && <div className="mobile-filter-overlay" onClick={() => setIsFilterOpen(false)} />}
+          
+          <aside className={`category-sidebar ${isFilterOpen ? 'mobile-open' : ''}`}>
             <Sidebar 
               onApplyFilter={handleApplyFilter} 
-              initialFilters={{ ...searchParams, categoryId: !['on-sale', 'new-arrivals', 'top-selling'].includes(id) ? id : searchParams.categoryId }} 
+              initialFilters={{ ...searchParams, categoryId: !['on-sale', 'new-arrivals', 'top-selling'].includes(id) ? id : searchParams.categoryId }}
+              onClose={() => setIsFilterOpen(false)}
             />
           </aside>
 
@@ -106,6 +110,11 @@ export default function CategoryPageContent({ id, categoryName, initialProducts,
                 </p>
               </div>
               <div className="header-right">
+                <button className="mobile-filter-trigger" onClick={() => setIsFilterOpen(true)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H21M6 12H18M10 18H14" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
                 <span className="sort-label">Sort by:</span>
                 <div className="category-sort-wrapper">
                   <CustomSelect

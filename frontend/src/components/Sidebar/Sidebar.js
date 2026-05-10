@@ -5,7 +5,7 @@ import { SlidersHorizontal, ChevronRight, ChevronDown, ChevronUp, Check } from '
 import { API_BASE_URL } from '@/config/api';
 import './Sidebar.css';
 
-export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
+export default function Sidebar({ onApplyFilter, initialFilters = {}, onClose }) {
   const [selectedColor, setSelectedColor] = useState(initialFilters.color || '');
   const [selectedSize, setSelectedSize] = useState(initialFilters.size || '');
   const [priceRange, setPriceRange] = useState({ 
@@ -90,8 +90,17 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
     <aside className="sidebar">
       <div className="sidebar-header">
         <h3>Filters</h3>
-        <button className="clear-all-btn" onClick={clearFilters}>Clear All</button>
-        <SlidersHorizontal size={24} className="filter-icon" />
+        <div className="sidebar-header-actions">
+          <button className="clear-all-btn" onClick={clearFilters}>Clear All</button>
+          {onClose && (
+            <button className="mobile-close-btn" onClick={onClose}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          )}
+          <SlidersHorizontal size={24} className="filter-icon" />
+        </div>
       </div>
 
       <div className="filter-section category-links">
@@ -234,14 +243,17 @@ export default function Sidebar({ onApplyFilter, initialFilters = {} }) {
 
       <button
         className="apply-filter-btn"
-        onClick={() => onApplyFilter({
-          categoryId: selectedCategoryId,
-          color: selectedColor,
-          size: selectedSize,
-          minPrice: priceRange.min,
-          maxPrice: priceRange.max,
-          style: selectedStyle
-        })}
+        onClick={() => {
+          onApplyFilter({
+            categoryId: selectedCategoryId,
+            color: selectedColor,
+            size: selectedSize,
+            minPrice: priceRange.min,
+            maxPrice: priceRange.max,
+            style: selectedStyle
+          });
+          if (onClose) onClose();
+        }}
       >
         Apply Filter
       </button>
