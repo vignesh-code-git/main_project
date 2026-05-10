@@ -291,13 +291,14 @@ export default function EditProductPage() {
               {colorsList.map(color => (
                 <div 
                   key={color.id}
-                  className={`color-preset-item ${formData.colors.includes(color.name) ? 'selected' : ''}`}
+                  className={`color-preset-item ${formData.colors.some(c => c.toLowerCase() === color.name.toLowerCase()) ? 'selected' : ''}`}
                   onClick={() => {
                     setFormData(prev => {
-                      const isSelected = prev.colors.includes(color.name);
+                      const isSelected = prev.colors.some(c => c.toLowerCase() === color.name.toLowerCase());
                       if (isSelected) {
-                        return { ...prev, colors: prev.colors.filter(c => c !== color.name) };
+                        return { ...prev, colors: prev.colors.filter(c => c.toLowerCase() !== color.name.toLowerCase()) };
                       } else {
+                        // Use the official color name from the list for consistency
                         return { ...prev, colors: [...prev.colors, color.name] };
                       }
                     });
@@ -363,12 +364,12 @@ export default function EditProductPage() {
                   <div className="existing-images-grid">
                     {existingImages
                       .filter(img => {
-                        // 1. Direct match with current gallery color
-                        if (img.color === color) return true;
+                        // 1. Direct match with current gallery color (case-insensitive)
+                        if (img.color?.toLowerCase() === color.toLowerCase()) return true;
                         
-                        // 2. Fallback: If image has NO color, show it in the FIRST color's gallery
-                        // This handles bulk-uploaded images or legacy data
-                        if (!img.color && formData.colors[0] === color) return true;
+                        // 2. Fallback: If image has NO color (bulk upload / legacy), show it in ALL active galleries 
+                        // so the user can always see and manage their existing assets.
+                        if (!img.color) return true;
                         
                         return false;
                       })
