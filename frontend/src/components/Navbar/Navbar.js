@@ -320,7 +320,7 @@ export default function Navbar() {
                   </Link>
                 ) : (
                   <Link href="/seller/auth" className="mobile-only" onClick={() => setMobileMenuOpen(false)}>
-                    <Store size={20} /> Become a Seller
+                    Become a Seller
                   </Link>
                 )}
               </li>
