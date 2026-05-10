@@ -7,6 +7,7 @@ import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import { X } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import Pagination from '@/components/Pagination/Pagination';
+import CustomSelect from '@/components/CustomSelect/CustomSelect';
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -519,16 +520,13 @@ export default function AdminDashboard() {
                           </span>
                         </td>
                         <td>
-                          <select
-                            className="status-dropdown-admin"
-                            value={order.status}
-                            onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
-                          >
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                          </select>
+                          <div style={{ width: '150px' }}>
+                            <CustomSelect
+                              options={['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']}
+                              value={order.status}
+                              onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                            />
+                          </div>
                         </td>
                       </tr>
                     ))}

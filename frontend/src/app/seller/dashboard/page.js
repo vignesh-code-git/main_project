@@ -9,6 +9,7 @@ import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
 import Pagination from '@/components/Pagination/Pagination';
+import CustomSelect from '@/components/CustomSelect/CustomSelect';
 import './seller-dashboard.css';
 import '../products/products.css';
 
@@ -254,45 +255,6 @@ export default function SellerDashboard() {
   };
 
 
-  // Custom Status Dropdown Component
-
-  const StatusDropdown = ({ currentStatus, onUpdate }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-
-    return (
-      <div className="custom-status-dropdown">
-        <button 
-          className={`status-trigger-btn ${currentStatus.toLowerCase()} ${isOpen ? 'open' : ''}`}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span>{currentStatus}</span>
-          <ChevronDown size={14} className={isOpen ? 'rotate' : ''} />
-        </button>
-
-        {isOpen && (
-          <>
-            <div className="dropdown-overlay-fixed" onClick={() => setIsOpen(false)} />
-            <div className="status-options-menu">
-              {statuses.map(status => (
-                <button
-                  key={status}
-                  className={`status-option-item ${status.toLowerCase()} ${status === currentStatus ? 'active' : ''}`}
-                  onClick={() => {
-                    onUpdate(status);
-                    setIsOpen(false);
-                  }}
-                >
-                  <span>{status}</span>
-                  {status === currentStatus && <Check size={14} />}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  };
 
   if (loading || !user) return <div className="loading-dashboard-overlay">Loading Dashboard...</div>;
 
@@ -504,10 +466,13 @@ export default function SellerDashboard() {
                             </span>
                           </td>
                           <td>
-                            <StatusDropdown 
-                              currentStatus={order.status} 
-                              onUpdate={(newStatus) => handleStatusUpdate(order.id, newStatus)} 
-                            />
+                            <div style={{ width: '130px' }}>
+                              <CustomSelect 
+                                options={['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']}
+                                value={order.status} 
+                                onChange={(e) => handleStatusUpdate(order.id, e.target.value)} 
+                              />
+                            </div>
                           </td>
                         </tr>
                       ))
