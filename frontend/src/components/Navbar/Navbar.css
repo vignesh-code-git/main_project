@@ -302,7 +302,8 @@
 
 .mobile-dashboard-trigger {
   display: none;
-  width: 38px; /* Slightly larger for better touch target */
+  width: 38px;
+  /* Slightly larger for better touch target */
   height: 38px;
   background: #000;
   color: #fff !important;
@@ -317,6 +318,8 @@
 .mobile-dashboard-trigger svg {
   display: block;
   margin: 0;
+  transform: translateY(4px);
+  /* ADJUST THIS LINE TO MOVE ICON DOWN */
 }
 
 .mobile-dashboard-trigger:active {
@@ -561,11 +564,13 @@
   }
 
   .user-trigger {
-    padding: 4px 4px; /* More compact on mobile */
+    padding: 4px 4px;
+    /* More compact on mobile */
   }
 
-  .user-trigger > svg:last-child {
-    display: none !important; /* Hide chevron arrow */
+  .user-trigger>svg:last-child {
+    display: none !important;
+    /* Hide chevron arrow */
   }
 
   /* Compact right-aligned dropdown on tablet & mobile */
