@@ -310,7 +310,7 @@
   color: #fff !important;
   border-radius: 50%;
   transition: all 0.2s;
-  transform: translateY(0.5px); /* Tiny bit up from previous */
+  /* Transform removed for absolute mathematical centering */
 }
 
 .mobile-dashboard-trigger:active {
