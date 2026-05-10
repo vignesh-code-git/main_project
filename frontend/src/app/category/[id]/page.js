@@ -10,8 +10,7 @@ async function getCategoryData(id, searchParams) {
     let categoryName = 'Category';
 
     if (id === 'new-arrivals') {
-      params.append('onSale', 'true');
-      params.append('sortBy', 'oldest');
+      params.append('sortBy', 'newest');
       categoryName = 'New Arrivals';
     } else if (id === 'top-selling') {
       endpoint = `${API_BASE_URL}/api/products/top-selling`;

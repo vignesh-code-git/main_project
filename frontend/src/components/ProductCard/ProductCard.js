@@ -23,7 +23,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
       const matchingImage = product.images.find(img =>
         img.color && typeof img.color === 'string' && selectedColors.includes(img.color.toLowerCase())
       );
-      rawUrl = (matchingImage?.url) || product.imageUrl || (product.images?.[0]?.url);
+      rawUrl = (product.images?.[0]?.url) || (matchingImage?.url) || product.imageUrl;
     }
 
     return resolveImageUrl(rawUrl);
