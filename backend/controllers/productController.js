@@ -67,7 +67,12 @@ exports.getAllProducts = async (req, res) => {
       where,
       order,
       include: [
-        { model: ProductImage, as: 'images' },
+        { 
+          model: ProductImage, 
+          as: 'images',
+          separate: true,
+          order: [['id', 'ASC']]
+        },
         { model: Category }
       ],
       distinct: true // To get accurate count with includes
@@ -108,7 +113,12 @@ exports.getSellerProducts = async (req, res) => {
     const { count, rows: products } = await Product.findAndCountAll({
       where,
       include: [
-        { model: ProductImage, as: 'images' },
+        { 
+          model: ProductImage, 
+          as: 'images',
+          separate: true,
+          order: [['id', 'ASC']]
+        },
         { model: Category }
       ],
       order,
@@ -163,7 +173,12 @@ exports.getNewArrivals = async (req, res) => {
       where,
       order: [['createdAt', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }],
+      include: [{ 
+          model: ProductImage, 
+          as: 'images',
+          separate: true,
+          order: [['id', 'ASC']]
+        }],
       distinct: true
     });
     console.log(`Found ${products.length} new arrivals.`);
@@ -205,7 +220,12 @@ exports.getTopSelling = async (req, res) => {
       where,
       order: [['rating', 'DESC']],
       limit: 20,
-      include: [{ model: ProductImage, as: 'images' }],
+      include: [{ 
+          model: ProductImage, 
+          as: 'images',
+          separate: true,
+          order: [['id', 'ASC']]
+        }],
       distinct: true
     });
     console.log(`Found ${products.length} top selling products.`);
@@ -469,7 +489,12 @@ exports.exportProductsToCSV = async (req, res) => {
   try {
     const products = await Product.findAll({
       where: { sellerId: req.user.id },
-      include: [{ model: ProductImage, as: 'images' }]
+      include: [{ 
+        model: ProductImage, 
+        as: 'images',
+        separate: true,
+        order: [['id', 'ASC']]
+      }]
     });
 
     if (products.length === 0) {
@@ -569,7 +594,12 @@ exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
       include: [
-        { model: ProductImage, as: 'images' },
+        { 
+          model: ProductImage, 
+          as: 'images',
+          separate: true,
+          order: [['id', 'ASC']]
+        },
         { model: Category },
         {
           model: Review,
