@@ -1166,6 +1166,36 @@ input:checked+.slider:before {
   gap: 10px;
 }
 
+.preview-item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-item.image-error {
+  background: #fff5f5;
+  border: 1px dashed #ff8787;
+}
+
+.error-placeholder {
+  display: none;
+  font-size: 10px;
+  color: #ff3333;
+  text-align: center;
+  padding: 5px;
+}
+
+.image-error .error-placeholder {
+  display: block;
+}
+
 .preview-thumb-box {
   position: relative;
   aspect-ratio: 1;

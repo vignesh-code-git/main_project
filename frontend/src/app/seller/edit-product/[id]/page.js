@@ -374,8 +374,16 @@ export default function EditProductPage() {
                         return false;
                       })
                       .map((img, idx) => (
-                        <div key={idx} className="preview-item existing-file">
-                          <img src={resolveImageUrl(img.url)} alt="existing" />
+                        <div key={idx} className="preview-item existing-file" title={img.url}>
+                          <img 
+                            src={resolveImageUrl(img.url)} 
+                            alt="existing" 
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.parentElement.classList.add('image-error');
+                            }}
+                          />
+                          <div className="error-placeholder">Broken Link</div>
                           <button 
                             type="button" 
                             className="remove-img-btn"

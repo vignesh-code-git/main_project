@@ -369,16 +369,42 @@ exports.bulkUploadProducts = async (req, res) => {
               console.log(`Successfully created: ${product.name}`);
             }
 
-            // Handle images (if provided in CSV, it REPLACES existing images for the product)
+            // Handle images (supports both simple list and color-grouped list)
             if (p.images) {
-              // Clear existing images for the product first
               await ProductImage.destroy({ where: { productId: product.id } });
 
-              const imageRecords = imageLinks.map(url => ({
-                url: url.trim(),
-                productId: product.id
-              }));
-              await ProductImage.bulkCreate(imageRecords);
+              const imageRecords = [];
+              
+              // Advanced Format: "Red:/img1.jpg,/img2.jpg|Black:/img3.jpg"
+              if (p.images.includes(':')) {
+                const colorGroups = p.images.split('|');
+                for (const group of colorGroups) {
+                  const [colorName, urls] = group.split(':');
+                  if (colorName && urls) {
+                    const links = urls.split(',');
+                    for (const url of links) {
+                      imageRecords.push({
+                        url: url.trim(),
+                        productId: product.id,
+                        color: colorName.trim() // Assign specific color from CSV
+                      });
+                    }
+                  }
+                }
+              } else {
+                // Simple Format: "/img1.jpg,/img2.jpg" (Standard fallback)
+                const imageLinks = p.images.split(',');
+                for (const url of imageLinks) {
+                  imageRecords.push({
+                    url: url.trim(),
+                    productId: product.id
+                  });
+                }
+              }
+
+              if (imageRecords.length > 0) {
+                await ProductImage.bulkCreate(imageRecords);
+              }
             }
 
           } catch (itemErr) {
