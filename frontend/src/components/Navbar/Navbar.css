@@ -304,13 +304,19 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 34px; /* Matches visual footprint of other icons */
+  width: 34px;
   height: 34px;
   background: #000;
   color: #fff !important;
   border-radius: 50%;
   transition: all 0.2s;
-  /* Transform removed for absolute mathematical centering */
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.mobile-dashboard-trigger svg {
+  display: block;
+  margin: 0 auto;
 }
 
 .mobile-dashboard-trigger:active {
