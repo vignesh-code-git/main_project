@@ -8,7 +8,9 @@ import { Plus, Package, DollarSign, ShoppingBag, AlertCircle, Save, X, ChevronDo
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import { API_BASE_URL, getAuthHeaders, resolveImageUrl } from '@/config/api';
 import { updateUser } from '@/lib/redux/slices/authSlice';
+import Pagination from '@/components/Pagination/Pagination';
 import './seller-dashboard.css';
+import '../products/products.css';
 
 export default function SellerDashboard() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -22,6 +24,8 @@ export default function SellerDashboard() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [statsData, setStatsData] = useState({ revenue: 0, orders: 0, products: 0, customers: 0 });
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, productId: null });
+  const [productPagination, setProductPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
+  const [orderPagination, setOrderPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
   
   // New States for Returns & Feedback
   const [returns, setReturns] = useState([]);
@@ -66,7 +70,7 @@ export default function SellerDashboard() {
         setShowOnboarding(true);
       }
       
-      fetchSellerProducts(user.id);
+      fetchSellerProducts(user.id, productPagination.currentPage);
       fetchSellerOrders(user.id);
       fetchDashboardStats();
 
@@ -91,23 +95,38 @@ export default function SellerDashboard() {
     }
   };
 
-  const fetchSellerProducts = async (sellerId) => {
+  const fetchSellerProducts = async (sellerId, page = 1) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/products?sellerId=${sellerId}`);
+      const res = await fetch(`${API_BASE_URL}/api/products/seller/my-products?page=${page}&limit=10`, {
+        headers: getAuthHeaders()
+      });
       const data = await res.json();
-      setProducts(data.products || (Array.isArray(data) ? data : []));
+      setProducts(data.products || []);
+      setProductPagination({
+        total: data.total || 0,
+        currentPage: data.currentPage || 1,
+        totalPages: data.totalPages || 1
+      });
     } catch (err) {
       console.error("Failed to fetch products:", err);
     }
   };
 
-  const fetchSellerOrders = async (sellerId) => {
+  const fetchSellerOrders = async (sellerId, page = 1) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}?page=${page}&limit=10`, {
         headers: getAuthHeaders()
       });
       const data = await res.json();
-      setOrders(data);
+      const ordersData = Array.isArray(data) ? data : (data.orders || []);
+      setOrders(ordersData);
+      if (data.totalPages) {
+        setOrderPagination({
+          total: data.total || 0,
+          currentPage: data.currentPage || 1,
+          totalPages: data.totalPages || 1
+        });
+      }
     } catch (err) {
       console.error("Failed to fetch orders:", err);
     } finally {
@@ -359,6 +378,18 @@ export default function SellerDashboard() {
                 </button>
               </div>
               <div className="product-table-container">
+                {productPagination.totalPages > 1 && (
+                  <div className="pagination-wrapper top">
+                    <div className="pagination-info">
+                      Showing {((productPagination.currentPage - 1) * 10) + 1} to {Math.min(productPagination.currentPage * 10, productPagination.total)} of {productPagination.total} products
+                    </div>
+                    <Pagination 
+                      currentPage={productPagination.currentPage}
+                      totalPages={productPagination.totalPages}
+                      onPageChange={(page) => fetchSellerProducts(user.id, page)}
+                    />
+                  </div>
+                )}
 
                 <table className="product-table">
                   <thead>
@@ -417,6 +448,18 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
+              {productPagination.totalPages > 1 && (
+                <div className="pagination-wrapper bottom" style={{ marginTop: '20px' }}>
+                  <div className="pagination-info">
+                    Showing {((productPagination.currentPage - 1) * 10) + 1} to {Math.min(productPagination.currentPage * 10, productPagination.total)} of {productPagination.total} products
+                  </div>
+                  <Pagination 
+                    currentPage={productPagination.currentPage}
+                    totalPages={productPagination.totalPages}
+                    onPageChange={(page) => fetchSellerProducts(user.id, page)}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -478,6 +521,18 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
+              {orderPagination.totalPages > 1 && (
+                <div className="pagination-wrapper bottom" style={{ marginTop: '20px' }}>
+                  <div className="pagination-info">
+                    Showing {((orderPagination.currentPage - 1) * 10) + 1} to {Math.min(orderPagination.currentPage * 10, orderPagination.total)} of {orderPagination.total} orders
+                  </div>
+                  <Pagination 
+                    currentPage={orderPagination.currentPage}
+                    totalPages={orderPagination.totalPages}
+                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
+                  />
+                </div>
+              )}
             </div>
           )}
 
