@@ -445,7 +445,16 @@ export default function AdminDashboard() {
               <p>Process and track all platform transactions.</p>
             </header>
             <div className="admin-card-stylish">
-              <h2>Master Order List</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h2>Master Order List</h2>
+                {orderPagination.totalPages > 1 && (
+                  <Pagination 
+                    currentPage={orderPagination.currentPage}
+                    totalPages={orderPagination.totalPages}
+                    onPageChange={(page) => fetchData('orders', page)}
+                  />
+                )}
+              </div>
               <div className="admin-table-wrapper">
                 <table>
                   <thead>
@@ -492,15 +501,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {orderPagination.totalPages > 1 && (
-                <div className="admin-pagination-footer">
-                  <Pagination 
-                    currentPage={orderPagination.currentPage}
-                    totalPages={orderPagination.totalPages}
-                    onPageChange={(page) => fetchData('orders', page)}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -512,7 +512,16 @@ export default function AdminDashboard() {
               <p>Manage all items listed across the storefront.</p>
             </header>
             <div className="admin-card-stylish">
-              <h2>Master Product List</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h2>Master Product List</h2>
+                {productPagination.totalPages > 1 && (
+                  <Pagination 
+                    currentPage={productPagination.currentPage}
+                    totalPages={productPagination.totalPages}
+                    onPageChange={(page) => fetchData('products', page)}
+                  />
+                )}
+              </div>
               <div className="admin-table-wrapper">
                 <table>
                   <thead>
@@ -540,15 +549,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {productPagination.totalPages > 1 && (
-                <div className="admin-pagination-footer">
-                  <Pagination 
-                    currentPage={productPagination.currentPage}
-                    totalPages={productPagination.totalPages}
-                    onPageChange={(page) => fetchData('products', page)}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -573,7 +573,17 @@ export default function AdminDashboard() {
 
             <div className="admin-card-stylish">
               <div className="asset-header-row">
-                <h2>{assetTab.toUpperCase()} LIST</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h2>{assetTab.toUpperCase()} LIST</h2>
+                  {assetPagination.totalPages > 1 && (
+                    <Pagination 
+                      currentPage={assetPagination.currentPage}
+                      totalPages={assetPagination.totalPages}
+                      onPageChange={(page) => fetchData(assetTab, page)}
+                    />
+                  )}
+                </div>
+                
                 <div className="admin-inline-form">
                   {assetTab === 'colors' ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
@@ -673,15 +683,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {assetPagination.totalPages > 1 && (
-                <div className="admin-pagination-footer">
-                  <Pagination 
-                    currentPage={assetPagination.currentPage}
-                    totalPages={assetPagination.totalPages}
-                    onPageChange={(page) => fetchData(assetTab, page)}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -693,7 +694,16 @@ export default function AdminDashboard() {
               <p>Overview of all marketplace vendors.</p>
             </header>
             <div className="admin-card-stylish">
-              <h2>Business Directory</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h2>Business Directory</h2>
+                {sellerPagination.totalPages > 1 && (
+                  <Pagination 
+                    currentPage={sellerPagination.currentPage}
+                    totalPages={sellerPagination.totalPages}
+                    onPageChange={(page) => fetchData('sellers', page)}
+                  />
+                )}
+              </div>
               <div className="admin-table-wrapper">
                 <table>
                   <thead>
@@ -719,15 +729,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {sellerPagination.totalPages > 1 && (
-                <div className="admin-pagination-footer">
-                  <Pagination 
-                    currentPage={sellerPagination.currentPage}
-                    totalPages={sellerPagination.totalPages}
-                    onPageChange={(page) => fetchData('sellers', page)}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -739,7 +740,16 @@ export default function AdminDashboard() {
               <p>Management of individual platform customers.</p>
             </header>
             <div className="admin-card-stylish">
-              <h2>Customer List</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h2>Customer List</h2>
+                {userPagination.totalPages > 1 && (
+                  <Pagination 
+                    currentPage={userPagination.currentPage}
+                    totalPages={userPagination.totalPages}
+                    onPageChange={(page) => fetchData('customers', page)}
+                  />
+                )}
+              </div>
               <div className="admin-table-wrapper">
                 <table>
                   <thead>
@@ -765,15 +775,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-              {userPagination.totalPages > 1 && (
-                <div className="admin-pagination-footer">
-                  <Pagination 
-                    currentPage={userPagination.currentPage}
-                    totalPages={userPagination.totalPages}
-                    onPageChange={(page) => fetchData('customers', page)}
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}

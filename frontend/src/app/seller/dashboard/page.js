@@ -448,18 +448,6 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
-              {productPagination.totalPages > 1 && (
-                <div className="pagination-wrapper bottom" style={{ marginTop: '20px' }}>
-                  <div className="pagination-info">
-                    Showing {((productPagination.currentPage - 1) * 10) + 1} to {Math.min(productPagination.currentPage * 10, productPagination.total)} of {productPagination.total} products
-                  </div>
-                  <Pagination 
-                    currentPage={productPagination.currentPage}
-                    totalPages={productPagination.totalPages}
-                    onPageChange={(page) => fetchSellerProducts(user.id, page)}
-                  />
-                </div>
-              )}
             </div>
           )}
 
@@ -521,18 +509,6 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
-              {orderPagination.totalPages > 1 && (
-                <div className="pagination-wrapper bottom" style={{ marginTop: '20px' }}>
-                  <div className="pagination-info">
-                    Showing {((orderPagination.currentPage - 1) * 10) + 1} to {Math.min(orderPagination.currentPage * 10, orderPagination.total)} of {orderPagination.total} orders
-                  </div>
-                  <Pagination 
-                    currentPage={orderPagination.currentPage}
-                    totalPages={orderPagination.totalPages}
-                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
-                  />
-                </div>
-              )}
             </div>
           )}
 
