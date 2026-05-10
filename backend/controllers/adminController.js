@@ -5,7 +5,7 @@ const { User, Product, WebsiteSettings, Category, Notification, Brand, Style, Si
 // @access  Private/Admin
 const getAllUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 9 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
     
     const { count, rows: users } = await User.findAndCountAll({
@@ -29,7 +29,7 @@ const getAllUsers = async (req, res) => {
 
 const getAllSellers = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 9 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     const { count, rows: sellers } = await User.findAndCountAll({

@@ -90,12 +90,15 @@ export default function AdminDashboard() {
         const sd = await s.json();
         const pd = await p.json();
         const od = await o.json();
-        setUsers(ud.users || []);
-        setUserPagination({ total: ud.total, currentPage: ud.currentPage, totalPages: ud.totalPages });
-        setSellers(sd.sellers || []);
-        setSellerPagination({ total: sd.total, currentPage: sd.currentPage, totalPages: sd.totalPages });
         setProducts(pd.products || []);
         setProductPagination({ total: pd.total, currentPage: pd.currentPage, totalPages: pd.totalPages });
+        
+        const sTotal = sd.total || (Array.isArray(sd) ? sd.length : 0);
+        setSellerPagination({ total: sTotal, currentPage: sd.currentPage || 1, totalPages: sd.totalPages || Math.ceil(sTotal / 9) || 1 });
+        
+        const uTotal = ud.total || (Array.isArray(ud) ? ud.length : 0);
+        setUserPagination({ total: uTotal, currentPage: ud.currentPage || 1, totalPages: ud.totalPages || Math.ceil(uTotal / 9) || 1 });
+
         setAllOrders(od.orders || (Array.isArray(od) ? od : []));
         const oTotal = od.total || (Array.isArray(od) ? od.length : 0);
         const oLimit = 9;
@@ -112,11 +115,15 @@ export default function AdminDashboard() {
         const res = await fetch(endpoint, { headers: getAuthHeaders() });
         const data = await res.json();
         if (tab === 'customers') {
-          setUsers(data.users || []);
-          setUserPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+          const userArr = data.users || (Array.isArray(data) ? data : []);
+          setUsers(userArr);
+          const uTotal = data.total || userArr.length;
+          setUserPagination({ total: uTotal, currentPage: data.currentPage || 1, totalPages: data.totalPages || Math.ceil(uTotal / 9) || 1 });
         } else if (tab === 'sellers') {
-          setSellers(data.sellers || []);
-          setSellerPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+          const sellerArr = data.sellers || (Array.isArray(data) ? data : []);
+          setSellers(sellerArr);
+          const sTotal = data.total || sellerArr.length;
+          setSellerPagination({ total: sTotal, currentPage: data.currentPage || 1, totalPages: data.totalPages || Math.ceil(sTotal / 9) || 1 });
         } else if (tab === 'products') {
           setProducts(data.products || []);
           setProductPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
