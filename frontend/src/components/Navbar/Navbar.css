@@ -304,8 +304,13 @@
   display: none;
   align-items: center;
   justify-content: center;
-  color: #000;
-  transition: transform 0.2s;
+  width: 34px; /* Matches visual footprint of other icons */
+  height: 34px;
+  background: #000;
+  color: #fff !important;
+  border-radius: 50%;
+  transition: all 0.2s;
+  transform: translateY(1.5px); /* Tiny bit down */
 }
 
 .mobile-dashboard-trigger:active {
@@ -546,6 +551,14 @@
 
   .mobile-dashboard-trigger {
     display: flex;
+  }
+
+  .user-trigger {
+    padding: 4px 4px; /* More compact on mobile */
+  }
+
+  .user-trigger > svg:last-child {
+    display: none !important; /* Hide chevron arrow */
   }
 
   /* Compact right-aligned dropdown on tablet & mobile */

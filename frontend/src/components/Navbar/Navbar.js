@@ -410,15 +410,7 @@ export default function Navbar() {
                 <Search size={24} />
               </button>
 
-              {mounted && isAuthenticated && (user?.role === 'admin' || user?.role === 'seller') && (
-                <Link
-                  href={user.role === 'admin' ? '/admin/dashboard' : '/seller/dashboard'}
-                  className="mobile-dashboard-trigger mobile-only"
-                  title={user.role === 'admin' ? 'Admin Panel' : 'Seller Panel'}
-                >
-                  <LayoutDashboard size={24} />
-                </Link>
-              )}
+
 
               <Link href="/cart" className="cart-icon" title="View Cart">
                 <ShoppingCart size={24} />
@@ -600,6 +592,16 @@ export default function Navbar() {
               ) : (
                 <Link href="/auth/login" className="nav-login-link" title="Login">
                   <UserCircle size={24} />
+                </Link>
+              )}
+
+              {mounted && isAuthenticated && (user?.role === 'admin' || user?.role === 'seller') && (
+                <Link
+                  href={user.role === 'admin' ? '/admin/dashboard' : '/seller/dashboard'}
+                  className="mobile-dashboard-trigger mobile-only"
+                  title={user.role === 'admin' ? 'Admin Panel' : 'Seller Panel'}
+                >
+                  <LayoutDashboard size={16} />
                 </Link>
               )}
             </div>
