@@ -95,7 +95,12 @@ export default function AdminDashboard() {
         setSellerPagination({ total: sd.total, currentPage: sd.currentPage, totalPages: sd.totalPages });
         setProducts(pd.products || []);
         setProductPagination({ total: pd.total, currentPage: pd.currentPage, totalPages: pd.totalPages });
-        setAllOrders(od.orders || od);
+        setAllOrders(od.orders || (Array.isArray(od) ? od : []));
+        setOrderPagination({ 
+          total: od.total || 0, 
+          currentPage: od.currentPage || 1, 
+          totalPages: od.totalPages || (Array.isArray(od) ? 1 : 0) 
+        });
         setLoading(false);
         return;
       }
