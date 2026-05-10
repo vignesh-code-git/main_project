@@ -788,12 +788,14 @@ export default function AdminDashboard() {
             <div className="admin-card-stylish">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2>Customer List</h2>
-                {userPagination.totalPages > 1 && (
-                  <Pagination 
-                    currentPage={userPagination.currentPage}
-                    totalPages={userPagination.totalPages}
-                    onPageChange={(page) => fetchData('customers', page)}
-                  />
+                {userPagination.total > 0 && (
+                  <div style={{ minWidth: '300px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination 
+                      currentPage={userPagination.currentPage}
+                      totalPages={userPagination.totalPages}
+                      onPageChange={(page) => fetchData('customers', page)}
+                    />
+                  </div>
                 )}
               </div>
               <div className="admin-table-wrapper">
