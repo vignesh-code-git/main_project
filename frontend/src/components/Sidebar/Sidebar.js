@@ -89,174 +89,176 @@ export default function Sidebar({ onApplyFilter, initialFilters = {}, onClose })
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h3>Filters</h3>
+        <h3 className="sidebar-title">Filters</h3>
         <div className="sidebar-header-actions">
           <button className="clear-all-btn" onClick={clearFilters}>Clear All</button>
           {onClose && (
-            <button className="mobile-close-btn" onClick={onClose}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <button className="sidebar-close-btn" onClick={onClose}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="butt" strokeLinejoin="miter"/>
               </svg>
             </button>
           )}
-          <SlidersHorizontal size={24} className="filter-icon" />
+          {!onClose && <SlidersHorizontal size={24} className="filter-icon" />}
         </div>
       </div>
 
-      <div className="filter-section category-links">
-        <ul className="category-list">
-          {categories.length > 0 ? (
-            categories.map(cat => (
-              <li
-                key={cat.id}
-                className={selectedCategoryId === cat.id ? 'active-category' : ''}
-                onClick={() => setSelectedCategoryId(prev => prev === cat.id ? '' : cat.id)}
-              >
-                {cat.name} <ChevronRight size={16} />
-              </li>
-            ))
-          ) : (
-            <li className="loading-text">Loading categories...</li>
-          )}
-        </ul>
-      </div>
-
-      <div className="filter-section">
-        <div className="section-header" onClick={() => setIsPriceOpen(!isPriceOpen)}>
-          <h3>Price</h3>
-          {isPriceOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-        {isPriceOpen && (
-          <div className="price-slider">
-            <div
-              className="range-input-container"
-              style={{
-                background: `linear-gradient(to right, #F0F0F0 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.max / 10000) * 100}%, #F0F0F0 ${(priceRange.max / 10000) * 100}%)`
-              }}
-            >
-              <input
-                type="range"
-                min="0"
-                max="10000"
-                step="100"
-                value={priceRange.min}
-                onChange={(e) => {
-                  const val = Math.min(parseInt(e.target.value), priceRange.max - 100);
-                  setPriceRange(prev => ({ ...prev, min: val }));
-                }}
-                className="range-min"
-              />
-              <input
-                type="range"
-                min="0"
-                max="10000"
-                step="100"
-                value={priceRange.max}
-                onChange={(e) => {
-                  const val = Math.max(parseInt(e.target.value), priceRange.min + 100);
-                  setPriceRange(prev => ({ ...prev, max: val }));
-                }}
-                className="range-max"
-              />
-            </div>
-            <div className="price-labels">
-              <span className="price-label">₹{priceRange.min}</span>
-              <span className="price-label">₹{priceRange.max}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="filter-section">
-        <div className="section-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
-          <h3>Colors</h3>
-          {isColorsOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-        {isColorsOpen && (
-          <div className="color-grid figma-colors">
-            {colors.length > 0 ? (
-              colors.map((color, index) => (
-                <div
-                  key={index}
-                  className={`color-item ${selectedColor === color.name ? 'active' : ''}`}
-                  style={{ backgroundColor: color.hexCode || color.name.toLowerCase(), border: color.name?.toLowerCase() === 'white' ? '1px solid #ddd' : 'none' }}
-                  onClick={() => setSelectedColor(prev => prev === color.name ? '' : color.name)}
-                  title={color.name}
-                >
-                  {selectedColor === color.name && <Check size={16} strokeWidth={3} />}
-                </div>
-              ))
-            ) : (
-               <p className="loading-text">Loading colors...</p>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="filter-section">
-        <div className="section-header" onClick={() => setIsSizeOpen(!isSizeOpen)}>
-          <h3>Size</h3>
-          {isSizeOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-        {isSizeOpen && (
-          <div className="size-grid">
-            {sizes.length > 0 ? (
-              sizes.map(size => (
-                <button
-                  key={size.id}
-                  className={`size-item ${selectedSize === size.name ? 'active' : ''}`}
-                  onClick={() => setSelectedSize(prev => prev === size.name ? '' : size.name)}
-                >
-                  {size.name}
-                </button>
-              ))
-            ) : (
-              <p className="loading-text">Loading sizes...</p>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="filter-section">
-        <div className="section-header" onClick={() => setIsStyleOpen(!isStyleOpen)}>
-          <h3>Dress Style</h3>
-          {isStyleOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-        {isStyleOpen && (
+      <div className="sidebar-scroll-content">
+        <div className="filter-section category-links">
           <ul className="category-list">
-            {styles.length > 0 ? (
-              styles.map(style => (
+            {categories.length > 0 ? (
+              categories.map(cat => (
                 <li
-                  key={style.id}
-                  className={selectedStyle === style.name ? 'active-style' : ''}
-                  onClick={() => setSelectedStyle(prev => prev === style.name ? '' : style.name)}
+                  key={cat.id}
+                  className={selectedCategoryId === cat.id ? 'active-category' : ''}
+                  onClick={() => setSelectedCategoryId(prev => prev === cat.id ? '' : cat.id)}
                 >
-                  {style.name} <ChevronRight size={16} />
+                  {cat.name} <ChevronRight size={16} />
                 </li>
               ))
             ) : (
-              <li className="loading-text">Loading styles...</li>
+              <li className="loading-text">Loading categories...</li>
             )}
           </ul>
-        )}
-      </div>
+        </div>
 
-      <button
-        className="apply-filter-btn"
-        onClick={() => {
-          onApplyFilter({
-            categoryId: selectedCategoryId,
-            color: selectedColor,
-            size: selectedSize,
-            minPrice: priceRange.min,
-            maxPrice: priceRange.max,
-            style: selectedStyle
-          });
-          if (onClose) onClose();
-        }}
-      >
-        Apply Filter
-      </button>
+        <div className="filter-section">
+          <div className="section-header" onClick={() => setIsPriceOpen(!isPriceOpen)}>
+            <h3>Price</h3>
+            {isPriceOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          {isPriceOpen && (
+            <div className="price-slider">
+              <div
+                className="range-input-container"
+                style={{
+                  background: `linear-gradient(to right, #F0F0F0 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.min / 10000) * 100}%, #000 ${(priceRange.max / 10000) * 100}%, #F0F0F0 ${(priceRange.max / 10000) * 100}%)`
+                }}
+              >
+                <input
+                  type="range"
+                  min="0"
+                  max="10000"
+                  step="100"
+                  value={priceRange.min}
+                  onChange={(e) => {
+                    const val = Math.min(parseInt(e.target.value), priceRange.max - 100);
+                    setPriceRange(prev => ({ ...prev, min: val }));
+                  }}
+                  className="range-min"
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="10000"
+                  step="100"
+                  value={priceRange.max}
+                  onChange={(e) => {
+                    const val = Math.max(parseInt(e.target.value), priceRange.min + 100);
+                    setPriceRange(prev => ({ ...prev, max: val }));
+                  }}
+                  className="range-max"
+                />
+              </div>
+              <div className="price-labels">
+                <span className="price-label">₹{priceRange.min}</span>
+                <span className="price-label">₹{priceRange.max}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="filter-section">
+          <div className="section-header" onClick={() => setIsColorsOpen(!isColorsOpen)}>
+            <h3>Colors</h3>
+            {isColorsOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          {isColorsOpen && (
+            <div className="color-grid figma-colors">
+              {colors.length > 0 ? (
+                colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className={`color-item ${selectedColor === color.name ? 'active' : ''}`}
+                    style={{ backgroundColor: color.hexCode || color.name.toLowerCase(), border: color.name?.toLowerCase() === 'white' ? '1px solid #ddd' : 'none' }}
+                    onClick={() => setSelectedColor(prev => prev === color.name ? '' : color.name)}
+                    title={color.name}
+                  >
+                    {selectedColor === color.name && <Check size={16} strokeWidth={3} />}
+                  </div>
+                ))
+              ) : (
+                 <p className="loading-text">Loading colors...</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="filter-section">
+          <div className="section-header" onClick={() => setIsSizeOpen(!isSizeOpen)}>
+            <h3>Size</h3>
+            {isSizeOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          {isSizeOpen && (
+            <div className="size-grid">
+              {sizes.length > 0 ? (
+                sizes.map(size => (
+                  <button
+                    key={size.id}
+                    className={`size-item ${selectedSize === size.name ? 'active' : ''}`}
+                    onClick={() => setSelectedSize(prev => prev === size.name ? '' : size.name)}
+                  >
+                    {size.name}
+                  </button>
+                ))
+              ) : (
+                <p className="loading-text">Loading sizes...</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="filter-section">
+          <div className="section-header" onClick={() => setIsStyleOpen(!isStyleOpen)}>
+            <h3>Dress Style</h3>
+            {isStyleOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          {isStyleOpen && (
+            <ul className="category-list">
+              {styles.length > 0 ? (
+                styles.map(style => (
+                  <li
+                    key={style.id}
+                    className={selectedStyle === style.name ? 'active-style' : ''}
+                    onClick={() => setSelectedStyle(prev => prev === style.name ? '' : style.name)}
+                  >
+                    {style.name} <ChevronRight size={16} />
+                  </li>
+                ))
+              ) : (
+                <li className="loading-text">Loading styles...</li>
+              )}
+            </ul>
+          )}
+        </div>
+
+        <button
+          className="apply-filter-btn"
+          onClick={() => {
+            onApplyFilter({
+              categoryId: selectedCategoryId,
+              color: selectedColor,
+              size: selectedSize,
+              minPrice: priceRange.min,
+              maxPrice: priceRange.max,
+              style: selectedStyle
+            });
+            if (onClose) onClose();
+          }}
+        >
+          Apply Filter
+        </button>
+      </div>
     </aside>
   );
 }

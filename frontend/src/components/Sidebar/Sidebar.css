@@ -1,56 +1,82 @@
 .sidebar {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
 }
 
 .sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  background: #fff;
+  z-index: 10;
 }
 
-.sidebar-header h3 {
+.sidebar-scroll-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-top: 10px;
+  padding-right: 12px; /* Add gap between content and scrollbar */
+}
+
+.sidebar-scroll-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.sidebar-title {
   font-size: 24px;
   font-weight: 700;
   color: #000;
 }
 
-.filter-icon {
-  opacity: 0.8;
-  color: #000;
+.clear-all-btn {
+  background: none;
+  border: none;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+  transform: translateX(-4px); /* Moved left */
 }
+
 .sidebar-header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
-.mobile-close-btn {
-  background: none;
-  border: none;
+.sidebar-close-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
-  border-radius: 50%;
-  transition: background 0.2s;
+  padding: 0;
+  transition: opacity 0.2s;
+  border-radius: 0 !important;
+  transform: translate(-6px, -14px); /* Moved tiny bit left */
 }
 
-.mobile-close-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.clear-all-btn {
-  background: none;
-  border: none;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 14px;
-  cursor: pointer;
-  text-decoration: none;
-  margin-top: 2px;
+.sidebar-close-btn:hover {
+  opacity: 0.7;
 }
 
 .filter-section {
