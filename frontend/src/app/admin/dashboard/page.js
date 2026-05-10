@@ -96,10 +96,12 @@ export default function AdminDashboard() {
         setProducts(pd.products || []);
         setProductPagination({ total: pd.total, currentPage: pd.currentPage, totalPages: pd.totalPages });
         setAllOrders(od.orders || (Array.isArray(od) ? od : []));
+        const oTotal = od.total || (Array.isArray(od) ? od.length : 0);
+        const oLimit = 9;
         setOrderPagination({ 
-          total: od.total || 0, 
+          total: oTotal, 
           currentPage: od.currentPage || 1, 
-          totalPages: od.totalPages || (Array.isArray(od) ? 1 : 0) 
+          totalPages: od.totalPages || Math.ceil(oTotal / oLimit) || 1
         });
         setLoading(false);
         return;
@@ -120,7 +122,13 @@ export default function AdminDashboard() {
         } else if (tab === 'orders') {
           const ordersArr = Array.isArray(data) ? data : (data.orders || []);
           setAllOrders(ordersArr);
-          if (data.totalPages) setOrderPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+          const oTotal = data.total || ordersArr.length;
+          const oLimit = 9;
+          setOrderPagination({ 
+            total: oTotal, 
+            currentPage: data.currentPage || 1, 
+            totalPages: data.totalPages || Math.ceil(oTotal / oLimit) || 1
+          });
         } else if (['categories', 'brands', 'styles', 'sizes', 'colors'].includes(tab)) {
           if (tab === 'categories') setCategories(data.categories || []);
           else if (tab === 'brands') setBrands(data.brands || []);
