@@ -9,7 +9,7 @@ async function getHomeData() {
   try {
     const [newRes, topRes] = await Promise.all([
       fetch(`${API_BASE_URL}/api/products?sortBy=newest`, { cache: 'no-store' }),
-      fetch(`${API_BASE_URL}/api/products/top-selling`, { cache: 'no-store' })
+      fetch(`${API_BASE_URL}/api/products/top-selling?sortBy=oldest`, { cache: 'no-store' })
     ]);
 
     const newData = newRes.ok ? await newRes.json() : { products: [] };
