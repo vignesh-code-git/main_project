@@ -9,6 +9,7 @@ import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import './admin.css';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const { user: authUser, isAuthenticated } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
   const [userPagination, setUserPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
