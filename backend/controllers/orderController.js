@@ -145,7 +145,10 @@ exports.createOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.findAll({
+    const { page = 1, limit = 9 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { count, rows: orders } = await Order.findAndCountAll({
       where: { userId: req.params.userId },
       include: [
         {
@@ -159,12 +162,20 @@ exports.getUserOrders = async (req, res) => {
         },
         {
           model: Payment,
-          limit: 1 // Usually one primary payment per order
+          limit: 1
         }
       ],
-      order: [['createdAt', 'DESC']]
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']],
+      distinct: true
     });
-    res.json(orders);
+    res.json({
+      orders,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching orders' });
@@ -173,7 +184,10 @@ exports.getUserOrders = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.findAll({
+    const { page = 1, limit = 9 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { count, rows: orders } = await Order.findAndCountAll({
       include: [
         {
           model: OrderItem,
@@ -186,9 +200,17 @@ exports.getAllOrders = async (req, res) => {
         },
         User
       ],
-      order: [['createdAt', 'DESC']]
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']],
+      distinct: true
     });
-    res.json(orders);
+    res.json({
+      orders,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching all orders' });
@@ -226,15 +248,18 @@ exports.getOrderById = async (req, res) => {
 exports.getSellerOrders = async (req, res) => {
   try {
     const { sellerId } = req.params;
-    console.log('Fetching orders for sellerId:', sellerId);
+    const { page = 1, limit = 9 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    const orders = await Order.findAll({
+    const { count, rows: orders } = await Order.findAndCountAll({
       include: [
         {
           model: OrderItem,
+          required: true,
           include: [
             {
               model: Product,
+              required: true,
               where: { sellerId: sellerId },
               include: [{ model: ProductImage, as: 'images' }]
             }
@@ -242,15 +267,18 @@ exports.getSellerOrders = async (req, res) => {
         },
         User
       ],
-      order: [['createdAt', 'DESC']]
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']],
+      distinct: true
     });
 
-    // Filter out orders that don't have any items for this seller 
-    // (though the JOIN should have done this, sometimes associations are tricky)
-    const filteredOrders = orders.filter(order => order.OrderItems && order.OrderItems.length > 0);
-
-    console.log(`Found ${filteredOrders.length} orders for seller`);
-    res.json(filteredOrders);
+    res.json({
+      orders,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (error) {
     console.error('getSellerOrders Error:', error);
     res.status(500).json({ message: 'Error fetching seller orders' });

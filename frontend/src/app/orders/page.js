@@ -11,6 +11,7 @@ import { addItemToCart } from '@/lib/redux/slices/cartSlice';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import SuccessModal from '@/components/SuccessModal/SuccessModal';
 import OrderActionModal from '@/components/OrderActionModal/OrderActionModal';
+import Pagination from '@/components/Pagination/Pagination';
 import './orders-page.css';
 
 export default function OrdersPage() {
@@ -20,6 +21,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [pagination, setPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,19 +35,27 @@ export default function OrdersPage() {
   useEffect(() => {
     if (mounted) {
       if (isAuthenticated && user?.id) {
-        fetchOrders();
+        fetchOrders(pagination.currentPage);
       } else if (!isAuthenticated) {
         setLoading(false);
       }
     }
-  }, [mounted, isAuthenticated, user?.id]);
+  }, [mounted, isAuthenticated, user?.id, pagination.currentPage]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/orders/user/${user.id}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/orders/user/${user.id}?page=${page}&limit=9`, {
         headers: getAuthHeaders()
       });
-      setOrders(response.data);
+      const data = response.data;
+      setOrders(data.orders || (Array.isArray(data) ? data : []));
+      if (data.totalPages) {
+        setPagination({
+          total: data.total || 0,
+          currentPage: data.currentPage || 1,
+          totalPages: data.totalPages || 1
+        });
+      }
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -128,9 +138,18 @@ export default function OrdersPage() {
 
   return (
     <div className="container orders-page">
-      <header className="orders-header">
-        <h1 className="orders-title">MY ORDERS</h1>
-        <p className="orders-subtitle">Manage and track your recent orders</p>
+      <header className="orders-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div>
+          <h1 className="orders-title">MY ORDERS</h1>
+          <p className="orders-subtitle">Manage and track your recent orders</p>
+        </div>
+        {pagination.totalPages > 1 && (
+          <Pagination 
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={(page) => setPagination(prev => ({ ...prev, currentPage: page }))}
+          />
+        )}
       </header>
 
       {orders.length === 0 ? (
