@@ -364,7 +364,8 @@
     width: 100%;
   }
 
-  .stylish-upload-btn, .download-csv-btn {
+  .stylish-upload-btn,
+  .download-csv-btn {
     width: 100% !important;
     justify-content: center !important;
     text-align: center;
@@ -709,9 +710,10 @@
   width: 100%;
   background: #fff !important;
   font-size: 14px !important;
-  padding: 12px 55px 12px 16px !important; /* Increased right padding for button gap */
+  padding: 12px 55px 12px 16px !important;
+  /* Increased right padding for button gap */
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   flex: 1;
   white-space: nowrap;
@@ -721,10 +723,12 @@
 
 .remove-detail-btn {
   position: absolute;
-  right: 8px; /* Slightly closer to edge for better internal gap */
+  right: 8px;
+  /* Slightly closer to edge for better internal gap */
   top: 50%;
   transform: translateY(-50%);
-  background: #fff; /* Solid background to prevent text overlap */
+  background: #fff;
+  /* Solid background to prevent text overlap */
   border: none;
   color: #000;
   font-size: 22px;
@@ -737,7 +741,8 @@
   justify-content: center;
   font-weight: 300;
   z-index: 5;
-  border-radius: 50%; /* Rounded background for the X */
+  border-radius: 50%;
+  /* Rounded background for the X */
 }
 
 
@@ -773,7 +778,6 @@
 
 .remove-detail-btn:hover {
   color: #555;
-  transform: scale(1.1);
 }
 
 
@@ -816,7 +820,7 @@
   .status-toggle-group:last-child {
     grid-column: span 2;
     padding-top: 10px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
   }
 
   .toggle-label {
@@ -1412,7 +1416,8 @@ input:checked+.slider:before {
 }
 
 .final-create-btn {
-  flex: 1 !important; /* Fill the remaining right-side gap on desktop */
+  flex: 1 !important;
+  /* Fill the remaining right-side gap on desktop */
   width: auto !important;
   padding: 12px 32px !important;
   background: #000 !important;
@@ -1435,8 +1440,10 @@ input:checked+.slider:before {
     gap: 12px !important;
   }
 
-  .preview-btn, .final-create-btn {
-    width: 100% !important; /* Uniform full width on mobile */
+  .preview-btn,
+  .final-create-btn {
+    width: 100% !important;
+    /* Uniform full width on mobile */
     min-width: unset !important;
   }
 }
