@@ -300,6 +300,18 @@
   display: none;
 }
 
+.mobile-dashboard-trigger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  transition: transform 0.2s;
+}
+
+.mobile-dashboard-trigger:active {
+  transform: scale(0.9);
+}
+
 @media (max-width: 1200px) {
   .nav-links {
     gap: 12px;
@@ -532,6 +544,10 @@
     display: block;
   }
 
+  .mobile-dashboard-trigger {
+    display: flex;
+  }
+
   /* Compact right-aligned dropdown on tablet & mobile */
   .user-dropdown-menu {
     left: auto;
@@ -564,7 +580,7 @@
   }
 
   .nav-icons {
-    gap: 10px;
+    gap: 12px;
   }
 
   .user-name-text {

@@ -410,6 +410,16 @@ export default function Navbar() {
                 <Search size={24} />
               </button>
 
+              {mounted && isAuthenticated && (user?.role === 'admin' || user?.role === 'seller') && (
+                <Link
+                  href={user.role === 'admin' ? '/admin/dashboard' : '/seller/dashboard'}
+                  className="mobile-dashboard-trigger mobile-only"
+                  title={user.role === 'admin' ? 'Admin Panel' : 'Seller Panel'}
+                >
+                  <LayoutDashboard size={24} />
+                </Link>
+              )}
+
               <Link href="/cart" className="cart-icon" title="View Cart">
                 <ShoppingCart size={24} />
                 {cartItemsCount > 0 && <span className="cart-badge">{cartItemsCount}</span>}
