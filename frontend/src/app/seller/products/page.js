@@ -206,6 +206,17 @@ export default function InventoryManagementPage() {
             </div>
           ) : productsToDisplay.length > 0 ? (
             <>
+              <div className="pagination-wrapper top">
+                <div className="pagination-info">
+                  Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, totalItems)} of {totalItems} products
+                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+
               <table className="products-table">
                 <thead>
                   <tr>
@@ -259,7 +270,7 @@ export default function InventoryManagementPage() {
                 </tbody>
               </table>
 
-              <div className="pagination-wrapper">
+              <div className="pagination-wrapper bottom">
                 <div className="pagination-info">
                   Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, totalItems)} of {totalItems} products
                 </div>

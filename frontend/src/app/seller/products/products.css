@@ -333,11 +333,21 @@
 }
 
 .pagination-wrapper {
-  padding: 4px 24px;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #fff;
+}
+
+.pagination-wrapper.top {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+}
+
+.pagination-wrapper.bottom {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 20px;
 }
 
 
