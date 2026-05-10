@@ -42,6 +42,7 @@ async function getCategoryData(id, searchParams) {
     if (searchParams.search) params.append('search', searchParams.search);
     if (searchParams.brand) params.append('brand', searchParams.brand);
     if (searchParams.page) params.append('page', searchParams.page);
+    params.append('limit', '9');
 
     const sortMap = {
       'Most Popular': 'popular',
