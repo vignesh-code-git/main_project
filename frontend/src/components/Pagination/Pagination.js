@@ -27,7 +27,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
   };
 
   return (
-    <div className="pg-main-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+    <div className="pg-main-container">
       <button 
         className="pg-nav-button" 
         onClick={() => onPageChange(current - 1)}
@@ -37,7 +37,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
         <span>Previous</span>
       </button>
 
-      <div className="pg-number-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div className="pg-number-group">
         {getPageNumbers().map((num, index) => (
           num === '...' ? (
             <span key={`dots-${index}`} className="pg-dots-item">...</span>

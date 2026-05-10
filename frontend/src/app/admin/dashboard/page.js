@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { API_BASE_URL, getAuthHeaders } from '@/config/api';
 import { X } from 'lucide-react';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
+import Pagination from '@/components/Pagination/Pagination';
 import './admin.css';
 
 export default function AdminDashboard() {
@@ -493,15 +494,11 @@ export default function AdminDashboard() {
               </div>
               {orderPagination.totalPages > 1 && (
                 <div className="admin-pagination-footer">
-                  <button 
-                    disabled={orderPagination.currentPage === 1}
-                    onClick={() => fetchData('orders', orderPagination.currentPage - 1)}
-                  >Previous</button>
-                  <span>Page {orderPagination.currentPage} of {orderPagination.totalPages}</span>
-                  <button 
-                    disabled={orderPagination.currentPage === orderPagination.totalPages}
-                    onClick={() => fetchData('orders', orderPagination.currentPage + 1)}
-                  >Next</button>
+                  <Pagination 
+                    currentPage={orderPagination.currentPage}
+                    totalPages={orderPagination.totalPages}
+                    onPageChange={(page) => fetchData('orders', page)}
+                  />
                 </div>
               )}
             </div>
@@ -545,15 +542,11 @@ export default function AdminDashboard() {
               </div>
               {productPagination.totalPages > 1 && (
                 <div className="admin-pagination-footer">
-                  <button 
-                    disabled={productPagination.currentPage === 1}
-                    onClick={() => fetchData('products', productPagination.currentPage - 1)}
-                  >Previous</button>
-                  <span>Page {productPagination.currentPage} of {productPagination.totalPages}</span>
-                  <button 
-                    disabled={productPagination.currentPage === productPagination.totalPages}
-                    onClick={() => fetchData('products', productPagination.currentPage + 1)}
-                  >Next</button>
+                  <Pagination 
+                    currentPage={productPagination.currentPage}
+                    totalPages={productPagination.totalPages}
+                    onPageChange={(page) => fetchData('products', page)}
+                  />
                 </div>
               )}
             </div>
@@ -682,15 +675,11 @@ export default function AdminDashboard() {
               </div>
               {assetPagination.totalPages > 1 && (
                 <div className="admin-pagination-footer">
-                  <button 
-                    disabled={assetPagination.currentPage === 1}
-                    onClick={() => fetchData(assetTab, assetPagination.currentPage - 1)}
-                  >Previous</button>
-                  <span>Page {assetPagination.currentPage} of {assetPagination.totalPages}</span>
-                  <button 
-                    disabled={assetPagination.currentPage === assetPagination.totalPages}
-                    onClick={() => fetchData(assetTab, assetPagination.currentPage + 1)}
-                  >Next</button>
+                  <Pagination 
+                    currentPage={assetPagination.currentPage}
+                    totalPages={assetPagination.totalPages}
+                    onPageChange={(page) => fetchData(assetTab, page)}
+                  />
                 </div>
               )}
             </div>
@@ -732,15 +721,11 @@ export default function AdminDashboard() {
               </div>
               {sellerPagination.totalPages > 1 && (
                 <div className="admin-pagination-footer">
-                  <button 
-                    disabled={sellerPagination.currentPage === 1}
-                    onClick={() => fetchData('sellers', sellerPagination.currentPage - 1)}
-                  >Previous</button>
-                  <span>Page {sellerPagination.currentPage} of {sellerPagination.totalPages}</span>
-                  <button 
-                    disabled={sellerPagination.currentPage === sellerPagination.totalPages}
-                    onClick={() => fetchData('sellers', sellerPagination.currentPage + 1)}
-                  >Next</button>
+                  <Pagination 
+                    currentPage={sellerPagination.currentPage}
+                    totalPages={sellerPagination.totalPages}
+                    onPageChange={(page) => fetchData('sellers', page)}
+                  />
                 </div>
               )}
             </div>
@@ -782,15 +767,11 @@ export default function AdminDashboard() {
               </div>
               {userPagination.totalPages > 1 && (
                 <div className="admin-pagination-footer">
-                  <button 
-                    disabled={userPagination.currentPage === 1}
-                    onClick={() => fetchData('customers', userPagination.currentPage - 1)}
-                  >Previous</button>
-                  <span>Page {userPagination.currentPage} of {userPagination.totalPages}</span>
-                  <button 
-                    disabled={userPagination.currentPage === userPagination.totalPages}
-                    onClick={() => fetchData('customers', userPagination.currentPage + 1)}
-                  >Next</button>
+                  <Pagination 
+                    currentPage={userPagination.currentPage}
+                    totalPages={userPagination.totalPages}
+                    onPageChange={(page) => fetchData('customers', page)}
+                  />
                 </div>
               )}
             </div>

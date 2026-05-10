@@ -977,37 +977,15 @@ tr:hover td {
 
 .admin-pagination-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  gap: 20px;
-  padding: 30px;
+  padding: 24px 30px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.5);
+  background: #fff;
 }
 
-.admin-pagination-footer button {
-  padding: 10px 24px;
-  border: 1px solid #000;
-  background: transparent;
-  color: #000;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
 
-.admin-pagination-footer button:hover:not(:disabled) {
-  background: #000;
-  color: #fff;
-}
 
-.admin-pagination-footer button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  border-color: #ccc;
-}
 
 .admin-pagination-footer span {
   font-weight: 600;

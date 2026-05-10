@@ -4,7 +4,7 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size, sortBy, page = 1, limit = 9 } = req.query;
+    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size, sortBy, page = 1, limit = 10 } = req.query;
     const { Op } = require('sequelize');
     const offset = (parseInt(page) - 1) * parseInt(limit);
     let where = {};
