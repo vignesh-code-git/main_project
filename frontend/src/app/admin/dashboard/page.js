@@ -410,50 +410,52 @@ export default function AdminDashboard() {
             </header>
             <div className="admin-card-stylish">
               <h2>Master Order List</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Date</th>
-                    <th>Current Status</th>
-                    <th>Update Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allOrders.map(order => (
-                    <tr key={order.id}>
-                      <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
-                      <td>{order.User?.name}</td>
-                      <td>{order.OrderItems?.length} items</td>
-                      <td>₹{order.totalAmount}</td>
-                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <span className={`status-pill ${order.status.toLowerCase()}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td>
-                        <select
-                          className="status-dropdown-admin"
-                          value={order.status}
-                          onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Processing">Processing</option>
-                          <option value="Shipped">Shipped</option>
-                          <option value="Delivered">Delivered</option>
-                        </select>
-                      </td>
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Items</th>
+                      <th>Total</th>
+                      <th>Date</th>
+                      <th>Current Status</th>
+                      <th>Update Status</th>
                     </tr>
-                  ))}
-                  {allOrders.length === 0 && (
-                    <tr><td colSpan="7" style={{ textAlign: 'center', padding: '64px' }}>No orders found.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {allOrders.map(order => (
+                      <tr key={order.id}>
+                        <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
+                        <td>{order.User?.name}</td>
+                        <td>{order.OrderItems?.length} items</td>
+                        <td>₹{order.totalAmount}</td>
+                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <span className={`status-pill ${order.status.toLowerCase()}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td>
+                          <select
+                            className="status-dropdown-admin"
+                            value={order.status}
+                            onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                    {allOrders.length === 0 && (
+                      <tr><td colSpan="7" style={{ textAlign: 'center', padding: '64px' }}>No orders found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -466,31 +468,33 @@ export default function AdminDashboard() {
             </header>
             <div className="admin-card-stylish">
               <h2>Master Product List</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product Details</th>
-                    <th>Category</th>
-                    <th>Pricing</th>
-                    <th>Inventory</th>
-                    <th>Seller</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(products) && products.map(product => (
-                    <tr key={product.id || product._id}>
-                      <td style={{ fontWeight: '800' }}>{product.name}</td>
-                      <td>{product.Category?.name || 'General'}</td>
-                      <td>₹{product.price}</td>
-                      <td>{product.stock} units</td>
-                      <td>{product.User?.name || 'Platform'}</td>
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Product Details</th>
+                      <th>Category</th>
+                      <th>Pricing</th>
+                      <th>Inventory</th>
+                      <th>Seller</th>
                     </tr>
-                  ))}
-                  {(!Array.isArray(products) || products.length === 0) && (
-                    <tr><td colSpan="5" style={{ textAlign: 'center', padding: '64px' }}>Inventory is currently empty.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(products) && products.map(product => (
+                      <tr key={product.id || product._id}>
+                        <td style={{ fontWeight: '800' }}>{product.name}</td>
+                        <td>{product.Category?.name || 'General'}</td>
+                        <td>₹{product.price}</td>
+                        <td>{product.stock} units</td>
+                        <td>{product.User?.name || 'Platform'}</td>
+                      </tr>
+                    ))}
+                    {(!Array.isArray(products) || products.length === 0) && (
+                      <tr><td colSpan="5" style={{ textAlign: 'center', padding: '64px' }}>Inventory is currently empty.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -586,30 +590,32 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <table>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    {assetTab === 'colors' && <th>Preview</th>}
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(assetTab === 'categories' ? categories : assetTab === 'brands' ? brands : assetTab === 'styles' ? styles : assetTab === 'sizes' ? sizes : colors).map(item => (
-                    <tr key={item.id}>
-                      <td style={{ fontWeight: '800' }}>{item.name}</td>
-                      {assetTab === 'colors' && (
-                        <td>
-                          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: item.hexCode, border: '1px solid #ddd' }}></div>
-                        </td>
-                      )}
-                      <td>
-                        <button className="btn-delete-admin" onClick={() => handleDeleteAsset(assetTab, item.id, assetTab === 'categories' ? setCategories : assetTab === 'brands' ? setBrands : assetTab === 'styles' ? setStyles : assetTab === 'sizes' ? setSizes : setColors)}>DELETE</button>
-                      </td>
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      {assetTab === 'colors' && <th>Preview</th>}
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {(assetTab === 'categories' ? categories : assetTab === 'brands' ? brands : assetTab === 'styles' ? styles : assetTab === 'sizes' ? sizes : colors).map(item => (
+                      <tr key={item.id}>
+                        <td style={{ fontWeight: '800' }}>{item.name}</td>
+                        {assetTab === 'colors' && (
+                          <td>
+                            <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: item.hexCode, border: '1px solid #ddd' }}></div>
+                          </td>
+                        )}
+                        <td>
+                          <button className="btn-delete-admin" onClick={() => handleDeleteAsset(assetTab, item.id, assetTab === 'categories' ? setCategories : assetTab === 'brands' ? setBrands : assetTab === 'styles' ? setStyles : assetTab === 'sizes' ? setSizes : setColors)}>DELETE</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -622,29 +628,31 @@ export default function AdminDashboard() {
             </header>
             <div className="admin-card-stylish">
               <h2>Business Directory</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Store Identity</th>
-                    <th>Representative</th>
-                    <th>Contact Email</th>
-                    <th>Registration Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(sellers) && sellers.map(seller => (
-                    <tr key={seller.id || seller._id}>
-                      <td style={{ fontWeight: '800' }}>{seller.storeName || 'N/A'}</td>
-                      <td>{seller.name}</td>
-                      <td>{seller.email}</td>
-                      <td>{new Date(seller.createdAt).toLocaleDateString()}</td>
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Store Identity</th>
+                      <th>Representative</th>
+                      <th>Contact Email</th>
+                      <th>Registration Date</th>
                     </tr>
-                  ))}
-                  {(!Array.isArray(sellers) || sellers.length === 0) && (
-                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No sellers found.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(sellers) && sellers.map(seller => (
+                      <tr key={seller.id || seller._id}>
+                        <td style={{ fontWeight: '800' }}>{seller.storeName || 'N/A'}</td>
+                        <td>{seller.name}</td>
+                        <td>{seller.email}</td>
+                        <td>{new Date(seller.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                    {(!Array.isArray(sellers) || sellers.length === 0) && (
+                      <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No sellers found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
@@ -657,29 +665,31 @@ export default function AdminDashboard() {
             </header>
             <div className="admin-card-stylish">
               <h2>Customer List</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Account Name</th>
-                    <th>Email Address</th>
-                    <th>Account Type</th>
-                    <th>Member Since</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(users) && users.map(user => (
-                    <tr key={user.id || user._id}>
-                      <td style={{ fontWeight: '800' }}>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>Standard User</td>
-                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+              <div className="admin-table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Account Name</th>
+                      <th>Email Address</th>
+                      <th>Account Type</th>
+                      <th>Member Since</th>
                     </tr>
-                  ))}
-                  {(!Array.isArray(users) || users.length === 0) && (
-                    <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No users found.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Array.isArray(users) && users.map(user => (
+                      <tr key={user.id || user._id}>
+                        <td style={{ fontWeight: '800' }}>{user.name}</td>
+                        <td>{user.email}</td>
+                        <td>Standard User</td>
+                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                    {(!Array.isArray(users) || users.length === 0) && (
+                      <tr><td colSpan="4" style={{ textAlign: 'center', padding: '64px' }}>No users found.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}

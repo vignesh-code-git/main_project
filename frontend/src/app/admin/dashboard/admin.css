@@ -265,6 +265,13 @@
   margin-bottom: 40px;
 }
 
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 24px;
+}
+
 table {
   width: 100%;
   border-collapse: separate;
@@ -279,6 +286,7 @@ th {
   font-weight: 900;
   color: var(--admin-text-muted);
   border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 td {
@@ -287,6 +295,7 @@ td {
   font-weight: 600;
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 td:first-child {
@@ -299,6 +308,27 @@ td:last-child {
   border-right: 1px solid var(--border-color);
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .admin-table-wrapper {
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+    padding: 0 20px;
+  }
+
+  .admin-table-wrapper table {
+    min-width: 900px; /* Force horizontal scroll for better mobile visibility */
+  }
+
+  th:last-child, td:last-child {
+    padding-right: 64px !important; /* Visual gap on the right side when scrolled */
+  }
+
+  .admin-card-stylish {
+    padding: 32px 20px;
+  }
 }
 
 tr:hover td {
