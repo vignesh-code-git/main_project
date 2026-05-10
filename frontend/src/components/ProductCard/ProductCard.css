@@ -137,33 +137,46 @@
     margin-bottom: 10px;
   }
 
-
   .product-info h3 {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 4px;
   }
 
   .stars {
-    font-size: 14px;
+    font-size: 12px;
+    gap: 2px;
   }
 
   .rating-value {
-    font-size: 12px;
+    font-size: 10px;
   }
 
-  .current-price,
+  .current-price {
+    font-size: 16px;
+  }
+  
   .original-price {
-    font-size: 18px;
+    font-size: 14px;
   }
 
   .discount-badge {
-    padding: 4px 8px;
-    font-size: 10px;
+    padding: 2px 6px;
+    font-size: 9px;
   }
 
   .quick-add-btn {
     display: none !important;
-    /* Hide on mobile to match design */
+  }
+}
+
+@media (max-width: 380px) {
+  .product-price {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .current-price {
+    font-size: 15px;
   }
 }
 

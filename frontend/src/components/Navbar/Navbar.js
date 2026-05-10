@@ -601,7 +601,7 @@ export default function Navbar() {
                   className="mobile-dashboard-trigger mobile-only"
                   title={user.role === 'admin' ? 'Admin Panel' : 'Seller Panel'}
                 >
-                  <LayoutDashboard size={16} />
+                  <LayoutDashboard size={20} />
                 </Link>
               )}
             </div>
