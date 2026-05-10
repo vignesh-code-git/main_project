@@ -41,6 +41,7 @@ async function getCategoryData(id, searchParams) {
     if (searchParams.size) params.append('size', searchParams.size);
     if (searchParams.search) params.append('search', searchParams.search);
     if (searchParams.brand) params.append('brand', searchParams.brand);
+    if (searchParams.page) params.append('page', searchParams.page);
 
     const sortMap = {
       'Most Popular': 'popular',
@@ -56,26 +57,30 @@ async function getCategoryData(id, searchParams) {
 
     let products = [];
     let total = 0;
+    let totalPages = 1;
+    let currentPage = 1;
 
     if (prodData.products) {
       products = prodData.products;
       total = prodData.total || prodData.products.length;
+      totalPages = prodData.totalPages || 1;
+      currentPage = prodData.currentPage || 1;
     } else {
       products = Array.isArray(prodData) ? prodData : [];
       total = products.length;
     }
 
-    return { products, total, categoryName };
+    return { products, total, totalPages, currentPage, categoryName };
   } catch (err) {
     console.error("Failed to fetch category data:", err);
-    return { products: [], total: 0, categoryName: 'Category' };
+    return { products: [], total: 0, totalPages: 1, currentPage: 1, categoryName: 'Category' };
   }
 }
 
 export default async function CategoryPage({ params, searchParams }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  const { products, total, categoryName } = await getCategoryData(resolvedParams.id, resolvedSearchParams);
+  const { products, total, totalPages, currentPage, categoryName } = await getCategoryData(resolvedParams.id, resolvedSearchParams);
 
   return (
     <Suspense fallback={<div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading products...</div>}>
@@ -84,6 +89,8 @@ export default async function CategoryPage({ params, searchParams }) {
         categoryName={categoryName}
         initialProducts={products}
         initialTotal={total}
+        totalPages={totalPages}
+        currentPage={currentPage}
         searchParams={resolvedSearchParams}
       />
     </Suspense>

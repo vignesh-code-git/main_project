@@ -102,7 +102,7 @@
     transform: translateX(-50%) scale(0.95);
     width: 90%;
     max-width: 400px;
-    height: 72vh; /* Just a tiny bit shorter */
+    height: 68vh; /* Reduced height a bit more */
     background: #fff;
     z-index: 1000;
     opacity: 0;

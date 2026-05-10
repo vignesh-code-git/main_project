@@ -4,8 +4,9 @@ const csv = require('csv-parser');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size, sortBy } = req.query;
+    const { categoryId, onSale, sellerId, minPrice, maxPrice, color, style, search, brand, size, sortBy, page = 1, limit = 9 } = req.query;
     const { Op } = require('sequelize');
+    const offset = (parseInt(page) - 1) * parseInt(limit);
     let where = {};
 
     if (categoryId) where.categoryId = categoryId;
@@ -66,6 +67,8 @@ exports.getAllProducts = async (req, res) => {
     const { count, rows: products } = await Product.findAndCountAll({
       where,
       order,
+      limit: parseInt(limit),
+      offset: parseInt(offset),
       include: [
         {
           model: ProductImage,
@@ -75,9 +78,14 @@ exports.getAllProducts = async (req, res) => {
         },
         { model: Category }
       ],
-      distinct: true // To get accurate count with includes
+      distinct: true
     });
-    res.json({ products, total: count });
+    res.json({ 
+      products, 
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
