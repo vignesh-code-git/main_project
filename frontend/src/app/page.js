@@ -8,7 +8,7 @@ import { API_BASE_URL } from '@/config/api';
 async function getHomeData() {
   try {
     const [newRes, topRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/products?onSale=true&sortBy=oldest`, { cache: 'no-store' }),
+      fetch(`${API_BASE_URL}/api/products?sortBy=newest`, { cache: 'no-store' }),
       fetch(`${API_BASE_URL}/api/products/top-selling`, { cache: 'no-store' })
     ]);
 
