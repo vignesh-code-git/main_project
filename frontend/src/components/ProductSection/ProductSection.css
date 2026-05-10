@@ -56,10 +56,8 @@
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin-bottom: 20px;
-    padding: 0 4px; /* Subtle internal padding for better alignment */
   }
-
 }

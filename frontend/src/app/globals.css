@@ -107,6 +107,10 @@ p {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
   h1 {
     font-size: 36px;
   }
@@ -114,5 +118,11 @@ p {
   h2 {
     font-size: 32px;
     margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
   }
 }
