@@ -67,8 +67,8 @@ exports.getAllProducts = async (req, res) => {
       where,
       order,
       include: [
-        { 
-          model: ProductImage, 
+        {
+          model: ProductImage,
           as: 'images',
           separate: true,
           order: [['id', 'ASC']]
@@ -113,8 +113,8 @@ exports.getSellerProducts = async (req, res) => {
     const { count, rows: products } = await Product.findAndCountAll({
       where,
       include: [
-        { 
-          model: ProductImage, 
+        {
+          model: ProductImage,
           as: 'images',
           separate: true,
           order: [['id', 'ASC']]
@@ -173,12 +173,12 @@ exports.getNewArrivals = async (req, res) => {
       where,
       order: [['createdAt', 'DESC']],
       limit: 20,
-      include: [{ 
-          model: ProductImage, 
-          as: 'images',
-          separate: true,
-          order: [['id', 'ASC']]
-        }],
+      include: [{
+        model: ProductImage,
+        as: 'images',
+        separate: true,
+        order: [['id', 'ASC']]
+      }],
       distinct: true
     });
     console.log(`Found ${products.length} new arrivals.`);
@@ -220,12 +220,12 @@ exports.getTopSelling = async (req, res) => {
       where,
       order: [['rating', 'DESC']],
       limit: 20,
-      include: [{ 
-          model: ProductImage, 
-          as: 'images',
-          separate: true,
-          order: [['id', 'ASC']]
-        }],
+      include: [{
+        model: ProductImage,
+        as: 'images',
+        separate: true,
+        order: [['id', 'ASC']]
+      }],
       distinct: true
     });
     console.log(`Found ${products.length} top selling products.`);
@@ -346,8 +346,8 @@ exports.bulkUploadProducts = async (req, res) => {
             if (categoryId && isNaN(categoryId)) {
               const { Category } = require('../models/associations');
               const { Op } = require('sequelize');
-              const category = await Category.findOne({ 
-                where: { name: { [Op.iLike]: categoryId.trim() } } 
+              const category = await Category.findOne({
+                where: { name: { [Op.iLike]: categoryId.trim() } }
               });
               if (category) categoryId = category.id;
             }
@@ -394,7 +394,7 @@ exports.bulkUploadProducts = async (req, res) => {
               await ProductImage.destroy({ where: { productId: product.id } });
 
               const imageRecords = [];
-              
+
               // Advanced Format: "Red:/img1.jpg,/img2.jpg|Black:/img3.jpg"
               if (p.images.includes(':')) {
                 const colorGroups = p.images.split('|');
@@ -489,8 +489,8 @@ exports.exportProductsToCSV = async (req, res) => {
   try {
     const products = await Product.findAll({
       where: { sellerId: req.user.id },
-      include: [{ 
-        model: ProductImage, 
+      include: [{
+        model: ProductImage,
         as: 'images',
         separate: true,
         order: [['id', 'ASC']]
@@ -594,8 +594,8 @@ exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id, {
       include: [
-        { 
-          model: ProductImage, 
+        {
+          model: ProductImage,
           as: 'images',
           separate: true,
           order: [['id', 'ASC']]

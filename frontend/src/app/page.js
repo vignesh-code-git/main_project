@@ -32,17 +32,17 @@ export default async function Home() {
     <>
       <Hero />
       <BrandBanner />
-      <ProductSection 
-        title="NEW ARRIVALS" 
-        products={newArrivals} 
-        viewAllHref="/category/new-arrivals" 
-        loading={false} 
+      <ProductSection
+        title="NEW ARRIVALS"
+        products={newArrivals}
+        viewAllHref="/category/new-arrivals"
+        loading={false}
       />
-      <ProductSection 
-        title="TOP SELLING" 
-        products={topSelling} 
-        viewAllHref="/shop?popular=true" 
-        loading={false} 
+      <ProductSection
+        title="TOP SELLING"
+        products={topSelling}
+        viewAllHref="/shop?popular=true"
+        loading={false}
       />
       <DressStyleGallery />
       <Testimonials />

@@ -14,15 +14,18 @@ async function getCategoryData(id, searchParams) {
       categoryName = 'New Arrivals';
     } else if (id === 'top-selling') {
       endpoint = `${API_BASE_URL}/api/products/top-selling`;
+      params.append('sortBy', 'oldest');
       categoryName = 'Top Selling';
     } else if (id === 'on-sale') {
       params.append('onSale', 'true');
+      params.append('sortBy', 'oldest');
       categoryName = 'On Sale';
     } else if (styles.includes(id.toLowerCase())) {
       params.append('style', id.charAt(0).toUpperCase() + id.slice(1));
       categoryName = id.charAt(0).toUpperCase() + id.slice(1);
     } else {
       params.append('categoryId', id);
+      params.append('sortBy', 'oldest');
       // Fetch category details
       const catRes = await fetch(`${API_BASE_URL}/api/products/categories`);
       const catData = await catRes.json();
@@ -38,7 +41,7 @@ async function getCategoryData(id, searchParams) {
     if (searchParams.size) params.append('size', searchParams.size);
     if (searchParams.search) params.append('search', searchParams.search);
     if (searchParams.brand) params.append('brand', searchParams.brand);
-    
+
     const sortMap = {
       'Most Popular': 'popular',
       'Newest': 'newest',
@@ -50,7 +53,7 @@ async function getCategoryData(id, searchParams) {
 
     const prodRes = await fetch(`${endpoint}?${params.toString()}`, { cache: 'no-store' });
     const prodData = await prodRes.json();
-    
+
     let products = [];
     let total = 0;
 
@@ -75,8 +78,8 @@ export default async function CategoryPage({ params, searchParams }) {
   const { products, total, categoryName } = await getCategoryData(resolvedParams.id, resolvedSearchParams);
 
   return (
-    <Suspense fallback={<div className="container" style={{padding: '100px 0', textAlign: 'center'}}>Loading products...</div>}>
-      <CategoryPageContent 
+    <Suspense fallback={<div className="container" style={{ padding: '100px 0', textAlign: 'center' }}>Loading products...</div>}>
+      <CategoryPageContent
         id={resolvedParams.id}
         categoryName={categoryName}
         initialProducts={products}
