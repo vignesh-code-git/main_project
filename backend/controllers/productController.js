@@ -363,15 +363,9 @@ exports.bulkUploadProducts = async (req, res) => {
               // Clear existing images for the product first
               await ProductImage.destroy({ where: { productId: product.id } });
 
-              const imageLinks = p.images.split(',');
-              
-              // Try to associate images with the first color if available
-              const firstColor = productData.color ? productData.color.split(',')[0].trim() : null;
-              
               const imageRecords = imageLinks.map(url => ({
                 url: url.trim(),
-                productId: product.id,
-                color: firstColor // Associate images with the primary color from CSV
+                productId: product.id
               }));
               await ProductImage.bulkCreate(imageRecords);
             }

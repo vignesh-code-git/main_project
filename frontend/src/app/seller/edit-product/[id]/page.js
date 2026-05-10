@@ -320,7 +320,7 @@ export default function EditProductPage() {
                   <div 
                     className="color-indicator" 
                     style={{ 
-                      backgroundColor: colorsList.find(p => p.name === color)?.hexCode || '#808080' 
+                    backgroundColor: colorsList.find(p => p.name.toLowerCase() === color.toLowerCase())?.hexCode || '#808080' 
                     }}
                   ></div>
                   <span>{color} Gallery</span>
