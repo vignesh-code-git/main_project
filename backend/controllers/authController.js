@@ -1,4 +1,5 @@
 const { User, Notification } = require('../models/associations');
+const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -259,6 +260,16 @@ const deleteAccount = async (req, res) => {
     }
 
     // Perform deletion
+    // Manually handle actorId notifications since they might not be caught by standard cascade
+    await Notification.destroy({ 
+      where: { 
+        [Op.or]: [
+          { userId: user.id },
+          { actorId: user.id }
+        ]
+      } 
+    });
+
     await user.destroy();
 
     // Clear cookie

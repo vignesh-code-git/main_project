@@ -18,7 +18,7 @@ const Size = require('./Size');
 const Color = require('./Color');
 
 // Define associations
-User.hasMany(Product, { foreignKey: 'sellerId' });
+User.hasMany(Product, { foreignKey: 'sellerId', onDelete: 'CASCADE' });
 Product.belongsTo(User, { foreignKey: 'sellerId' });
 
 Category.hasMany(Product, { foreignKey: 'categoryId' });
@@ -27,50 +27,54 @@ Product.belongsTo(Category, { foreignKey: 'categoryId' });
 Product.hasMany(ProductImage, { as: 'images', foreignKey: 'productId' });
 ProductImage.belongsTo(Product, { foreignKey: 'productId' });
 
-User.hasMany(Review, { foreignKey: 'userId' });
+User.hasMany(Review, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Review.belongsTo(User, { foreignKey: 'userId' });
 
 Product.hasMany(Review, { foreignKey: 'productId' });
 Review.belongsTo(Product, { foreignKey: 'productId' });
 
-User.hasMany(Order, { foreignKey: 'userId' });
+User.hasMany(Order, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Order.belongsTo(User, { foreignKey: 'userId' });
 
-Order.hasMany(OrderItem, { foreignKey: 'orderId' });
+Order.hasMany(OrderItem, { foreignKey: 'orderId', onDelete: 'CASCADE' });
 OrderItem.belongsTo(Order, { foreignKey: 'orderId' });
 
 Product.hasMany(OrderItem, { foreignKey: 'productId' });
 OrderItem.belongsTo(Product, { foreignKey: 'productId' });
 
-User.hasMany(Notification, { foreignKey: 'userId' });
+// Notifications
+User.hasMany(Notification, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Notification.belongsTo(User, { foreignKey: 'userId' });
 
-User.hasMany(Address, { foreignKey: 'userId' });
+User.hasMany(Notification, { as: 'ActorNotifications', foreignKey: 'actorId', onDelete: 'CASCADE' });
+Notification.belongsTo(User, { as: 'Actor', foreignKey: 'actorId' });
+
+User.hasMany(Address, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Address.belongsTo(User, { foreignKey: 'userId' });
 
-User.hasMany(CartItem, { foreignKey: 'userId' });
+User.hasMany(CartItem, { foreignKey: 'userId', onDelete: 'CASCADE' });
 CartItem.belongsTo(User, { foreignKey: 'userId' });
 
 Product.hasMany(CartItem, { foreignKey: 'productId' });
 CartItem.belongsTo(Product, { foreignKey: 'productId' });
 
 // Payment Associations
-User.hasMany(Payment, { foreignKey: 'userId' });
+User.hasMany(Payment, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Payment.belongsTo(User, { foreignKey: 'userId' });
 
 Order.hasMany(Payment, { foreignKey: 'orderId' });
 Payment.belongsTo(Order, { foreignKey: 'orderId' });
 
 // Return Associations
-User.hasMany(Return, { foreignKey: 'userId' });
+User.hasMany(Return, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Return.belongsTo(User, { foreignKey: 'userId' });
 Order.hasMany(Return, { foreignKey: 'orderId' });
 Return.belongsTo(Order, { foreignKey: 'orderId' });
 
 // Feedback Associations
-User.hasMany(DeliveryFeedback, { foreignKey: 'userId' });
+User.hasMany(DeliveryFeedback, { foreignKey: 'userId', onDelete: 'CASCADE' });
 DeliveryFeedback.belongsTo(User, { foreignKey: 'userId' });
-Order.hasMany(DeliveryFeedback, { foreignKey: 'orderId' });
+Order.hasMany(DeliveryFeedback, { foreignKey: 'orderId', onDelete: 'CASCADE' });
 DeliveryFeedback.belongsTo(Order, { foreignKey: 'orderId' });
 
 module.exports = {
