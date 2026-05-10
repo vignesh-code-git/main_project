@@ -329,6 +329,34 @@ td:last-child {
   .admin-card-stylish {
     padding: 32px 20px;
   }
+
+  /* Professional Settings Mobile Adjustments */
+  .setting-row-professional {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .setting-actions-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .setting-preview-box {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16/9;
+  }
+
+  .upload-wrapper-professional {
+    width: 100%;
+  }
+
+  .upload-wrapper-professional .btn-upload-premium {
+    width: 100%;
+  }
 }
 
 tr:hover td {
@@ -821,6 +849,26 @@ tr:hover td {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .asset-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .admin-inline-form {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .admin-input-stylish {
+    max-width: none !important;
+    width: 100%;
+  }
 }
 
 .color-preview-wrapper-admin {
