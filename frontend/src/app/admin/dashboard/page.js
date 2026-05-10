@@ -492,12 +492,14 @@ export default function AdminDashboard() {
             <div className="admin-card-stylish">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2>Master Order List</h2>
-                {orderPagination.totalPages > 1 && (
-                  <Pagination 
-                    currentPage={orderPagination.currentPage}
-                    totalPages={orderPagination.totalPages}
-                    onPageChange={(page) => fetchData('orders', page)}
-                  />
+                {orderPagination.total > 0 && (
+                  <div style={{ minWidth: '300px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination 
+                      currentPage={orderPagination.currentPage}
+                      totalPages={orderPagination.totalPages}
+                      onPageChange={(page) => fetchData('orders', page)}
+                    />
+                  </div>
                 )}
               </div>
               <div className="admin-table-wrapper">
@@ -738,12 +740,14 @@ export default function AdminDashboard() {
             <div className="admin-card-stylish">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                 <h2>Business Directory</h2>
-                {sellerPagination.totalPages > 1 && (
-                  <Pagination 
-                    currentPage={sellerPagination.currentPage}
-                    totalPages={sellerPagination.totalPages}
-                    onPageChange={(page) => fetchData('sellers', page)}
-                  />
+                {sellerPagination.total > 0 && (
+                  <div style={{ minWidth: '300px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination 
+                      currentPage={sellerPagination.currentPage}
+                      totalPages={sellerPagination.totalPages}
+                      onPageChange={(page) => fetchData('sellers', page)}
+                    />
+                  </div>
                 )}
               </div>
               <div className="admin-table-wrapper">
