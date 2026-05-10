@@ -11,8 +11,11 @@ import './admin.css';
 export default function AdminDashboard() {
   const { user: authUser, isAuthenticated } = useSelector((state) => state.auth);
   const [users, setUsers] = useState([]);
+  const [userPagination, setUserPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
   const [sellers, setSellers] = useState([]);
+  const [sellerPagination, setSellerPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
   const [products, setProducts] = useState([]);
+  const [productPagination, setProductPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -28,58 +31,79 @@ export default function AdminDashboard() {
     const params = new URLSearchParams(window.location.search);
     params.set('tab', tab);
     router.push(`${window.location.pathname}?${params.toString()}`, { scroll: false });
+    fetchData(tab, 1);
   };
+
   const [allOrders, setAllOrders] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [styles, setStyles] = useState([]);
-  const [sizes, setSizes] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [newBrandName, setNewBrandName] = useState('');
-  const [newStyleName, setNewStyleName] = useState('');
-  const [newSizeName, setNewSizeName] = useState('');
-  const [newColor, setNewColor] = useState({ name: '', hexCode: '' });
-  const [assetTab, setAssetTab] = useState('categories');
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [orderPagination, setOrderPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
+  const [assetPagination, setAssetPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
 
-  // Delete Confirmation State
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteConfig, setDeleteConfig] = useState({
-    id: null,
-    type: '',
-    listSetter: null,
-    title: '',
-    message: ''
-  });
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-    if (!token) {
-      router.push('/auth/login');
-      return;
-    }
-
-    if (!isAuthenticated || (authUser && authUser.role !== 'admin')) {
-      // If we have a token but state hasn't caught up yet, wait a bit longer
-      const timer = setTimeout(() => {
-        if (!isAuthenticated && !localStorage.getItem('token')) {
-          router.push('/auth/login');
-        }
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-
-    const fetchData = async () => {
-      try {
-        const [usersRes, sellersRes, settingsRes, productsRes, ordersRes, catRes, brandRes, styleRes, sizeRes, colorRes] = await Promise.all([
+  const fetchData = async (tab = activeTab, page = 1) => {
+    try {
+      setLoading(true);
+      let endpoint = '';
+      if (tab === 'customers') endpoint = `${API_BASE_URL}/api/admin/users?page=${page}`;
+      else if (tab === 'sellers') endpoint = `${API_BASE_URL}/api/admin/sellers?page=${page}`;
+      else if (tab === 'products') endpoint = `${API_BASE_URL}/api/products?page=${page}`;
+      else if (tab === 'orders') endpoint = `${API_BASE_URL}/api/orders?page=${page}`;
+      else if (['categories', 'brands', 'styles', 'sizes', 'colors'].includes(tab)) endpoint = `${API_BASE_URL}/api/admin/${tab}?page=${page}`;
+      else if (tab === 'assets') {
+        // Default assets load (categories)
+        endpoint = `${API_BASE_URL}/api/admin/categories?page=${page}`;
+      }
+      else if (tab === 'dashboard') {
+        // Initial load for overview stats
+        const [u, s, p, o] = await Promise.all([
           fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/admin/sellers`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/admin/settings`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() })
+        ]);
+        const ud = await u.json();
+        const sd = await s.json();
+        const pd = await p.json();
+        const od = await o.json();
+        setUsers(ud.users || []);
+        setUserPagination({ total: ud.total, currentPage: ud.currentPage, totalPages: ud.totalPages });
+        setSellers(sd.sellers || []);
+        setSellerPagination({ total: sd.total, currentPage: sd.currentPage, totalPages: sd.totalPages });
+        setProducts(pd.products || []);
+        setProductPagination({ total: pd.total, currentPage: pd.currentPage, totalPages: pd.totalPages });
+        setAllOrders(od.orders || od);
+        setLoading(false);
+        return;
+      }
+
+      if (endpoint) {
+        const res = await fetch(endpoint, { headers: getAuthHeaders() });
+        const data = await res.json();
+        if (tab === 'customers') {
+          setUsers(data.users || []);
+          setUserPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+        } else if (tab === 'sellers') {
+          setSellers(data.sellers || []);
+          setSellerPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+        } else if (tab === 'products') {
+          setProducts(data.products || []);
+          setProductPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+        } else if (tab === 'orders') {
+          const ordersArr = Array.isArray(data) ? data : (data.orders || []);
+          setAllOrders(ordersArr);
+          if (data.totalPages) setOrderPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+        } else if (['categories', 'brands', 'styles', 'sizes', 'colors'].includes(tab)) {
+          if (tab === 'categories') setCategories(data.categories || []);
+          else if (tab === 'brands') setBrands(data.brands || []);
+          else if (tab === 'styles') setStyles(data.styles || []);
+          else if (tab === 'sizes') setSizes(data.sizes || []);
+          else if (tab === 'colors') setColors(data.colors || []);
+          setAssetPagination({ total: data.total, currentPage: data.currentPage, totalPages: data.totalPages });
+        }
+      }
+
+      // Always fetch assets/settings if needed or once
+      if (categories.length === 0) {
+        const [settingsRes, catRes, brandRes, styleRes, sizeRes, colorRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/admin/settings`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products/categories`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products/brands`, { headers: getAuthHeaders() }),
           fetch(`${API_BASE_URL}/api/products/styles`, { headers: getAuthHeaders() }),
@@ -87,33 +111,43 @@ export default function AdminDashboard() {
           fetch(`${API_BASE_URL}/api/products/colors`, { headers: getAuthHeaders() })
         ]);
 
-        const usersData = await usersRes.json();
-        const sellersData = await sellersRes.json();
         const settingsData = await settingsRes.json();
-        const productsData = await productsRes.json();
-        const ordersData = await ordersRes.json();
         const categoriesData = await catRes.json();
         const brandsData = await brandRes.json();
         const stylesData = await styleRes.json();
         const sizesData = await sizeRes.json();
         const colorsData = await colorRes.json();
 
-        setUsers(Array.isArray(usersData) ? usersData : []);
-        setSellers(Array.isArray(sellersData) ? sellersData : []);
         setSettings(Array.isArray(settingsData) ? settingsData : []);
-        setProducts(Array.isArray(productsData) ? productsData : (productsData.products || []));
-        setAllOrders(Array.isArray(ordersData) ? ordersData : []);
         setCategories(Array.isArray(categoriesData) ? categoriesData : []);
         setBrands(Array.isArray(brandsData) ? brandsData : []);
         setStyles(Array.isArray(stylesData) ? stylesData : []);
         setSizes(Array.isArray(sizesData) ? sizesData : []);
         setColors(Array.isArray(colorsData) ? colorsData : []);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching admin data:', error);
-        setLoading(false);
       }
-    };
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      router.push('/auth/login');
+      return;
+    }
+
+    if (!isAuthenticated || (authUser && authUser.role !== 'admin')) {
+      const timer = setTimeout(() => {
+        if (!isAuthenticated && !localStorage.getItem('token')) {
+          router.push('/auth/login');
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
 
     fetchData();
   }, [isAuthenticated, authUser, router]);
@@ -456,6 +490,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {orderPagination.totalPages > 1 && (
+                <div className="admin-pagination-footer">
+                  <button 
+                    disabled={orderPagination.currentPage === 1}
+                    onClick={() => fetchData('orders', orderPagination.currentPage - 1)}
+                  >Previous</button>
+                  <span>Page {orderPagination.currentPage} of {orderPagination.totalPages}</span>
+                  <button 
+                    disabled={orderPagination.currentPage === orderPagination.totalPages}
+                    onClick={() => fetchData('orders', orderPagination.currentPage + 1)}
+                  >Next</button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -495,6 +542,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {productPagination.totalPages > 1 && (
+                <div className="admin-pagination-footer">
+                  <button 
+                    disabled={productPagination.currentPage === 1}
+                    onClick={() => fetchData('products', productPagination.currentPage - 1)}
+                  >Previous</button>
+                  <span>Page {productPagination.currentPage} of {productPagination.totalPages}</span>
+                  <button 
+                    disabled={productPagination.currentPage === productPagination.totalPages}
+                    onClick={() => fetchData('products', productPagination.currentPage + 1)}
+                  >Next</button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -508,7 +568,10 @@ export default function AdminDashboard() {
 
             <nav className="asset-sub-tabs">
               {['categories', 'brands', 'styles', 'sizes', 'colors'].map(t => (
-                <div key={t} className={`asset-tab ${assetTab === t ? 'active' : ''}`} onClick={() => setAssetTab(t)}>
+                <div key={t} className={`asset-tab ${assetTab === t ? 'active' : ''}`} onClick={() => {
+                  setAssetTab(t);
+                  fetchData(t, 1);
+                }}>
                   {t.toUpperCase()}
                 </div>
               ))}
@@ -616,6 +679,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {assetPagination.totalPages > 1 && (
+                <div className="admin-pagination-footer">
+                  <button 
+                    disabled={assetPagination.currentPage === 1}
+                    onClick={() => fetchData(assetTab, assetPagination.currentPage - 1)}
+                  >Previous</button>
+                  <span>Page {assetPagination.currentPage} of {assetPagination.totalPages}</span>
+                  <button 
+                    disabled={assetPagination.currentPage === assetPagination.totalPages}
+                    onClick={() => fetchData(assetTab, assetPagination.currentPage + 1)}
+                  >Next</button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -653,6 +729,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {sellerPagination.totalPages > 1 && (
+                <div className="admin-pagination-footer">
+                  <button 
+                    disabled={sellerPagination.currentPage === 1}
+                    onClick={() => fetchData('sellers', sellerPagination.currentPage - 1)}
+                  >Previous</button>
+                  <span>Page {sellerPagination.currentPage} of {sellerPagination.totalPages}</span>
+                  <button 
+                    disabled={sellerPagination.currentPage === sellerPagination.totalPages}
+                    onClick={() => fetchData('sellers', sellerPagination.currentPage + 1)}
+                  >Next</button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -690,6 +779,19 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
+              {userPagination.totalPages > 1 && (
+                <div className="admin-pagination-footer">
+                  <button 
+                    disabled={userPagination.currentPage === 1}
+                    onClick={() => fetchData('customers', userPagination.currentPage - 1)}
+                  >Previous</button>
+                  <span>Page {userPagination.currentPage} of {userPagination.totalPages}</span>
+                  <button 
+                    disabled={userPagination.currentPage === userPagination.totalPages}
+                    onClick={() => fetchData('customers', userPagination.currentPage + 1)}
+                  >Next</button>
+                </div>
+              )}
             </div>
           </div>
         )}

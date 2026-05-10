@@ -5,26 +5,47 @@ const { User, Product, WebsiteSettings, Category, Notification, Brand, Style, Si
 // @access  Private/Admin
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll({
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    
+    const { count, rows: users } = await User.findAndCountAll({
       where: { role: 'customer' },
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']]
     });
-    res.json(users);
+    
+    res.json({
+      users,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Get all sellers
-// @route   GET /api/admin/sellers
-// @access  Private/Admin
 const getAllSellers = async (req, res) => {
   try {
-    const sellers = await User.findAll({
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    const { count, rows: sellers } = await User.findAndCountAll({
       where: { role: 'seller' },
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']]
     });
-    res.json(sellers);
+
+    res.json({
+      sellers,
+      total: count,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -135,6 +156,70 @@ const deleteCategory = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
+};
+
+const getCategories = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows: categories } = await Category.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['name', 'ASC']]
+    });
+    res.json({ categories, total: count, totalPages: Math.ceil(count / limit), currentPage: parseInt(page) });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const getBrands = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows: brands } = await Brand.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['name', 'ASC']]
+    });
+    res.json({ brands, total: count, totalPages: Math.ceil(count / limit), currentPage: parseInt(page) });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const getStyles = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows: styles } = await Style.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['name', 'ASC']]
+    });
+    res.json({ styles, total: count, totalPages: Math.ceil(count / limit), currentPage: parseInt(page) });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const getSizes = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows: sizes } = await Size.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+    res.json({ sizes, total: count, totalPages: Math.ceil(count / limit), currentPage: parseInt(page) });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+const getColors = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { count, rows: colors } = await Color.findAndCountAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['name', 'ASC']]
+    });
+    res.json({ colors, total: count, totalPages: Math.ceil(count / limit), currentPage: parseInt(page) });
+  } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
 // --- Brand Management ---
