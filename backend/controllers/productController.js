@@ -321,13 +321,24 @@ exports.bulkUploadProducts = async (req, res) => {
               }
             }
 
+            // Resolve category (supports both ID and Name)
+            let categoryId = p.categoryId;
+            if (categoryId && isNaN(categoryId)) {
+              const { Category } = require('../models/associations');
+              const { Op } = require('sequelize');
+              const category = await Category.findOne({ 
+                where: { name: { [Op.iLike]: categoryId.trim() } } 
+              });
+              if (category) categoryId = category.id;
+            }
+
             const productData = {
               name: p.name,
               price: p.price,
               originalPrice: p.originalPrice || null,
               rating: p.rating || 5,
               description: p.description,
-              categoryId: p.categoryId,
+              categoryId: categoryId,
               brand: p.brand,
               style: p.style || 'Casual',
               color: p.color || 'Black',

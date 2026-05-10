@@ -84,7 +84,7 @@ export default function ProductCard({ product, priority = false, activeColors = 
                   className={`card-color-dot ${isSelected ? 'selected' : ''}`}
                   title={colorName}
                   style={{
-                    backgroundColor: colorName.toLowerCase(),
+                    backgroundColor: colorName.toLowerCase().replace(/\s+/g, ''),
                     border: colorName.toLowerCase() === 'white' ? '1px solid #ddd' : 'none'
                   }}
                 ></span>
