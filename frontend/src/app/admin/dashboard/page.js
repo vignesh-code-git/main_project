@@ -21,6 +21,7 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [assetTab, setAssetTab] = useState('categories');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -39,6 +40,29 @@ export default function AdminDashboard() {
   const [allOrders, setAllOrders] = useState([]);
   const [orderPagination, setOrderPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
   const [assetPagination, setAssetPagination] = useState({ total: 0, currentPage: 1, totalPages: 1 });
+
+  // Missing State Restored
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [styles, setStyles] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newStyleName, setNewStyleName] = useState('');
+  const [newSizeName, setNewSizeName] = useState('');
+  const [newColor, setNewColor] = useState({ name: '', hexCode: '' });
+  
+  const [toast, setToast] = useState({ show: false, message: '' });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfig, setDeleteConfig] = useState({ 
+    id: null, 
+    type: '', 
+    listSetter: null, 
+    title: '', 
+    message: '' 
+  });
 
   const fetchData = async (tab = activeTab, page = 1) => {
     try {
