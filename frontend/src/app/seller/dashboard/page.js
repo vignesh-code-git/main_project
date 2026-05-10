@@ -366,21 +366,23 @@ export default function SellerDashboard() {
 
           {activeTab === 'inventory' && (
             <div className="inventory-section">
-              <div className="section-header-row">
-                <h2>Inventory Management</h2>
-                <button 
-                  onClick={handleExport} 
-                  className="dashboard-export-btn"
-                  disabled={isExporting}
-                >
-                  <Download size={16} /> {isExporting ? 'Exporting...' : 'Export CSV'}
-                </button>
-              </div>
-              <div className="product-table-container">
+              <div className="section-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <h2>Inventory Management</h2>
+                  <button 
+                    onClick={handleExport} 
+                    className="dashboard-export-btn"
+                    disabled={isExporting}
+                    style={{ margin: 0 }}
+                  >
+                    <Download size={16} /> {isExporting ? 'Exporting...' : 'Export CSV'}
+                  </button>
+                </div>
+
                 {productPagination.totalPages > 1 && (
-                  <div className="pagination-wrapper top">
-                    <div className="pagination-info">
-                      Showing {((productPagination.currentPage - 1) * 10) + 1} to {Math.min(productPagination.currentPage * 10, productPagination.total)} of {productPagination.total} products
+                  <div className="pagination-wrapper top" style={{ border: 'none', padding: 0, margin: 0 }}>
+                    <div className="pagination-info" style={{ marginRight: '15px', color: 'var(--text-muted)', fontSize: '14px' }}>
+                      Showing {((productPagination.currentPage - 1) * 9) + 1} to {Math.min(productPagination.currentPage * 9, productPagination.total)} of {productPagination.total} products
                     </div>
                     <Pagination 
                       currentPage={productPagination.currentPage}
@@ -389,6 +391,8 @@ export default function SellerDashboard() {
                     />
                   </div>
                 )}
+              </div>
+              <div className="product-table-container">
 
                 <table className="product-table">
                   <thead>
@@ -452,7 +456,16 @@ export default function SellerDashboard() {
 
           {activeTab === 'orders' && (
             <div className="orders-section">
-              <h2>Order Fulfillment</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2>Order Fulfillment</h2>
+                {orderPagination.totalPages > 1 && (
+                  <Pagination 
+                    currentPage={orderPagination.currentPage}
+                    totalPages={orderPagination.totalPages}
+                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
+                  />
+                )}
+              </div>
               <div className="product-table-container">
                 <table className="product-table">
                   <thead>

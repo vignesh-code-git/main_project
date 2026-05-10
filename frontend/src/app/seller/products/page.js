@@ -206,9 +206,9 @@ export default function InventoryManagementPage() {
             </div>
           ) : productsToDisplay.length > 0 ? (
             <>
-              <div className="pagination-wrapper top">
-                <div className="pagination-info">
-                  Showing {((currentPage - 1) * 10) + 1} to {Math.min(currentPage * 10, totalItems)} of {totalItems} products
+              <div className="pagination-wrapper top" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '15px' }}>
+                <div className="pagination-info" style={{ marginRight: '15px' }}>
+                  Showing {((currentPage - 1) * 9) + 1} to {Math.min(currentPage * 9, totalItems)} of {totalItems} products
                 </div>
                 <Pagination
                   currentPage={currentPage}
