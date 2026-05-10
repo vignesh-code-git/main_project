@@ -310,54 +310,7 @@ td:last-child {
   border-bottom-right-radius: 8px;
 }
 
-@media (max-width: 768px) {
-  .admin-table-wrapper {
-    margin-left: -20px;
-    margin-right: -20px;
-    width: calc(100% + 40px);
-    padding: 0 20px;
-  }
 
-  .admin-table-wrapper table {
-    min-width: 900px; /* Force horizontal scroll for better mobile visibility */
-  }
-
-  th:last-child, td:last-child {
-    padding-right: 64px !important; /* Visual gap on the right side when scrolled */
-  }
-
-  .admin-card-stylish {
-    padding: 32px 20px;
-  }
-
-  /* Professional Settings Mobile Adjustments */
-  .setting-row-professional {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    padding: 24px;
-  }
-
-  .setting-actions-right {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    width: 100%;
-  }
-
-  .setting-preview-box {
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 16/9;
-  }
-
-  .upload-wrapper-professional {
-    width: 100%;
-  }
-
-  .upload-wrapper-professional .btn-upload-premium {
-    width: 100%;
-  }
-}
 
 tr:hover td {
   background: #FAFAFA;
@@ -493,7 +446,8 @@ tr:hover td {
 }
 
 .btn-upload-premium {
-  padding: 12px 24px;
+  height: 56px;
+  padding: 0 32px;
   background: #000;
   color: #FFF;
   border: none;
@@ -774,7 +728,7 @@ tr:hover td {
 
 .admin-input-stylish {
   flex: 1;
-  height: 48px;
+  height: 56px;
   padding: 0 20px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -941,4 +895,62 @@ tr:hover td {
   font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+/* 
+   FINAL MOBILE OVERRIDES 
+   Placed at the end to ensure they win the CSS cascade.
+*/
+@media (max-width: 768px) {
+  .admin-table-wrapper {
+    margin-left: -20px;
+    margin-right: -20px;
+    width: calc(100% + 40px);
+    padding: 0 20px;
+  }
+
+  .admin-table-wrapper table {
+    min-width: 900px;
+  }
+
+  th:last-child, td:last-child {
+    padding-right: 64px !important;
+  }
+
+  .admin-card-stylish {
+    padding: 32px 20px;
+  }
+
+  /* Web Settings Vertical Order Fix */
+  .setting-row-professional {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 32px;
+    padding: 32px 24px;
+  }
+
+  .setting-actions-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    width: 100%;
+  }
+
+  .setting-preview-box {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16/9;
+    order: 1; /* Ensure Image is after text */
+  }
+
+  .upload-wrapper-professional {
+    width: 100%;
+    order: 2; /* Ensure Button is last */
+  }
+
+  .upload-wrapper-professional .btn-upload-premium {
+    width: 100%;
+  }
 }
