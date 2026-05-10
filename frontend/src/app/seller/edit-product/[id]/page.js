@@ -67,7 +67,7 @@ export default function EditProductPage() {
           categoryId: productData.categoryId,
           style: productData.style || '',
           brand: productData.brand || '',
-          colors: productData.color ? productData.color.split(',') : ['Black'],
+          colors: productData.color ? productData.color.split(',').map(c => c.trim()) : ['Black'],
           sizes: productData.size ? productData.size.split(',').map(s => s.trim()) : [],
         });
         
@@ -362,7 +362,16 @@ export default function EditProductPage() {
                   {/* Show existing images for this color */}
                   <div className="existing-images-grid">
                     {existingImages
-                      .filter(img => img.color === color || (!img.color && color === 'Black' && existingImages.length === 1))
+                      .filter(img => {
+                        // 1. Direct match with current gallery color
+                        if (img.color === color) return true;
+                        
+                        // 2. Fallback: If image has NO color, show it in the FIRST color's gallery
+                        // This handles bulk-uploaded images or legacy data
+                        if (!img.color && formData.colors[0] === color) return true;
+                        
+                        return false;
+                      })
                       .map((img, idx) => (
                         <div key={idx} className="preview-item existing-file">
                           <img src={resolveImageUrl(img.url)} alt="existing" />
