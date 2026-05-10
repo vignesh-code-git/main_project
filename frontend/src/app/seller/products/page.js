@@ -74,7 +74,7 @@ export default function InventoryManagementPage() {
       const response = await axios.get(`${API_BASE_URL}/api/products/seller/my-products`, {
         params: {
           page: currentPage,
-          limit: 10,
+          limit: 9,
           search: debouncedSearch,
           sortBy: sortBy,
           status: filterStatus

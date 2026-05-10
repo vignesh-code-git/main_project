@@ -97,7 +97,7 @@ export default function SellerDashboard() {
 
   const fetchSellerProducts = async (sellerId, page = 1) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/products/seller/my-products?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/products/seller/my-products?page=${page}&limit=9`, {
         headers: getAuthHeaders()
       });
       const data = await res.json();
@@ -114,12 +114,11 @@ export default function SellerDashboard() {
 
   const fetchSellerOrders = async (sellerId, page = 1) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}?page=${page}&limit=10`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/seller?page=${page}&limit=9`, {
         headers: getAuthHeaders()
       });
       const data = await res.json();
-      const ordersData = Array.isArray(data) ? data : (data.orders || []);
-      setOrders(ordersData);
+      setOrders(data.orders || (Array.isArray(data) ? data : []));
       if (data.totalPages) {
         setOrderPagination({
           total: data.total || 0,
@@ -128,7 +127,7 @@ export default function SellerDashboard() {
         });
       }
     } catch (err) {
-      console.error("Failed to fetch orders:", err);
+      console.error("Failed to fetch seller orders:", err);
     } finally {
       setLoading(false);
     }

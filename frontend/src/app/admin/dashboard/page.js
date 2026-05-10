@@ -68,22 +68,22 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       let endpoint = '';
-      if (tab === 'customers') endpoint = `${API_BASE_URL}/api/admin/users?page=${page}`;
-      else if (tab === 'sellers') endpoint = `${API_BASE_URL}/api/admin/sellers?page=${page}`;
-      else if (tab === 'products') endpoint = `${API_BASE_URL}/api/products?page=${page}`;
-      else if (tab === 'orders') endpoint = `${API_BASE_URL}/api/orders?page=${page}`;
-      else if (['categories', 'brands', 'styles', 'sizes', 'colors'].includes(tab)) endpoint = `${API_BASE_URL}/api/admin/${tab}?page=${page}`;
+      if (tab === 'customers') endpoint = `${API_BASE_URL}/api/admin/users?page=${page}&limit=9`;
+      else if (tab === 'sellers') endpoint = `${API_BASE_URL}/api/admin/sellers?page=${page}&limit=9`;
+      else if (tab === 'products') endpoint = `${API_BASE_URL}/api/products?page=${page}&limit=9`;
+      else if (tab === 'orders') endpoint = `${API_BASE_URL}/api/orders?page=${page}&limit=9`;
+      else if (['categories', 'brands', 'styles', 'sizes', 'colors'].includes(tab)) endpoint = `${API_BASE_URL}/api/admin/${tab}?page=${page}&limit=9`;
       else if (tab === 'assets') {
         // Default assets load (categories)
-        endpoint = `${API_BASE_URL}/api/admin/categories?page=${page}`;
+        endpoint = `${API_BASE_URL}/api/admin/categories?page=${page}&limit=9`;
       }
       else if (tab === 'dashboard') {
         // Initial load for overview stats
         const [u, s, p, o] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/admin/users`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/admin/sellers`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/products`, { headers: getAuthHeaders() }),
-          fetch(`${API_BASE_URL}/api/orders`, { headers: getAuthHeaders() })
+          fetch(`${API_BASE_URL}/api/admin/users?limit=9`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/admin/sellers?limit=9`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/products?limit=9`, { headers: getAuthHeaders() }),
+          fetch(`${API_BASE_URL}/api/orders?limit=9`, { headers: getAuthHeaders() })
         ]);
         const ud = await u.json();
         const sd = await s.json();
