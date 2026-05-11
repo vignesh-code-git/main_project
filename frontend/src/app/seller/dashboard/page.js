@@ -499,19 +499,6 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
-              
-              {orderPagination.total > 0 && (
-                <div className="pagination-wrapper bottom" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div className="pagination-info" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-                    Showing {((orderPagination.currentPage - 1) * 9) + 1} to {Math.min(orderPagination.currentPage * 9, orderPagination.total)} of {orderPagination.total} orders
-                  </div>
-                  <Pagination 
-                    currentPage={orderPagination.currentPage}
-                    totalPages={orderPagination.totalPages}
-                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
-                  />
-                </div>
-              )}
             </div>
           )}
 

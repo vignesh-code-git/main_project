@@ -62,16 +62,24 @@
   border-radius: 0 0 20px 20px;
   list-style: none;
   padding: 8px 0;
-  max-height: 250px;
+  max-height: none; /* Show all options without scrolling */
   overflow-y: auto;
   z-index: 1000;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
   animation: slideDown 0.2s ease-out;
+  
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-select-options::-webkit-scrollbar {
+  display: none;
 }
 
 .custom-select-option {
