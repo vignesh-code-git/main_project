@@ -101,22 +101,107 @@
   }
   
   .shop-sidebar {
-    display: none; /* Hide sidebar on mobile to match Category page behavior */
+    position: fixed;
+    top: 150px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    width: 90%;
+    max-width: 400px;
+    height: 68vh;
+    background: #fff;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    display: flex !important;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
   }
 
-  .shop-products-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .sidebar {
+    padding: 24px 6px 24px 24px;
+    height: 100%;
+  }
+
+  .shop-sidebar.mobile-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+  }
+
+  .mobile-filter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
+
+  .shop-page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .mobile-filter-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
   }
 }
 
-@media (max-width: 480px) {
+@media (min-width: 1025px) {
+  .mobile-filter-trigger,
+  .mobile-filter-overlay {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .shop-products-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding-top: 24px;
+  }
+
   .shop-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
   }
 
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .shop-sort-wrapper {
+    flex: 1;
+  }
+
+  .shop-header h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
   .shop-products-grid {
-    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .shop-page {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }

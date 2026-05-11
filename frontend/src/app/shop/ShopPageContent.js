@@ -15,11 +15,13 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
   const [products, setProducts] = useState(initialProducts || []);
   const [loading, setLoading] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.sortBy || 'Most Popular');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Update products when initialProducts change (from server)
   useEffect(() => {
     setProducts(initialProducts);
     setLoading(false);
+    setIsFilterOpen(false); // Close filter on apply/navigation
   }, [initialProducts]);
 
   const handleApplyFilter = (newFilters) => {
@@ -31,7 +33,7 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
     let hasFilters = false;
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        // For price, only append if it deviates from the 0-500 range
+        // For price, only append if it deviates from the 0-10000 range
         if (key === 'minPrice' && parseInt(value) === 0) return;
         if (key === 'maxPrice' && parseInt(value) === 10000) return;
         
@@ -78,8 +80,15 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
         <Breadcrumbs paths={breadcrumbPaths} />
 
         <div className="shop-layout">
-          <aside className="shop-sidebar">
-            <Sidebar onApplyFilter={handleApplyFilter} initialFilters={searchParams} />
+          {/* Mobile Filter Overlay */}
+          {isFilterOpen && <div className="mobile-filter-overlay" onClick={() => setIsFilterOpen(false)} />}
+
+          <aside className={`shop-sidebar ${isFilterOpen ? 'mobile-open' : ''}`}>
+            <Sidebar 
+              onApplyFilter={handleApplyFilter} 
+              initialFilters={searchParams} 
+              onClose={() => setIsFilterOpen(false)}
+            />
           </aside>
 
           <main className="shop-content">
@@ -91,6 +100,11 @@ export default function ShopPageContent({ initialProducts, initialTotal, searchP
                 </p>
               </div>
               <div className="header-right">
+                <button className="mobile-filter-trigger" onClick={() => setIsFilterOpen(true)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H21M6 12H18M10 18H14" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
                 <span className="sort-label">Sort by:</span>
                 <div className="shop-sort-wrapper">
                   <CustomSelect

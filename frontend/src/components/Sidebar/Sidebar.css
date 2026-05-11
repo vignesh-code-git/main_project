@@ -266,3 +266,9 @@ input[type="range"]::-moz-range-thumb {
 .apply-filter-btn:hover {
   opacity: 0.9;
 }
+
+@media (min-width: 1025px) {
+  .sidebar-close-btn {
+    display: none !important;
+  }
+}
