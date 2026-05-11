@@ -418,14 +418,19 @@ export default function SellerDashboard() {
 
           {activeTab === 'orders' && (
             <div className="orders-section">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div className="section-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2>Order Fulfillment</h2>
-                {orderPagination.totalPages > 1 && (
-                  <Pagination 
-                    currentPage={orderPagination.currentPage}
-                    totalPages={orderPagination.totalPages}
-                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
-                  />
+                {orderPagination.total > 0 && (
+                  <div className="pagination-wrapper top" style={{ border: 'none', padding: 0, margin: 0, display: 'flex', alignItems: 'center' }}>
+                    <div className="pagination-info" style={{ marginRight: '15px', color: 'var(--text-muted)', fontSize: '14px' }}>
+                      Showing {((orderPagination.currentPage - 1) * 9) + 1} to {Math.min(orderPagination.currentPage * 9, orderPagination.total)} of {orderPagination.total} orders
+                    </div>
+                    <Pagination 
+                      currentPage={orderPagination.currentPage}
+                      totalPages={orderPagination.totalPages}
+                      onPageChange={(page) => fetchSellerOrders(user.id, page)}
+                    />
+                  </div>
                 )}
               </div>
               <div className="product-table-container">
@@ -495,8 +500,11 @@ export default function SellerDashboard() {
                 </table>
               </div>
               
-              {orderPagination.totalPages > 1 && (
-                <div className="pagination-wrapper bottom" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+              {orderPagination.total > 0 && (
+                <div className="pagination-wrapper bottom" style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="pagination-info" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+                    Showing {((orderPagination.currentPage - 1) * 9) + 1} to {Math.min(orderPagination.currentPage * 9, orderPagination.total)} of {orderPagination.total} orders
+                  </div>
                   <Pagination 
                     currentPage={orderPagination.currentPage}
                     totalPages={orderPagination.totalPages}
