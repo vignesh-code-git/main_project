@@ -115,7 +115,7 @@ export default function SellerDashboard() {
 
   const fetchSellerOrders = async (sellerId, page = 1) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/orders/seller?page=${page}&limit=9`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/seller/${sellerId}?page=${page}&limit=9`, {
         headers: getAuthHeaders()
       });
       const data = await res.json();
@@ -450,7 +450,7 @@ export default function SellerDashboard() {
                           <td>
                             <div className="mini-item-list-seller">
                               {(order.OrderItems || [])
-                                .filter(item => item.Product?.sellerId === user?.id)
+                                .filter(item => String(item.Product?.sellerId) === String(user?.id))
                                 .map((item, idx) => (
                                   <div key={idx} className="seller-mini-item">
                                     {item.Product?.name} (x{item.quantity})

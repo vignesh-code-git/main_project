@@ -247,9 +247,13 @@ exports.getOrderById = async (req, res) => {
 
 exports.getSellerOrders = async (req, res) => {
   try {
-    const { sellerId } = req.params;
+    const sellerId = req.params.sellerId || req.user?.id;
     const { page = 1, limit = 9 } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    if (!sellerId) {
+      return res.status(400).json({ message: 'Seller ID is required' });
+    }
 
     const { count, rows: orders } = await Order.findAndCountAll({
       include: [
@@ -260,7 +264,7 @@ exports.getSellerOrders = async (req, res) => {
             {
               model: Product,
               required: true,
-              where: { sellerId: sellerId },
+              where: { sellerId: parseInt(sellerId) },
               include: [{ model: ProductImage, as: 'images' }]
             }
           ]
@@ -270,7 +274,8 @@ exports.getSellerOrders = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']],
-      distinct: true
+      distinct: true,
+      subQuery: false // Critical for correct joins with pagination
     });
 
     res.json({
