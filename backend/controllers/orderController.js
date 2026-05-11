@@ -255,16 +255,39 @@ exports.getSellerOrders = async (req, res) => {
       return res.status(400).json({ message: 'Seller ID is required' });
     }
 
+    // 1. Find all Order IDs that contain at least one product from this seller
+    const sellerItems = await OrderItem.findAll({
+      attributes: ['orderId'],
+      include: [{
+        model: Product,
+        where: { sellerId: parseInt(sellerId) },
+        required: true,
+        attributes: ['id']
+      }],
+      raw: true
+    });
+
+    const orderIds = [...new Set(sellerItems.map(item => item.orderId))];
+
+    if (orderIds.length === 0) {
+      return res.json({
+        orders: [],
+        total: 0,
+        currentPage: parseInt(page),
+        totalPages: 0
+      });
+    }
+
+    // 2. Fetch the orders for those IDs with pagination
+    // We still filter OrderItems to only show THIS seller's items in the dashboard
     const { count, rows: orders } = await Order.findAndCountAll({
+      where: { id: orderIds },
       include: [
         {
           model: OrderItem,
-          required: true,
           include: [
             {
               model: Product,
-              required: true,
-              where: { sellerId: parseInt(sellerId) },
               include: [{ model: ProductImage, as: 'images' }]
             }
           ]
@@ -274,8 +297,7 @@ exports.getSellerOrders = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']],
-      distinct: true,
-      subQuery: false // Critical for correct joins with pagination
+      distinct: true
     });
 
     res.json({

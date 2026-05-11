@@ -443,39 +443,47 @@ export default function SellerDashboard() {
                   </thead>
                   <tbody>
                     {Array.isArray(orders) && orders.length > 0 ? (
-                      orders.map((order) => (
-                        <tr key={order.id}>
-                          <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
-                          <td>{order.User?.name}</td>
-                          <td>
-                            <div className="mini-item-list-seller">
-                              {(order.OrderItems || [])
-                                .filter(item => String(item.Product?.sellerId) === String(user?.id))
-                                .map((item, idx) => (
+                      orders.map((order) => {
+                        const sellerItems = (order.OrderItems || []).filter(item => String(item.Product?.sellerId) === String(user?.id));
+                        const otherItemsCount = (order.OrderItems || []).length - sellerItems.length;
+
+                        return (
+                          <tr key={order.id}>
+                            <td style={{ fontWeight: '800', fontFamily: 'monospace' }}>#{order.id.split('-')[0].toUpperCase()}</td>
+                            <td>{order.User?.name}</td>
+                            <td>
+                              <div className="mini-item-list-seller">
+                                {sellerItems.map((item, idx) => (
                                   <div key={idx} className="seller-mini-item">
                                     {item.Product?.name} (x{item.quantity})
                                   </div>
                                 ))}
-                            </div>
-                          </td>
-                          <td>₹{order.totalAmount}</td>
-                          <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                          <td>
-                            <span className={`status-pill ${order.status.toLowerCase()}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td>
-                            <div style={{ width: '130px' }}>
-                              <CustomSelect 
-                                options={['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']}
-                                value={order.status} 
-                                onChange={(e) => handleStatusUpdate(order.id, e.target.value)} 
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                                {otherItemsCount > 0 && (
+                                  <div className="other-items-notice" style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '5px' }}>
+                                    + {otherItemsCount} other item(s) from different sellers
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td>₹{order.totalAmount}</td>
+                            <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                            <td>
+                              <span className={`status-pill ${order.status.toLowerCase()}`}>
+                                {order.status}
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ width: '150px' }}>
+                                <CustomSelect 
+                                  options={['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']}
+                                  value={order.status} 
+                                  onChange={(e) => handleStatusUpdate(order.id, e.target.value)} 
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan="7" style={{ textAlign: 'center', padding: '40px' }}>
@@ -486,6 +494,16 @@ export default function SellerDashboard() {
                   </tbody>
                 </table>
               </div>
+              
+              {orderPagination.totalPages > 1 && (
+                <div className="pagination-wrapper bottom" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <Pagination 
+                    currentPage={orderPagination.currentPage}
+                    totalPages={orderPagination.totalPages}
+                    onPageChange={(page) => fetchSellerOrders(user.id, page)}
+                  />
+                </div>
+              )}
             </div>
           )}
 
