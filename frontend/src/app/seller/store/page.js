@@ -97,162 +97,171 @@ export default function StoreProfilePage() {
         </button>
       </div>
 
-      <div className="store-details-grid">
-        <div className="details-card main-info">
-          <div className="card-header">
-            <Building size={20} />
-            <h2>Business Information</h2>
-          </div>
-
-          <form onSubmit={handleSubmit} className={`store-form ${isEditing ? 'editing' : ''}`}>
-            <div className="form-group-v3">
-              <label>Store Name</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.storeName}
-                  onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                  required
-                />
-              ) : (
-                <p>{formData.storeName || 'N/A'}</p>
-              )}
+      <form onSubmit={handleSubmit}>
+        <div className="store-details-grid">
+          <div className="details-card main-info">
+            <div className="card-header">
+              <Building size={20} />
+              <h2>Business Information</h2>
             </div>
 
-            <div className="form-group-v3">
-              <label>About Store</label>
-              {isEditing ? (
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                />
-              ) : (
-                <p className="description-text">{formData.description}</p>
-              )}
-            </div>
-
-            <div className="contact-info-grid">
+            <div className={`store-form ${isEditing ? 'editing' : ''}`}>
               <div className="form-group-v3">
-                <label><Phone size={14} /> Phone Number</label>
+                <label>Store Name</label>
                 {isEditing ? (
                   <input
-                    type="tel"
-                    value={formData.phoneNumber}
-                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    type="text"
+                    value={formData.storeName}
+                    onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
+                    required
                   />
                 ) : (
-                  <p>{formData.phoneNumber || 'N/A'}</p>
+                  <p>{formData.storeName || 'N/A'}</p>
                 )}
               </div>
+
               <div className="form-group-v3">
-                <label><Mail size={14} /> Email Address</label>
-                <p className="readonly">{user?.email}</p>
+                <label>About Store</label>
+                {isEditing ? (
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    rows={4}
+                  />
+                ) : (
+                  <p className="description-text">{formData.description}</p>
+                )}
+              </div>
+
+              <div className="contact-info-grid">
+                <div className="form-group-v3">
+                  <label><Phone size={14} /> Phone Number</label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                    />
+                  ) : (
+                    <p>{formData.phoneNumber || 'N/A'}</p>
+                  )}
+                </div>
+                <div className="form-group-v3">
+                  <label><Mail size={14} /> Email Address</label>
+                  <p className="readonly">{user?.email}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="details-card address-info">
+            <div className="card-header">
+              <MapPin size={20} />
+              <h2>Store Location</h2>
+            </div>
+
+            <div className={`store-form ${isEditing ? 'editing' : ''}`}>
+              <div className="form-group-v3">
+                <label>Street Address</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Enter street address"
+                  />
+                ) : (
+                  <p>{formData.address || 'N/A'}</p>
+                )}
+              </div>
+
+              <div className="form-grid-v3">
+                <div className="form-group-v3">
+                  <label>City</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="City"
+                    />
+                  ) : (
+                    <p>{formData.city || 'N/A'}</p>
+                  )}
+                </div>
+                <div className="form-group-v3">
+                  <label>State</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                      placeholder="State"
+                    />
+                  ) : (
+                    <p>{formData.state || 'N/A'}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-grid-v3">
+                <div className="form-group-v3">
+                  <label>Zip Code</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={formData.zipCode}
+                      onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                      placeholder="Zip code"
+                    />
+                  ) : (
+                    <p>{formData.zipCode || 'N/A'}</p>
+                  )}
+                </div>
+                <div className="form-group-v3">
+                  <label>Country</label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={formData.country}
+                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                      placeholder="Country"
+                    />
+                  ) : (
+                    <p>{formData.country || 'N/A'}</p>
+                  )}
+                </div>
               </div>
             </div>
 
-            {isEditing && (
-              <button type="submit" className={`save-store-btn ${!hasChanges ? 'disabled' : ''}`} disabled={loading || !hasChanges}>
-                {loading ? 'Saving...' : <><Save size={18} /> Save Changes</>}
-              </button>
-            )}
-          </form>
+            <div className="location-map-preview">
+              {formData.address ? (
+                <iframe
+                  width="100%"
+                  height="200"
+                  style={{ border: 0, borderRadius: '12px' }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipCode}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                ></iframe>
+              ) : (
+                <div className="map-placeholder">
+                  <Globe size={32} />
+                  <span>Add your business address to see the map</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="details-card address-info">
-          <div className="card-header">
-            <MapPin size={20} />
-            <h2>Store Location</h2>
+        {isEditing && (
+          <div className="form-actions-sticky">
+            <button type="submit" className={`save-store-btn ${!hasChanges ? 'disabled' : ''}`} disabled={loading || !hasChanges}>
+              {loading ? 'Saving...' : <><Save size={18} /> Save Changes</>}
+            </button>
           </div>
-
-          <div className={`store-form ${isEditing ? 'editing' : ''}`}>
-            <div className="form-group-v3">
-              <label>Street Address</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                />
-              ) : (
-                <p>{formData.address || 'N/A'}</p>
-              )}
-            </div>
-
-            <div className="form-grid-v3">
-              <div className="form-group-v3">
-                <label>City</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  />
-                ) : (
-                  <p>{formData.city || 'N/A'}</p>
-                )}
-              </div>
-              <div className="form-group-v3">
-                <label>State</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  />
-                ) : (
-                  <p>{formData.state || 'N/A'}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="form-grid-v3">
-              <div className="form-group-v3">
-                <label>Zip Code</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.zipCode}
-                    onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-                  />
-                ) : (
-                  <p>{formData.zipCode || 'N/A'}</p>
-                )}
-              </div>
-              <div className="form-group-v3">
-                <label>Country</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  />
-                ) : (
-                  <p>{formData.country || 'N/A'}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="location-map-preview">
-            {formData.address ? (
-              <iframe
-                width="100%"
-                height="300"
-                style={{ border: 0, borderRadius: '12px' }}
-                loading="lazy"
-                allowFullScreen
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(`${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipCode}`)}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-              ></iframe>
-            ) : (
-              <div className="map-placeholder">
-                <Globe size={32} />
-                <span>Add your business address to see the map</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+        )}
+      </form>
 
       {message.text && (
         <div className={`message-toast ${message.type}`}>

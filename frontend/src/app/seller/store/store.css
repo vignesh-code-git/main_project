@@ -210,6 +210,18 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
+.form-actions-sticky {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+  animation: slideUp 0.3s ease-out;
+}
+
+.form-actions-sticky .save-store-btn {
+  max-width: 300px;
+  margin-top: 0;
+}
+
 /* Map Preview */
 .location-map-preview {
   margin-top: 24px;
